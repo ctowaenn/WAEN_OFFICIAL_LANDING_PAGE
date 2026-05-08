@@ -383,14 +383,7 @@ button, input, textarea { font-family: inherit; }
   border-top: 1px solid var(--beige);
   padding-top: 28px;
 }
-.scan-video {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 18px;
-  background: #0c0c0c;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
-}
+.scan-tech:empty { display: none; }
 
 /* ================================================================
    03 — TICKER
@@ -586,14 +579,18 @@ button, input, textarea { font-family: inherit; }
 ================================================================ */
 #s-vision {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Exact desktop layout: 592px video + 466px text */
+  grid-template-columns: 592px 466px;
   min-height: 760px;
+  justify-content: center;
   background: var(--black);
+  width: 100%;
 }
 .vision-left {
   position: relative;
   overflow: hidden;
   background: #332e2b;
+  min-width: 0;
 }
 .vision-video {
   position: absolute;
@@ -608,6 +605,7 @@ button, input, textarea { font-family: inherit; }
   flex-direction: column;
   justify-content: space-between;
   border-left: 1px solid rgba(255,255,255,0.06);
+  min-width: 0;
 }
 .vision-tag {
   font-size: 10px;
