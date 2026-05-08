@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="WAENN — Moda con criterio. Diseño, tecnología y fit real. Spain, Est. 2025.">
+  <meta name="theme-color" content="#0c0c0c">
+  <title>WAENN — Vestir con Criterio</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0c0c'/><text x='50%' y='72%' dominant-baseline='middle' text-anchor='middle' font-size='54' font-family='Arial Black,Arial,sans-serif' font-weight='900' fill='white'>NN</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ================================================================
+       RESET & BASE
+    ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+    button, input, textarea { font-family: inherit; }
+
+    /* ================================================================
+       VARIABLES
+    ================================================================ */
+    :root {
+      --black:   #0c0c0c;
+      --dark:    #1a1a1a;
+      --red:     #c8102e;
+      --white:   #ffffff;
+      --beige:   #e8e3dc;
+      --tan:     #7a756e;
+      --nav-h:   72px;
+    }
+
+    /* ================================================================
+       SCROLL-REVEAL
+    ================================================================ */
+    .rv {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+    .rv-fade {
+      opacity: 0;
+      transition: opacity 1s cubic-bezier(0.16,1,0.3,1);
+    }
+    .rv.show, .rv-fade.show { opacity: 1; transform: none; }
+    .d1 { transition-delay: 0.10s; }
+    .d2 { transition-delay: 0.22s; }
+    .d3 { transition-delay: 0.34s; }
+    .d4 { transition-delay: 0.46s; }
+    .d5 { transition-delay: 0.58s; }
+
+    /* ================================================================
+       GLASS BUTTON
+    ================================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 0.75px solid rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.62);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow:
+        0 1px 8px 2px rgba(0,0,0,0.05),
+        0 4px 28px 0 rgba(0,0,0,0.10),
+        inset 0 1px 0 0 rgba(255,255,255,0.75);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: #0f0f14;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.25s, box-shadow 0.25s, transform 0.18s;
+      padding: 0 28px;
+      height: 42px;
+    }
+    .btn:hover {
+      background: rgba(255,255,255,0.90);
+      box-shadow: 0 2px 16px 4px rgba(0,0,0,0.10), 0 6px 36px 0 rgba(0,0,0,0.14), inset 0 1px 0 0 rgba(255,255,255,0.9);
+      transform: translateY(-1px);
+    }
+    .btn-dark {
+      background: rgba(20,20,20,0.72);
+      border-color: rgba(255,255,255,0.22);
+      color: #fff;
+    }
+    .btn-dark:hover {
+      background: rgba(40,40,40,0.90);
+    }
+
+    /* ================================================================
+       NAV
+    ================================================================ */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 900;
+      background: rgba(255,255,255,0.97);
+      border-bottom: 1px solid var(--beige);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      transition: background 0.35s, border-color 0.35s;
+    }
+    #nav.dark {
+      background: rgba(12,12,12,0.97);
+      border-color: rgba(255,255,255,0.08);
+    }
+    #nav-logo {
+      height: 20px;
+      width: auto;
+      flex-shrink: 0;
+    }
+    #nav-logo-img {
+      height: 20px;
+      width: auto;
+      transition: filter 0.35s;
+    }
+    #nav.dark #nav-logo-img { filter: invert(1); }
+    #nav-links {
+      display: flex;
+      align-items: center;
+      gap: 52px;
+      margin-left: auto;
+      margin-right: 40px;
+    }
+    #nav-links a {
+      font-size: 11px;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+    #nav.dark #nav-links a { color: rgba(255,255,255,0.75); }
+    #nav-links a:hover { color: var(--red); }
+    #nav .btn {
+      height: 38px;
+      font-size: 10px;
+      letter-spacing: 1.2px;
+      padding: 0 22px;
+    }
+
+    /* ================================================================
+       01 — INTRO / NN MASK
+    ================================================================ */
+    #s-intro {
+      position: relative;
+      height: calc(100vh + 900px);
+      background: var(--black);
+    }
+    .intro-pin {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--black);
+    }
+    .intro-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.25;
+    }
+    .intro-mask {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      /* NN visual center: 47.5% x, 51% y (from Figma node coords) */
+      transform-origin: 47.5% 51%;
+      will-change: transform;
+    }
+    /* text behind mask (visible through NN cutout) */
+    .intro-tagline {
+      position: absolute;
+      bottom: 152px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(28px,3.5vw,48px);
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: rgba(255,255,255,0.28);
+      white-space: nowrap;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    /* ================================================================
+       02 — HERO TEXT
+    ================================================================ */
+    #s-hero {
+      position: relative;
+      background: #fff;
+      padding: var(--nav-h) 0 0;
+      min-height: 700px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    .hero-inner {
+      position: relative;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 62px 47px 80px;
+      min-height: 700px;
+    }
+    .hero-tag {
+      font-size: 11px;
+      letter-spacing: 4.4px;
+      text-transform: uppercase;
+      color: var(--dark);
+      margin-bottom: 100px;
+    }
+    .hero-h1-wrap {
+      position: relative;
+    }
+    .hero-h1 {
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(64px, 9.5vw, 128px);
+      font-weight: 900;
+      line-height: 0.86;
+      color: var(--dark);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+    .hero-h1-red {
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(64px, 9.5vw, 128px);
+      font-weight: 900;
+      line-height: 0.86;
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      display: block;
+      margin-top: 0;
+    }
+    .hero-aside {
+      position: absolute;
+      right: 47px;
+      top: 62px;
+      width: min(498px, 38vw);
+    }
+    .hero-body {
+      font-size: clamp(15px,1.4vw,20px);
+      line-height: 1.75;
+      color: var(--dark);
+      margin-bottom: 40px;
+    }
+    .hero-cta-row {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .hero-cta-row .btn { height: 50px; font-size: 11px; padding: 0 32px; }
+    .hero-link {
+      font-size: 11px;
+      letter-spacing: 2.42px;
+      color: var(--tan);
+      font-weight: 700;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .hero-link:hover { color: var(--dark); }
+    .hero-divider {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: var(--beige);
+    }
+
+    /* ================================================================
+       04 — APP / PHONE SECTION
+    ================================================================ */
+    #s-app {
+      position: relative;
+      background: #fff;
+      overflow: hidden;
+    }
+    .app-inner {
+      position: relative;
+      max-width: 1440px;
+      margin: 0 auto;
+      min-height: 700px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 47px;
+    }
+    .app-tag {
+      font-size: 11px;
+      letter-spacing: 4.4px;
+      color: var(--dark);
+      text-transform: uppercase;
+      margin-bottom: 60px;
+      align-self: flex-start;
+    }
+    .app-phone-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+    }
+    .app-phone {
+      width: min(380px, 55vw);
+      height: auto;
+      display: block;
+      will-change: transform;
+      transform-origin: center center;
+      filter: drop-shadow(0 24px 60px rgba(0,0,0,0.18));
+      transition: transform 0.05s linear;
+    }
+
+    /* ================================================================
+       03 — TICKER
+    ================================================================ */
+    #s-ticker {
+      position: relative;
+      height: 48px;
+      overflow: hidden;
+      border-top: 1px solid var(--beige);
+      border-bottom: 1px solid var(--beige);
+      background: #fff;
+    }
+    .ticker-track {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      white-space: nowrap;
+      animation: tickerMove 28s linear infinite;
+      will-change: transform;
+    }
+    .ticker-item {
+      font-size: 11px;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--dark);
+      padding: 0 0 0 46px;
+      font-weight: 400;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    .ticker-dot {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      color: var(--red);
+      padding: 0 0 0 46px;
+    }
+    @keyframes tickerMove {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ================================================================
+       05 — DIFERENCIA
+    ================================================================ */
+    #s-dif {
+      background: var(--black);
+      padding: 80px 0 80px;
+    }
+    .dif-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 56px;
+    }
+    .dif-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+    .dif-h1 {
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(52px, 7.5vw, 100px);
+      font-weight: 900;
+      line-height: 0.86;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+    .dif-intro {
+      font-size: clamp(14px,1.3vw,18px);
+      line-height: 1.75;
+      color: rgba(255,255,255,0.80);
+      max-width: 440px;
+      align-self: center;
+    }
+    .dif-rule {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 0 0 40px;
+    }
+    .dif-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    .dif-col {
+      padding: 0 0 0 0;
+      padding-right: 40px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .dif-col:last-child { border-right: none; padding-right: 0; }
+    .dif-col + .dif-col { padding-left: 40px; }
+    .dif-num {
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(32px,3.5vw,44px);
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .dif-label {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      color: #fff;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .dif-text {
+      font-size: 15px;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.82);
+    }
+
+    /* ================================================================
+       06 — ACCESO ANTICIPADO
+    ================================================================ */
+    #s-access {
+      background: #fff;
+    }
+    .access-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 760px;
+    }
+    .access-left {
+      padding: 140px 56px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--beige);
+    }
+    .access-h2 {
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(44px, 6.2vw, 84px);
+      font-weight: 900;
+      line-height: 0.86;
+      color: var(--dark);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+    .access-h2-red { color: var(--red); display: block; }
+    .access-sub {
+      font-size: clamp(15px,1.3vw,18px);
+      line-height: 1.75;
+      color: var(--dark);
+      max-width: 500px;
+      margin-top: 60px;
+    }
+    .access-right {
+      padding: 140px 56px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .form-group {
+      margin-bottom: 60px;
+    }
+    .form-label {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #2b2b2b;
+      margin-bottom: 28px;
+      display: block;
+    }
+    .form-input {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(26,26,26,0.15);
+      padding: 0 0 12px;
+      font-size: 18px;
+      color: var(--dark);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input::placeholder { color: rgba(26,26,26,0.20); }
+    .form-input:focus { border-color: rgba(26,26,26,0.45); }
+    .access-right .btn {
+      height: 52px;
+      width: 100%;
+      font-size: 11px;
+      letter-spacing: 2.2px;
+      margin-top: auto;
+    }
+
+    /* ================================================================
+       07 — VISIÓN
+    ================================================================ */
+    #s-vision {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 760px;
+      background: var(--black);
+    }
+    .vision-left {
+      position: relative;
+      overflow: hidden;
+      background: #332e2b;
+    }
+    .vision-video {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .vision-right {
+      background: var(--black);
+      padding: 60px 56px 60px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-left: 1px solid rgba(255,255,255,0.06);
+    }
+    .vision-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: var(--red);
+      text-transform: uppercase;
+    }
+    .vision-h2 {
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(40px, 5.5vw, 70px);
+      font-weight: 900;
+      line-height: 0.86;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+    .vision-body {
+      font-size: clamp(14px,1.25vw,17px);
+      line-height: 1.8;
+      color: rgba(255,255,255,0.88);
+    }
+    .vision-body + .vision-body { margin-top: 28px; }
+    .vision-right .btn { align-self: flex-start; height: 44px; font-size: 10px; }
+
+    /* ================================================================
+       08 — MARCA / PILARES
+    ================================================================ */
+    #s-marca {
+      background: #fff;
+      padding: 115px 0 80px;
+    }
+    .marca-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 50px;
+    }
+    .marca-h2 {
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(40px, 7vw, 96px);
+      font-weight: 900;
+      line-height: 0.86;
+      color: var(--dark);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      margin-bottom: 80px;
+    }
+    .marca-rule {
+      border: none;
+      border-top: 1px solid var(--beige);
+      margin: 0 6px 0;
+    }
+    .pilares-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 0;
+    }
+    .pilar {
+      padding: 48px 0 0 0;
+      padding-right: 32px;
+      border-right: 1px solid var(--beige);
+    }
+    .pilar:last-child { border-right: none; padding-right: 0; }
+    .pilar + .pilar { padding-left: 32px; }
+    .pilar-name {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.82px;
+      color: var(--dark);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .pilar-text {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--tan);
+    }
+
+    /* ================================================================
+       09 — EDITORIAL MOSAIC
+    ================================================================ */
+    #s-mosaic {
+      display: grid;
+      grid-template-columns: 575fr 383fr 479fr;
+      grid-template-rows: 494px 406px;
+      height: 900px;
+      background: var(--beige);
+    }
+    .mosaic-cell {
+      overflow: hidden;
+      position: relative;
+    }
+    .mosaic-cell img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .mosaic-cell:hover img { transform: scale(1.04); }
+    .mosaic-cell-1 { grid-row: 1 / 3; }
+    .mosaic-label {
+      position: absolute;
+      bottom: 20px; left: 20px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 2.8px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* ================================================================
+       10 — HISTORIA / ORIGEN
+    ================================================================ */
+    #s-historia {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 760px;
+      background: #fff;
+    }
+    .historia-left {
+      padding: 100px 56px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--beige);
+    }
+    .historia-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: var(--red);
+      text-transform: uppercase;
+    }
+    .historia-h2 {
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(38px, 4.8vw, 64px);
+      font-weight: 900;
+      line-height: 0.86;
+      color: var(--dark);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+    .historia-h2-red { color: var(--red); }
+    .historia-body {
+      font-size: clamp(14px,1.25vw,17px);
+      line-height: 1.8;
+      color: var(--tan);
+    }
+    .historia-body + .historia-body { margin-top: 24px; }
+    .historia-right {
+      position: relative;
+      overflow: hidden;
+      background: #9a9490;
+    }
+    .historia-right img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    /* ================================================================
+       11 — FOOTER
+    ================================================================ */
+    #s-footer {
+      background: var(--black);
+      min-height: 300px;
+      position: relative;
+    }
+    .footer-top-rule {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .footer-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 64px 41px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .footer-logo {
+      height: 65px;
+      width: auto;
+    }
+    .footer-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: right;
+    }
+    .footer-nav a {
+      font-size: 12px;
+      letter-spacing: 1.92px;
+      color: #fff;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .footer-nav a:hover { color: var(--red); }
+    .footer-bottom {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 56px 0;
+    }
+    .footer-bottom-rule {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 28px;
+      margin-top: 40px;
+    }
+    .footer-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 36px;
+    }
+    .footer-copy {
+      font-size: 11px;
+      letter-spacing: 0.88px;
+      color: rgba(255,255,255,0.5);
+    }
+    .footer-social {
+      display: flex;
+      gap: 36px;
+    }
+    .footer-social a {
+      font-size: 11px;
+      letter-spacing: 1.76px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .footer-social a:hover { color: #fff; }
+
+    /* ================================================================
+       MOBILE RESPONSIVE
+    ================================================================ */
+    @media (max-width: 900px) {
+      #nav-links { display: none; }
+      .hero-aside { position: static; width: 100%; margin-top: 48px; }
+      .hero-inner { padding: 48px 24px 60px; min-height: auto; }
+      .hero-tag { margin-bottom: 48px; }
+      .dif-top { grid-template-columns: 1fr; }
+      .dif-cols { grid-template-columns: 1fr; }
+      .dif-col { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 0 32px; margin-bottom: 32px; }
+      .dif-col + .dif-col { padding-left: 0; }
+      .access-inner { grid-template-columns: 1fr; }
+      .access-left { padding: 80px 28px 48px; border-right: none; border-bottom: 1px solid var(--beige); }
+      .access-right { padding: 48px 28px 80px; }
+      #s-vision { grid-template-columns: 1fr; }
+      .vision-left { min-height: 320px; }
+      .pilares-grid { grid-template-columns: 1fr 1fr; }
+      .pilar { padding-right: 16px; }
+      .pilar + .pilar { padding-left: 16px; }
+      #s-mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: 260px 260px 260px; height: auto; }
+      .mosaic-cell-1 { grid-row: auto; }
+      #s-historia { grid-template-columns: 1fr; }
+      .historia-right { min-height: 380px; position: relative; }
+      .footer-inner { flex-direction: column; gap: 40px; }
+      .footer-nav { text-align: left; }
+    }
+    @media (max-width: 600px) {
+      .hero-h1, .hero-h1-red { font-size: 52px; }
+      .dif-inner { padding: 0 24px; }
+      .marca-inner { padding: 0 24px; }
+      .pilares-grid { grid-template-columns: 1fr; }
+      .pilar { border-right: none; padding: 0 0 32px; margin-bottom: 0; }
+      .pilar + .pilar { padding-left: 0; }
+      #s-mosaic { grid-template-columns: 1fr; grid-template-rows: repeat(5, 240px); }
+    }
+
+    /* ================================================================
+       REDUCED MOTION
+    ================================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      .rv, .rv-fade { transition: none; opacity: 1; transform: none; }
+      .ticker-track { animation: none; }
+      .intro-mask { transition: none; }
+      .app-phone { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       NAV
+  ============================================================ -->
+  <nav id="nav" role="navigation" aria-label="Navegación principal">
+    <a id="nav-logo" href="#" aria-label="WAENN — Inicio">
+      <!-- Black logo for light bg, inverted via CSS for dark bg -->
+      <img id="nav-logo-img"
+           src="https://www.figma.com/api/mcp/asset/fdbe41b6-e4a6-48d5-b7c5-14310409656d"
+           alt="WAENN"
+           height="20">
+    </a>
+    <div id="nav-links">
+      <a href="#s-marca">MARCA</a>
+      <a href="#s-dif">DIFERENCIA</a>
+      <a href="#s-vision">VISIÓN</a>
+    </div>
+    <a href="#s-access" class="btn" role="button">ACCESO ANTICIPADO</a>
+  </nav>
+
+  <!-- ============================================================
+       01 — INTRO / NN MASK SCROLL REVEAL
+  ============================================================ -->
+  <section id="s-intro" aria-label="Intro">
+    <div class="intro-pin" id="introPin">
+      <!-- Fashion photo behind the mask -->
+      <img class="intro-photo"
+           src="https://www.figma.com/api/mcp/asset/f26bcc26-ffbb-4a69-8a27-467c70f4544c"
+           alt="">
+      <!-- NN cutout mask — black layer with transparent NN, scales on scroll -->
+      <img class="intro-mask" id="introMask"
+           src="https://www.figma.com/api/mcp/asset/6c79e254-875b-4034-9c11-7b85d2a04e20"
+           alt="">
+    </div>
+  </section>
+
+  <!-- ============================================================
+       02 — HERO TEXT
+  ============================================================ -->
+  <section id="s-hero" aria-label="VESTIR CON CRITERIO">
+    <img class="hero-bg"
+         src="https://www.figma.com/api/mcp/asset/24763633-b2b4-43f6-9473-4733d0e8ad09"
+         alt="">
+    <div class="hero-inner">
+      <p class="hero-tag rv">SPAIN | EST.2025</p>
+
+      <div class="hero-h1-wrap">
+        <h1>
+          <span class="hero-h1 rv d1">VESTIR<br>CON</span>
+          <span class="hero-h1-red rv d2">CRITERIO.</span>
+        </h1>
+
+        <aside class="hero-aside">
+          <p class="hero-body rv d2">
+            WAENN nace para quienes no compran por impulso. Para quienes buscan una prenda que permanezca, que encaje de verdad y que diga algo sobre quién eres.
+          </p>
+          <div class="hero-cta-row rv d3">
+            <!-- href: conectar con formulario de lista de espera -->
+            <a href="#s-access" class="btn">UNIRME A LA LISTA</a>
+            <a href="#s-marca" class="hero-link">CONOCE LA MARCA ↓</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <div class="hero-divider"></div>
+  </section>
+
+  <!-- ============================================================
+       04 — APP / PHONE SHOWCASE
+  ============================================================ -->
+  <section id="s-app" aria-label="Experiencia Atelier Digital">
+    <div class="app-inner">
+      <p class="app-tag rv">EXPERIENCIA ATELIER A MEDIDA</p>
+      <div class="app-phone-wrap">
+        <img id="appPhone"
+             class="app-phone"
+             src="https://www.figma.com/api/mcp/asset/174f6aa7-c34b-482a-95db-7a43da794147"
+             alt="WAENN — App Atelier a Medida">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       03 — TICKER
+  ============================================================ -->
+  <div id="s-ticker" role="marquee" aria-label="Keywords">
+    <div class="ticker-track" aria-hidden="true">
+      <!-- Duplicated for seamless loop -->
+      <span class="ticker-item">MODA CON IDENTIDAD</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">DISEÑO &amp; TECNOLOGÍA</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">SPAIN | EST.2025</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">FIT REAL</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">PERMANENCIA SOBRE TENDENCIA</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">ATELIER DIGITAL</span>
+      <span class="ticker-dot">·</span>
+      <!-- duplicate -->
+      <span class="ticker-item">MODA CON IDENTIDAD</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">DISEÑO &amp; TECNOLOGÍA</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">SPAIN | EST.2025</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">FIT REAL</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">PERMANENCIA SOBRE TENDENCIA</span>
+      <span class="ticker-dot">·</span>
+      <span class="ticker-item">ATELIER DIGITAL</span>
+      <span class="ticker-dot">·</span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       05 — DIFERENCIA
+  ============================================================ -->
+  <section id="s-dif" aria-label="Lo que nos hace distintas">
+    <div class="dif-inner">
+      <div class="dif-top">
+        <h2 class="dif-h1 rv">
+          LO QUE NOS<br>
+          HACE<br>
+          <span style="color:var(--white)">DISTINTAS.</span>
+        </h2>
+        <p class="dif-intro rv d2">
+          No somos una marca de colección genérica. Somos el punto de encuentro entre la artesanía del diseño, la precisión de la tecnología y la honestidad de entender al cuerpo real.
+        </p>
+      </div>
+
+      <hr class="dif-rule">
+
+      <div class="dif-cols">
+        <div class="dif-col rv d1">
+          <p class="dif-num">01</p>
+          <p class="dif-label">Diseño con intención</p>
+          <p class="dif-text">Cada pieza de WAENN parte de una pregunta: ¿por qué existe esta prenda? No diseñamos por volumen. Diseñamos para que cada pieza tenga una razón de estar en tu armario y seguir ahí.</p>
+        </div>
+        <div class="dif-col rv d2">
+          <p class="dif-num">02</p>
+          <p class="dif-label">Tecnología aplicada al fit</p>
+          <p class="dif-text">Usamos tecnología no como marketing, sino como herramienta real. Para entender cómo se mueve un cuerpo, cómo cae una tela y cómo se siente una prenda cuando te la pones de verdad.</p>
+        </div>
+        <div class="dif-col rv d3">
+          <p class="dif-num">03</p>
+          <p class="dif-label">Identidad, no tendencia</p>
+          <p class="dif-text">En WAENN no seguimos temporadas. Construimos piezas que hablan del carácter de quien las lleva. La moda como expresión de quién eres, no de lo que está en el feed esta semana.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       06 — ACCESO ANTICIPADO
+  ============================================================ -->
+  <section id="s-access" aria-label="Acceso anticipado">
+    <div class="access-inner">
+      <div class="access-left">
+        <h2 class="access-h2 rv">
+          SÉ PARTE<br>
+          DE LO QUE<br>
+          <span class="access-h2-red">VIENE.</span>
+        </h2>
+        <p class="access-sub rv d2">
+          La primera colección de WAENN está a punto de ser presentada. Déjanos tus datos y serás el/la primerx en conocerla, con acceso exclusivo antes del lanzamiento público.
+        </p>
+      </div>
+      <div class="access-right">
+        <!-- href: conectar con backend / Mailchimp / Convertkit -->
+        <form id="access-form" onsubmit="handleForm(event)" novalidate>
+          <div class="form-group rv d1">
+            <label class="form-label" for="f-name">NOMBRE</label>
+            <input class="form-input" id="f-name" type="text" placeholder="Tu nombre" autocomplete="given-name" required>
+          </div>
+          <div class="form-group rv d2">
+            <label class="form-label" for="f-email">CORREO ELECTRÓNICO</label>
+            <input class="form-input" id="f-email" type="email" placeholder="tu@correo.com" autocomplete="email" required>
+          </div>
+          <div class="form-group rv d3">
+            <label class="form-label" for="f-prenda">¿QUÉ BUSCAS EN UNA PRENDA?</label>
+            <input class="form-input" id="f-prenda" type="text" placeholder="Cuéntanos">
+          </div>
+          <button type="submit" class="btn rv d4" style="width:100%;height:52px;font-size:11px;letter-spacing:2.2px;margin-top:20px;">
+            SOLICITAR ACCESO ANTICIPADO →
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       07 — VISIÓN
+  ============================================================ -->
+  <section id="s-vision" aria-label="Visión">
+    <div class="vision-left">
+      <!-- Video de moda / atelier — sustituir src por ruta real -->
+      <video class="vision-video"
+             src="vision-atelier.mp4"
+             autoplay muted loop playsinline
+             poster="https://www.figma.com/api/mcp/asset/f26bcc26-ffbb-4a69-8a27-467c70f4544c"
+             aria-hidden="true">
+      </video>
+    </div>
+    <div class="vision-right">
+      <p class="vision-tag rv">VISIÓN</p>
+      <h2 class="vision-h2 rv d1">
+        MÁS ALLÁ<br>
+        DE LA<br>
+        COLECCIÓN.
+      </h2>
+      <div>
+        <p class="vision-body rv d2">
+          WAENN empieza con una colección. Pero la visión es más amplia. Estamos construyendo un espacio donde el diseño desde 0, la tecnología de medidas y la experiencia atelier se integran en una sola propuesta.
+        </p>
+        <p class="vision-body rv d3">
+          Un lugar donde tu cuerpo no tiene que adaptarse a la prenda. La prenda se adapta a ti.
+        </p>
+      </div>
+      <!-- href: conectar con página de Atelier cuando esté disponible -->
+      <a href="#" class="btn rv d4">ATELIER DIGITAL — PRÓXIMAMENTE</a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       08 — MARCA / PILARES
+  ============================================================ -->
+  <section id="s-marca" aria-label="Una marca construida sobre cuatro pilares">
+    <div class="marca-inner">
+      <h2 class="marca-h2 rv">
+        UNA MARCA<br>
+        CONSTRUIDA SOBRE<br>
+        CUATRO PILARES.
+      </h2>
+      <hr class="marca-rule">
+      <div class="pilares-grid">
+        <div class="pilar rv d1">
+          <p class="pilar-name">PERMANENCIA</p>
+          <p class="pilar-text">Creamos prendas pensadas para durar. No en tendencia, sino en valor. Piezas que siguen siendo tuyas con el tiempo porque se construyeron bien desde el principio.</p>
+        </div>
+        <div class="pilar rv d2">
+          <p class="pilar-name">IDENTIDAD</p>
+          <p class="pilar-text">Vestir es un acto de comunicación. Cada elección dice algo. En WAENN queremos que lo que digas sea exactamente lo que quieres decir.</p>
+        </div>
+        <div class="pilar rv d3">
+          <p class="pilar-name">FIT REAL</p>
+          <p class="pilar-text">El fit no es un detalle técnico. Es la diferencia entre una prenda que usas y una que olvidas. Diseñamos para cómo se siente el cuerpo.</p>
+        </div>
+        <div class="pilar rv d4">
+          <p class="pilar-name">INNOVACIÓN ÚTIL</p>
+          <p class="pilar-text">La tecnología en WAENN no es decorativa. Es funcional. La usamos para entender y ajustar con más precisión y crear una experiencia de moda única.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       09 — EDITORIAL MOSAIC
+  ============================================================ -->
+  <section id="s-mosaic" aria-label="Editorial WAENN SS25">
+    <div class="mosaic-cell mosaic-cell-1 rv-fade">
+      <img src="https://www.figma.com/api/mcp/asset/92ccd8a3-7f01-4db0-88de-0cbd905a516d"
+           alt="WAENN SS25 — Editorial 1">
+      <span class="mosaic-label">WAENN — SS25</span>
+    </div>
+    <div class="mosaic-cell rv-fade d1">
+      <img src="https://www.figma.com/api/mcp/asset/4b06b587-f56f-4e65-b562-3b84fb12d006"
+           alt="WAENN SS25 — Editorial 2">
+    </div>
+    <div class="mosaic-cell rv-fade d2">
+      <img src="https://www.figma.com/api/mcp/asset/c3f6e8b0-2e0d-4ae9-be38-abced6fa365b"
+           alt="WAENN SS25 — Editorial 4">
+    </div>
+    <div class="mosaic-cell rv-fade d1">
+      <img src="https://www.figma.com/api/mcp/asset/c763fcfe-a5f1-4dcf-8788-0f4bcc86bc32"
+           alt="WAENN SS25 — Editorial 3">
+    </div>
+    <div class="mosaic-cell rv-fade d3">
+      <img src="https://www.figma.com/api/mcp/asset/48a7ea8e-c9f6-4d0f-9d4b-a7ee715bdfc3"
+           alt="WAENN SS25 — Editorial 5">
+    </div>
+  </section>
+
+  <!-- ============================================================
+       10 — HISTORIA / ORIGEN
+  ============================================================ -->
+  <section id="s-historia" aria-label="Origen de WAENN">
+    <div class="historia-left">
+      <p class="historia-tag rv">ORIGEN</p>
+      <h2 class="historia-h2 rv d1">
+        LA MODA<br>
+        MERECÍA OTRA<br>
+        <span class="historia-h2-red">CONVERSACIÓN.</span>
+      </h2>
+      <div>
+        <p class="historia-body rv d2">
+          La moda actual ofrece demasiado y dice muy poco. Colecciones que se olvidan en semanas. Tallas que no tienen en cuenta cómo se siente una persona en su propio cuerpo.
+        </p>
+        <p class="historia-body rv d3">
+          WAENN nació de esa incomodidad. De la convicción de que diseñar bien implica escuchar, entender y construir algo que tenga sentido para quien lo viste, no solo para quien lo vende.
+        </p>
+      </div>
+    </div>
+    <div class="historia-right rv-fade">
+      <img src="https://www.figma.com/api/mcp/asset/e4c2fbe4-0c3f-4490-a375-e9a81e3950ac"
+           alt="WAENN — Folleto de producto">
+    </div>
+  </section>
+
+  <!-- ============================================================
+       11 — FOOTER
+  ============================================================ -->
+  <footer id="s-footer" aria-label="Footer">
+    <hr class="footer-top-rule">
+    <div class="footer-inner">
+      <a href="#" aria-label="WAENN — Inicio">
+        <img class="footer-logo"
+             src="https://www.figma.com/api/mcp/asset/408b6aaa-151d-4c5c-bc9c-51eae511e493"
+             alt="WAENN">
+      </a>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="#s-marca">MARCA</a>
+        <a href="#s-dif">DIFERENCIA</a>
+        <a href="#s-vision">VISIÓN</a>
+        <a href="#s-access">ACCESO ANTICIPADO</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <hr class="footer-bottom-rule">
+      <div class="footer-meta">
+        <p class="footer-copy">ESPAÑA · 2025 · Todos los derechos reservados.</p>
+        <div class="footer-social">
+          <!-- href: reemplazar con URLs reales de redes sociales -->
+          <a href="#" aria-label="Instagram">INSTAGRAM</a>
+          <a href="#" aria-label="LinkedIn">LINKEDIN</a>
+          <a href="#" aria-label="TikTok">TIKTOK</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+  (function () {
+    'use strict';
+
+    const $ = id => document.getElementById(id);
+
+    // ── ELEMENTS ────────────────────────────────────────────────
+    const introSection = $('s-intro');
+    const introPin     = document.querySelector('.intro-pin');
+    const introMask    = $('introMask');
+    const nav          = $('nav');
+    const appSection   = $('s-app');
+    const appPhone     = $('appPhone');
+    const difSection   = $('s-dif');
+
+    // ── INTRO: NN MASK SCALE ON SCROLL ──────────────────────────
+    // The black mask with transparent NN cutout scales from 1 → 14.
+    // As it grows, the black edges leave the viewport, the NN
+    // letters expand to fill the screen, and the hero appears below.
+    function updateIntro() {
+      const vh = window.innerHeight;
+      const maxScroll = introSection.offsetHeight - vh;
+      const p = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
+      // Scale 1 → 22: generous margin so even the nearest dark pixel
+      // to the transform-origin fully exits the viewport before p=1.
+      const scale = 1 + p * 21;
+      introMask.style.transform = `scale(${scale})`;
+      // Hard-cut at 92% progress: guarantee mask is gone before hero
+      introMask.style.opacity = p > 0.92 ? '0' : '1';
+    }
+
+    // ── APP PHONE: SCALE ON SCROLL ───────────────────────────────
+    // Phone grows from scale(0.88) at section entry to scale(2.8)
+    // as the user scrolls through, simulating a zoom-into-screen feel.
+    function updateApp() {
+      if (!appSection || !appPhone) return;
+      const vh       = window.innerHeight;
+      const rect     = appSection.getBoundingClientRect();
+      const sectionH = appSection.offsetHeight;
+
+      // progress: 0 when section top hits viewport bottom → 1 when section bottom hits viewport top
+      const raw = 1 - (rect.bottom / (sectionH + vh));
+      const p   = Math.min(Math.max(raw, 0), 1);
+
+      // Scale: 0.88 → 2.6
+      const scale   = 0.88 + p * 1.72;
+      // Opacity: fade in first 10%, full from 10%→80%, fade out last 20%
+      let opacity = 1;
+      if (p < 0.10) opacity = p / 0.10;
+      else if (p > 0.80) opacity = 1 - (p - 0.80) / 0.20;
+
+      appPhone.style.transform = `scale(${scale})`;
+      appPhone.style.opacity   = opacity.toString();
+    }
+
+    // ── NAV DARK/LIGHT SWITCH ────────────────────────────────────
+    function updateNav() {
+      const introH = introSection.offsetHeight;
+      const vh     = window.innerHeight;
+      const isDark = window.scrollY > introH - vh * 0.3;
+
+      // Also dark over DIFERENCIA, VISIÓN, FOOTER
+      const darkSections = [difSection, $('s-vision'), $('s-footer')];
+      let overDark = false;
+      darkSections.forEach(sec => {
+        if (!sec) return;
+        const r = sec.getBoundingClientRect();
+        if (r.top < 60 && r.bottom > 0) overDark = true;
+      });
+
+      nav.classList.toggle('dark', isDark || overDark);
+    }
+
+    // ── SCROLL HANDLER ──────────────────────────────────────────
+    let rafPending = false;
+    function onScroll() {
+      if (rafPending) return;
+      rafPending = true;
+      requestAnimationFrame(() => {
+        updateIntro();
+        updateApp();
+        updateNav();
+        rafPending = false;
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // initial
+
+    // ── INTERSECTION OBSERVER: SCROLL-REVEAL ────────────────────
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -48px 0px' });
+
+    document.querySelectorAll('.rv, .rv-fade').forEach(el => {
+      revealObserver.observe(el);
+    });
+
+    // ── FORM SUBMIT ─────────────────────────────────────────────
+    // Conectar con Mailchimp / ConvertKit / backend propio
+    window.handleForm = function(e) {
+      e.preventDefault();
+      const btn  = e.target.querySelector('button[type="submit"]');
+      const orig = btn.textContent;
+      btn.textContent = '¡ RECIBIDO — GRACIAS !';
+      btn.style.background = 'rgba(200,16,46,0.12)';
+      btn.style.borderColor = 'rgba(200,16,46,0.4)';
+      btn.style.color = '#c8102e';
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style = '';
+      }, 4000);
+      // TODO: reemplazar con fetch() a tu endpoint de email
+    };
+
+  })();
+  </script>
+</body>
+</html>
