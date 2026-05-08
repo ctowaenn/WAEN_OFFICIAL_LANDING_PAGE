@@ -251,9 +251,9 @@ button, input, textarea, select { font-family: inherit; }
   transform: translateY(4px);
 }
 .intro-coming {
-  font-family: "Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: Arial, sans-serif;
   font-weight: 700;
-  font-size: clamp(14px, 1.7vw, 20px);
+  font-size: clamp(18px, 2.4vw, 30px);
   opacity: 0.88;
 }
 .intro-brand {
@@ -268,7 +268,7 @@ button, input, textarea, select { font-family: inherit; }
   height: clamp(42px, 6.4vw, 86px);
   width: auto;
   /* match previous “bold text” presence on dark bg */
-  filter: drop-shadow(0 10px 40px rgba(0,0,0,0.55)) drop-shadow(0 2px 12px rgba(0,0,0,0.45));
+  filter: invert(1) drop-shadow(0 10px 40px rgba(0,0,0,0.55)) drop-shadow(0 2px 12px rgba(0,0,0,0.45));
   opacity: 0.96;
 }
 .intro-tm {
@@ -1093,6 +1093,11 @@ select.form-input option:checked {
   .pilar { border-right: none; padding: 0 0 32px; margin-bottom: 0; }
   .pilar + .pilar { padding-left: 0; }
   #s-mosaic { grid-template-columns: 1fr; grid-template-rows: repeat(5, 240px); }
+
+  /* App mockups: slightly smaller base size on mobile */
+  .app-phone-stack {
+    width: min(320px, 86vw);
+  }
 }
 
 /* ================================================================

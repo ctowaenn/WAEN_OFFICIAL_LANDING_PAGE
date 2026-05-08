@@ -130,7 +130,12 @@
     const raw = 1 - rect.bottom / (sectionH + vh);
     const p = Math.min(Math.max(raw, 0), 1);
 
-    const scale = 0.88 + p * 1.72;
+    // Mobile: keep the "zoom-in" effect, but cap it so the phone
+    // doesn't overflow the viewport and feel comically large.
+    const isMobile = window.matchMedia && window.matchMedia('(max-width: 600px)').matches;
+    const minScale = isMobile ? 0.82 : 0.88;
+    const maxScale = isMobile ? 1.45 : 2.6;
+    const scale = minScale + p * (maxScale - minScale);
     let opacity = 1;
     if (p < 0.1) opacity = p / 0.1;
     else if (p > 0.8) opacity = 1 - (p - 0.8) / 0.2;
