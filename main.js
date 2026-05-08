@@ -478,27 +478,292 @@
     syncToggleAriaFromState();
   }
 
+  // ---------------------------------------------------------------------------
+  // Brevo integration
+  //
+  // Architecture: brevo.html is the single source of truth for the Brevo form
+  // action URL. We never inject Brevo's HTML into the page — we only fetch the
+  // file lazily, parse it, extract <form id="sib-form" action>, validate it,
+  // and assign it to #access-form. Submission goes via fetch (CORS) with a
+  // hidden iframe fallback if the browser blocks the cross-origin response.
+  // ---------------------------------------------------------------------------
+
+  const BREVO_CACHE_KEY = 'waenn:brevoAction';
+  const BREVO_CACHE_TTL_MS = 30 * 60 * 1000; // 30 min — short enough to pick up regenerated embeds quickly
+  const BREVO_FETCH_TIMEOUT_MS = 9000;
+
+  let brevoLoaderInflight = null;
+  let brevoLoaderFailed = false;
+
+  function isValidBrevoAction(url) {
+    if (!url || typeof url !== 'string') return false;
+    try {
+      const u = new URL(url);
+      if (u.protocol !== 'https:') return false;
+      // Brevo serves form submissions from *.sibforms.com (subdomain per account).
+      if (!/(^|\.)sibforms\.com$/i.test(u.host)) return false;
+      if (!u.pathname.startsWith('/serve/')) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function readBrevoCache() {
+    try {
+      const raw = sessionStorage.getItem(BREVO_CACHE_KEY);
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      if (!obj || typeof obj.url !== 'string' || typeof obj.ts !== 'number') return null;
+      if (Date.now() - obj.ts > BREVO_CACHE_TTL_MS) return null;
+      if (!isValidBrevoAction(obj.url)) return null;
+      return obj.url;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeBrevoCache(url) {
+    try {
+      sessionStorage.setItem(BREVO_CACHE_KEY, JSON.stringify({ url, ts: Date.now() }));
+    } catch {
+      /* sessionStorage may be unavailable (private mode, quota) — non-fatal */
+    }
+  }
+
+  async function loadBrevoActionUrl() {
+    if (brevoLoaderFailed) return null;
+
+    const cached = readBrevoCache();
+    if (cached) return cached;
+
+    if (brevoLoaderInflight) return brevoLoaderInflight;
+
+    brevoLoaderInflight = (async () => {
+      try {
+        const res = await fetch('brevo.html', { cache: 'no-cache', credentials: 'omit' });
+        if (!res.ok) throw new Error('brevo.html responded ' + res.status);
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const sib = doc.querySelector('form#sib-form, form[action*="sibforms.com/serve/"]');
+        const action = sib && sib.getAttribute('action');
+        if (!isValidBrevoAction(action)) throw new Error('action URL missing or invalid');
+        writeBrevoCache(action);
+        return action;
+      } catch (err) {
+        console.warn('[brevo] loader failed:', err);
+        brevoLoaderFailed = true;
+        return null;
+      } finally {
+        brevoLoaderInflight = null;
+      }
+    })();
+
+    return brevoLoaderInflight;
+  }
+
+  function applyBrevoActionTo(form, url) {
+    if (!form || !url) return false;
+    if (!isValidBrevoAction(url)) return false;
+    form.setAttribute('action', url);
+    return true;
+  }
+
+  function initBrevoLoader() {
+    const form = $('access-form');
+    if (!form || form.getAttribute('data-brevo') !== 'true') return;
+
+    let triggered = false;
+    const trigger = async () => {
+      if (triggered) return;
+      triggered = true;
+      const url = await loadBrevoActionUrl();
+      if (url) applyBrevoActionTo(form, url);
+    };
+
+    // Eager: any user intent on the form should kick off the load immediately.
+    form.addEventListener('focusin', trigger, { once: true });
+    form.addEventListener('pointerenter', trigger, { once: true });
+
+    // Lazy: when the user is approaching the access section.
+    const section = $('s-access');
+    if (section && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              trigger();
+              io.disconnect();
+              break;
+            }
+          }
+        },
+        { rootMargin: '300px 0px' }
+      );
+      io.observe(section);
+    } else if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(trigger, { timeout: 4000 });
+    } else {
+      window.setTimeout(trigger, 1500);
+    }
+  }
+
+  function resolveLocale() {
+    try {
+      if (typeof i18next !== 'undefined') {
+        const raw = i18next.resolvedLanguage || i18next.language;
+        if (raw) {
+          const lang = String(raw).toLowerCase().split('-')[0];
+          return lang === 'en' ? 'en' : 'es';
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+    return 'es';
+  }
+
   function initFormFallback() {
-    // If Brevo embed isn't installed yet, keep the original UX feedback.
     const form = $('access-form');
     if (!form) return;
-    form.addEventListener('submit', (e) => {
-      const usesBrevo = form.getAttribute('data-brevo') === 'true';
-      if (usesBrevo) return;
+    const btn = form.querySelector('button[type="submit"]');
+    const localeEl = $('f-locale');
+    const t = (k) => (typeof window.i18nT === 'function' ? window.i18nT(k) : k);
 
-      e.preventDefault();
-      const btn = form.querySelector('button[type="submit"]');
+    // Capture the button's original inline style ONCE so we can restore it
+    // exactly (the button uses inline width/height/font-size that we must keep).
+    const originalBtnStyle = btn ? btn.getAttribute('style') || '' : '';
+    let restoreTimer = null;
+
+    function flash(messageKey, kind) {
       if (!btn) return;
-      const t = typeof window.i18nT === 'function' ? window.i18nT : (k) => k;
-      const orig = btn.textContent;
-      btn.textContent = t('form.success');
-      btn.style.background = 'rgba(200,16,46,0.12)';
+      btn.textContent = t(messageKey);
+      btn.style.background = kind === 'error' ? 'rgba(200,16,46,0.06)' : 'rgba(200,16,46,0.12)';
       btn.style.borderColor = 'rgba(200,16,46,0.4)';
       btn.style.color = '#c8102e';
-      setTimeout(() => {
+      if (restoreTimer) window.clearTimeout(restoreTimer);
+      restoreTimer = window.setTimeout(() => {
         btn.textContent = t('form.submit');
-        btn.removeAttribute('style');
+        if (originalBtnStyle) btn.setAttribute('style', originalBtnStyle);
+        else btn.removeAttribute('style');
+        restoreTimer = null;
       }, 4000);
+    }
+
+    function setLoading(isLoading) {
+      if (!btn) return;
+      btn.disabled = isLoading;
+    }
+
+    async function ensureAction() {
+      const current = form.getAttribute('action');
+      if (isValidBrevoAction(current)) return current;
+      const url = await loadBrevoActionUrl();
+      if (url) applyBrevoActionTo(form, url);
+      return form.getAttribute('action');
+    }
+
+    function nativeIframeSubmit() {
+      // Fallback when fetch is blocked by CORS or fails.
+      // The form has target="brevo-hidden-frame", so the response goes into
+      // the hidden iframe and the page does NOT navigate.
+      try {
+        // HTMLFormElement.submit() bypasses our submit listener, so no recursion.
+        form.submit();
+        return true;
+      } catch (err) {
+        console.warn('[brevo] native iframe submit failed:', err);
+        return false;
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      const usesBrevo = form.getAttribute('data-brevo') === 'true';
+
+      // Fallback for the legacy/no-Brevo path: keep the original fake feedback.
+      if (!usesBrevo) {
+        e.preventDefault();
+        flash('form.success', 'success');
+        return;
+      }
+
+      // Honeypot — silent drop (don't tell the bot it failed).
+      const honeypot = form.querySelector('input[name="email_address_check"]');
+      if (honeypot && honeypot.value) {
+        e.preventDefault();
+        flash('form.success', 'success');
+        return;
+      }
+
+      // Native validation: let the browser show its own messages and bail.
+      // NOTE: don't preventDefault here — that would suppress the native UI.
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        try { form.reportValidity(); } catch { /* ignore */ }
+        return;
+      }
+
+      e.preventDefault();
+
+      // Normalize fields — defensive trim/lowercase before sending to Brevo.
+      const nameEl = $('f-name');
+      const emailEl = $('f-email');
+      if (nameEl && typeof nameEl.value === 'string') nameEl.value = nameEl.value.trim();
+      if (emailEl && typeof emailEl.value === 'string') {
+        emailEl.value = emailEl.value.trim().toLowerCase();
+      }
+
+      // Sync locale so Brevo sends the double opt-in email in the right language.
+      if (localeEl) localeEl.value = resolveLocale();
+
+      const action = await ensureAction();
+      if (!isValidBrevoAction(action)) {
+        flash('form.error', 'error');
+        return;
+      }
+
+      setLoading(true);
+      flash('form.loading', 'success');
+
+      const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timeoutId = ac
+        ? window.setTimeout(() => ac.abort(), BREVO_FETCH_TIMEOUT_MS)
+        : null;
+
+      try {
+        const res = await fetch(action, {
+          method: 'POST',
+          body: new FormData(form),
+          mode: 'cors',
+          credentials: 'omit',
+          signal: ac ? ac.signal : undefined,
+        });
+        if (timeoutId) window.clearTimeout(timeoutId);
+
+        if (res.ok) {
+          flash('form.success', 'success');
+          try { form.reset(); } catch { /* ignore */ }
+        } else {
+          // Non-2xx — try iframe fallback so the contact still reaches Brevo.
+          if (nativeIframeSubmit()) flash('form.success', 'success');
+          else flash('form.error', 'error');
+        }
+      } catch (err) {
+        if (timeoutId) window.clearTimeout(timeoutId);
+        // CORS, network, or timeout: fall back to native submit via hidden iframe.
+        // We can't read the iframe response (cross-origin), so we optimistically
+        // report success — Brevo confirms the actual subscription via opt-in email.
+        console.warn('[brevo] fetch failed, falling back to iframe submit:', err);
+        if (nativeIframeSubmit()) {
+          flash('form.success', 'success');
+          try { form.reset(); } catch { /* ignore */ }
+        } else {
+          flash('form.error', 'error');
+        }
+      } finally {
+        // Re-enable the button after the flash window so the user can retry.
+        window.setTimeout(() => setLoading(false), 4000);
+      }
     });
   }
 

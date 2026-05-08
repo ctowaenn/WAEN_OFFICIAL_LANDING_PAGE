@@ -77,7 +77,10 @@
     "optFit": "A fit that actually works",
     "optTodo": "All of the above",
     "submit": "REQUEST EARLY ACCESS →",
-    "success": "— RECEIVED — THANK YOU !"
+    "success": "— RECEIVED — THANK YOU !",
+    "loading": "SENDING…",
+    "error": "SOMETHING WENT WRONG — TRY AGAIN",
+    "consentLabel": "I agree to receive communications from WAENN and the privacy policy."
   },
   "vision": {
     "aria": "Vision",
