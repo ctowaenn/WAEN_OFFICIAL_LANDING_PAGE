@@ -201,7 +201,9 @@
     const segs = Array.from(row.querySelectorAll('.hero-cta-seg'));
     if (!track || !thumb || segs.length === 0) return;
 
-    let active = location.hash === '#s-marca' ? 1 : 0;
+    // Default state on page load is always "UNIRME A LA LISTA" (index 0),
+    // but after clicking, we remember the last pressed segment until refresh.
+    let active = 0;
     let hover = null;
     let focus = null;
 
@@ -255,10 +257,7 @@
       }, 0);
     });
 
-    window.addEventListener('hashchange', () => {
-      active = location.hash === '#s-marca' ? 1 : 0;
-      layout();
-    });
+    window.addEventListener('hashchange', layout);
 
     const ro = new ResizeObserver(() => layout());
     ro.observe(track);

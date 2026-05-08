@@ -258,11 +258,18 @@ button, input, textarea, select { font-family: inherit; }
 }
 .intro-brand {
   margin-top: clamp(10px, 1.8vw, 18px);
-  font-family: "Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  font-weight: 800;
-  font-size: clamp(42px, 6.4vw, 86px);
-  letter-spacing: 0.22em;
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(6px, 1vw, 10px);
   line-height: 0.92;
+}
+.intro-logo {
+  height: clamp(42px, 6.4vw, 86px);
+  width: auto;
+  /* match previous “bold text” presence on dark bg */
+  filter: drop-shadow(0 10px 40px rgba(0,0,0,0.55)) drop-shadow(0 2px 12px rgba(0,0,0,0.45));
+  opacity: 0.96;
 }
 .intro-tm {
   font-size: 0.38em;
