@@ -1199,13 +1199,12 @@ select.form-input option:checked {
 /* ================================================================
    MOBILE RESPONSIVE
 ================================================================ */
-@media (max-width: 900px) {
+@media screen and (max-width: 900px) {
   #nav { padding: 0 16px; }
-  #nav .btn {
-    height: 36px;
-    font-size: 9px;
-    letter-spacing: 1px;
-    padding: 0 14px;
+  /* CTA solo en el pill dock inferior */
+  nav#nav > a.btn[href="#s-access"],
+  #nav > a.btn {
+    display: none !important;
   }
   #nav-links { display: none; }
   #s-intro { height: calc(100vh + min(720px, 120vw)); }
