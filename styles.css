@@ -364,19 +364,108 @@ button, input, textarea, select { font-family: inherit; }
 .hero-cta-row {
   display: flex;
   align-items: center;
-  gap: 40px;
   flex-wrap: wrap;
 }
-.hero-cta-row .btn { height: 50px; font-size: 11px; padding: 0 32px; }
-.hero-link {
-  font-size: 11px;
-  letter-spacing: 2.42px;
-  color: var(--tan);
-  font-weight: 700;
-  text-transform: uppercase;
-  transition: color 0.2s;
+/* Una sola pastilla de vidrio que viaja entre las dos frases (posición vía main.js) */
+.hero-cta-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 6px 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
-.hero-link:hover { color: var(--dark); }
+.hero-cta-switch:not(.hero-cta-switch--ready) .hero-cta-thumb {
+  opacity: 0;
+}
+.hero-cta-thumb {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  border-radius: 999px;
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.58) 42%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+  backdrop-filter: blur(28px) saturate(1.45);
+  -webkit-backdrop-filter: blur(28px) saturate(1.45);
+  border: 0.75px solid rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.07),
+    0 12px 40px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.04);
+  transition:
+    left 0.55s cubic-bezier(0.32, 0.72, 0, 1),
+    top 0.55s cubic-bezier(0.32, 0.72, 0, 1),
+    width 0.55s cubic-bezier(0.32, 0.72, 0, 1),
+    height 0.55s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.35s ease;
+  will-change: left, top, width, height;
+}
+.hero-cta-sep {
+  position: relative;
+  z-index: 1;
+  padding: 0 12px 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(122, 117, 110, 0.4);
+  user-select: none;
+  pointer-events: none;
+}
+.hero-cta-seg {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: var(--tan);
+  cursor: pointer;
+  outline: none;
+  transition: color 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.hero-cta-seg-text {
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
+.hero-cta-arrow {
+  position: relative;
+  z-index: 1;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.85;
+}
+.hero-cta-switch[data-focus="0"] .hero-cta-seg[data-hero-cta-index="0"],
+.hero-cta-switch[data-focus="1"] .hero-cta-seg[data-hero-cta-index="1"] {
+  color: var(--dark);
+}
+.hero-cta-seg:focus-visible {
+  color: var(--dark);
+  box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.32);
+  border-radius: 999px;
+}
 .hero-divider {
   position: absolute;
   bottom: 0; left: 0; right: 0;
@@ -443,15 +532,6 @@ button, input, textarea, select { font-family: inherit; }
   opacity: 1;
   transform: translateY(0);
 }
-
-.scan-tech {
-  width: 100%;
-  max-width: 820px;
-  margin-top: 44px;
-  border-top: 1px solid var(--beige);
-  padding-top: 28px;
-}
-.scan-tech:empty { display: none; }
 
 /* ================================================================
    03 — TICKER
@@ -978,6 +1058,26 @@ select.form-input option:checked {
   .footer-inner { flex-direction: column; gap: 40px; }
   .footer-nav { text-align: left; }
 }
+@media (max-width: 520px) {
+  .hero-cta-switch {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 300px;
+  }
+  .hero-cta-sep {
+    padding: 4px 0 6px;
+    text-align: center;
+  }
+  .hero-cta-seg {
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+  }
+  .hero-cta-thumb {
+    border-radius: 20px;
+  }
+}
 @media (max-width: 600px) {
   .hero-h1, .hero-h1-red { font-size: 52px; }
   .dif-inner { padding: 0 24px; }
@@ -996,4 +1096,6 @@ select.form-input option:checked {
   .ticker-track { animation: none; }
   .intro-reveal { transition: none; }
   .app-phone { transition: none; }
+  .hero-cta-thumb { transition-duration: 0.01ms; }
+  .hero-cta-seg { transition-duration: 0.01ms; }
 }

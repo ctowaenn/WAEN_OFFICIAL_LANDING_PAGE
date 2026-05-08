@@ -192,6 +192,86 @@
     document.querySelectorAll('.rv, .rv-fade').forEach((el) => revealObserver.observe(el));
   }
 
+  function initHeroCtaSwitch() {
+    const row = document.querySelector('[data-hero-cta-switch]');
+    if (!row) return;
+
+    const track = row.querySelector('.hero-cta-switch');
+    const thumb = row.querySelector('.hero-cta-thumb');
+    const segs = Array.from(row.querySelectorAll('.hero-cta-seg'));
+    if (!track || !thumb || segs.length === 0) return;
+
+    let active = location.hash === '#s-marca' ? 1 : 0;
+    let hover = null;
+    let focus = null;
+
+    const displayed = () => {
+      if (hover !== null) return hover;
+      if (focus !== null) return focus;
+      return active;
+    };
+
+    function layout() {
+      const idx = displayed();
+      const seg = segs[idx];
+      if (!seg) return;
+
+      track.dataset.focus = String(idx);
+
+      const tr = track.getBoundingClientRect();
+      const sr = seg.getBoundingClientRect();
+      thumb.style.left = `${sr.left - tr.left}px`;
+      thumb.style.top = `${sr.top - tr.top}px`;
+      thumb.style.width = `${sr.width}px`;
+      thumb.style.height = `${sr.height}px`;
+    }
+
+    segs.forEach((seg, i) => {
+      seg.addEventListener('mouseenter', () => {
+        hover = i;
+        layout();
+      });
+      seg.addEventListener('pointerdown', () => {
+        active = i;
+        layout();
+      });
+    });
+
+    track.addEventListener('mouseleave', () => {
+      hover = null;
+      layout();
+    });
+
+    track.addEventListener('focusin', (e) => {
+      const seg = e.target.closest('.hero-cta-seg');
+      focus = seg && segs.includes(seg) ? segs.indexOf(seg) : null;
+      layout();
+    });
+
+    track.addEventListener('focusout', () => {
+      window.setTimeout(() => {
+        if (!track.contains(document.activeElement)) focus = null;
+        layout();
+      }, 0);
+    });
+
+    window.addEventListener('hashchange', () => {
+      active = location.hash === '#s-marca' ? 1 : 0;
+      layout();
+    });
+
+    const ro = new ResizeObserver(() => layout());
+    ro.observe(track);
+
+    window.addEventListener('resize', layout, { passive: true });
+
+    layout();
+    requestAnimationFrame(() => {
+      layout();
+      track.classList.add('hero-cta-switch--ready');
+    });
+  }
+
   function initFormFallback() {
     // If Brevo embed isn't installed yet, keep the original UX feedback.
     const form = $('access-form');
@@ -218,9 +298,10 @@
   window.addEventListener('scroll', onScroll, { passive: true });
 
   (async () => {
-    await initIntroMask();
     initRevealObserver();
+    initHeroCtaSwitch();
     initFormFallback();
+    await initIntroMask();
     onScroll();
   })();
 })();
