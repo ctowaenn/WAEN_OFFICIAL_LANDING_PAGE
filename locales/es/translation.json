@@ -135,6 +135,8 @@
     "shellAria": "Navegación móvil",
     "cta": "ACCESO",
     "menu": "MENÚ",
+    "menuOpen": "Abrir menú de secciones",
+    "menuClose": "Cerrar menú de secciones",
     "panelAria": "Enlaces de sección",
     "linksAria": "Secciones",
     "access": "ACCESO"

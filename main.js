@@ -295,6 +295,24 @@
     const sections = sectionIds.map((id) => $(id)).filter(Boolean);
     const links = Array.from(document.querySelectorAll('[data-mobile-dock-section]'));
 
+    function dockToggleAriaLabel(isOpen) {
+      try {
+        if (typeof i18next !== 'undefined' && i18next.t) {
+          const key = isOpen ? 'mobileDock.menuClose' : 'mobileDock.menuOpen';
+          const s = i18next.t(key);
+          if (s && s !== key) return s;
+        }
+      } catch {
+        /* ignore */
+      }
+      return isOpen ? 'Cerrar menú de secciones' : 'Abrir menú de secciones';
+    }
+
+    function syncToggleAriaFromState() {
+      const isOpen = dock.classList.contains('mobile-dock--open');
+      toggle.setAttribute('aria-label', dockToggleAriaLabel(isOpen));
+    }
+
     function setActiveById(id) {
       links.forEach((l) => {
         l.classList.toggle('is-active', l.getAttribute('data-mobile-dock-section') === id);
@@ -305,8 +323,16 @@
       dock.classList.toggle('mobile-dock--open', open);
       document.body.classList.toggle('mobile-dock--expanded', open);
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      panel.hidden = !open;
+      toggle.setAttribute('aria-label', dockToggleAriaLabel(open));
+      panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if ('inert' in panel) panel.inert = !open;
       backdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (open) {
+        requestAnimationFrame(() => {
+          const first = panel.querySelector('a.mobile-dock__link');
+          if (first) first.focus({ preventScroll: true });
+        });
+      }
     }
 
     function close() {
@@ -316,13 +342,19 @@
     toggle.addEventListener('click', () => {
       setOpen(!dock.classList.contains('mobile-dock--open'));
     });
-    backdrop.addEventListener('click', close);
+    backdrop.addEventListener('click', () => {
+      close();
+      toggle.focus();
+    });
 
     links.forEach((a) => {
       a.addEventListener('click', () => {
         window.setTimeout(close, 320);
       });
     });
+
+    window.addEventListener('i18n:ready', syncToggleAriaFromState);
+    window.addEventListener('i18n:updated', syncToggleAriaFromState);
 
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
@@ -360,6 +392,7 @@
     mq.addEventListener('change', onMqChange);
     onMqChange();
     applyHashActive();
+    syncToggleAriaFromState();
   }
 
   function initFormFallback() {

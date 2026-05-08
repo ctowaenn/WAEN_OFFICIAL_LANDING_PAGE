@@ -86,6 +86,7 @@
     applyDataI18n();
     renderTicker();
     updateLangToggle();
+    window.dispatchEvent(new Event('i18n:updated'));
   }
 
   function wireLangToggle() {
