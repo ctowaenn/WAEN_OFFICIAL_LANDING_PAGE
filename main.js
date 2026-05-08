@@ -182,8 +182,9 @@
   }
 
   /**
-   * GSAP ScrollTrigger: scrub con inercia (mejor sensación que scroll 1:1).
-   * Motion (ex-Framer Motion) no aplica aquí al ser HTML sin React.
+   * GSAP ScrollTrigger: scrub true = progress 1:1 con el scroll (reversible al subir).
+   * La sensación “premium” viene de easeInOutQuint / smoothstep en updateIntroFromProgress;
+   * un scrub numérico añadía inercia y retrasaba la vuelta al estado inicial.
    */
   function initIntroScrollEngine() {
     if (!introSection || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
@@ -192,7 +193,7 @@
     gsap.registerPlugin(ScrollTrigger);
     const reduce =
       typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const scrub = reduce ? 0 : 0.85;
+    const scrub = reduce ? 0 : true;
 
     const st = ScrollTrigger.create({
       id: 'intro-pin-scrub',
@@ -809,22 +810,21 @@
     });
   }
 
+  function refreshIntroScrollMetrics() {
+    recalcIntroMaxScroll();
+    if (introDrivenByST && typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+    onScroll();
+  }
+
   function startApp() {
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener(
-      'resize',
-      () => {
-        recalcIntroMaxScroll();
-        if (introDrivenByST && typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-        onScroll();
-      },
-      { passive: true }
-    );
-    window.addEventListener('load', () => {
-      recalcIntroMaxScroll();
-      if (introDrivenByST && typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-      onScroll();
-    });
+    window.addEventListener('resize', refreshIntroScrollMetrics, { passive: true });
+    window.addEventListener('load', refreshIntroScrollMetrics, { passive: true });
+    const vv = window.visualViewport;
+    if (vv) {
+      vv.addEventListener('resize', refreshIntroScrollMetrics, { passive: true });
+      vv.addEventListener('scroll', refreshIntroScrollMetrics, { passive: true });
+    }
 
     (async () => {
       recalcIntroMaxScroll();
