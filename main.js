@@ -7,7 +7,7 @@
   const introReveal = $('introReveal');
   const nav = $('nav');
   const appSection = $('s-app');
-  const appPhone = $('appPhone');
+  const appPhoneStack = document.querySelector('.app-phone-stack');
   const difSection = $('s-dif');
 
   function supportsMask() {
@@ -88,7 +88,9 @@
   }
 
   function updateApp() {
-    if (!appSection || !appPhone) return;
+    if (!appSection) return;
+    const phones = Array.from(document.querySelectorAll('.app-phone'));
+    if (phones.length === 0) return;
     const vh = window.innerHeight;
     const rect = appSection.getBoundingClientRect();
     const sectionH = appSection.offsetHeight;
@@ -101,8 +103,17 @@
     if (p < 0.1) opacity = p / 0.1;
     else if (p > 0.8) opacity = 1 - (p - 0.8) / 0.2;
 
-    appPhone.style.transform = `scale(${scale})`;
-    appPhone.style.opacity = String(opacity);
+    for (const phone of phones) {
+      phone.style.transform = `scale(${scale})`;
+      phone.style.opacity = String(opacity);
+    }
+
+    // Swap active mockup as you scroll through the app section.
+    // (Replace the duplicated placeholders with real assets whenever.)
+    if (appPhoneStack) {
+      const idx = Math.min(phones.length - 1, Math.floor(p * phones.length));
+      phones.forEach((el, i) => el.classList.toggle('is-active', i === idx));
+    }
   }
 
   function updateNav() {

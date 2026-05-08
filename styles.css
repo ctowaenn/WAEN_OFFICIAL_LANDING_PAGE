@@ -160,13 +160,7 @@ button, input, textarea { font-family: inherit; }
   overflow: hidden;
   background: var(--black);
 }
-.intro-photo {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  opacity: 0.25;
-}
+/* intro-photo removed: reveal layer is masked into letters */
 
 /* New: video/photo revealed only inside the WAENN letters */
 .intro-reveal {

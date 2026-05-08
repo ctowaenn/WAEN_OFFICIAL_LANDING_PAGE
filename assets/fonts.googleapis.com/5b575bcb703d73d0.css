@@ -1,0 +1,14 @@
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts.gstatic.com/e0e81c2a9b847ebb.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts.gstatic.com/bb525bc217ba95d0.ttf') format('truetype');
+}
