@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "title": "WAENN — Dress with Judgment",
+    "description": "WAENN — Fashion with judgment. Design, technology, and real fit. Spain, Est. 2025."
+  },
+  "nav": {
+    "ariaNav": "Main navigation",
+    "logoAria": "WAENN — Home",
+    "marca": "BRAND",
+    "diferencia": "DIFFERENCE",
+    "vision": "VISION",
+    "earlyAccess": "EARLY ACCESS",
+    "langToggle": "Site language"
+  },
+  "intro": {
+    "aria": "Intro",
+    "comingSoon": "COMING SOON SEP 2026"
+  },
+  "hero": {
+    "aria": "DRESS WITH JUDGMENT",
+    "tag": "SPAIN | EST.2025",
+    "h1Line1": "DRESS\nWITH",
+    "h1Red": "JUDGMENT.",
+    "body": "WAENN is for those who don’t shop on impulse. For those who want a garment that lasts, that truly fits, and says something about who you are.",
+    "ctaAria": "Primary actions",
+    "joinList": "JOIN THE LIST",
+    "knowBrand": "DISCOVER THE BRAND"
+  },
+  "app": {
+    "aria": "Digital Atelier Experience",
+    "tag": "BESPOKE ATELIER EXPERIENCE",
+    "stackAria": "WAENN mobile mockups",
+    "mockupAlt1": "WAENN — Mockup 1",
+    "mockupAlt2": "WAENN — Mockup 2",
+    "mockupAlt3": "WAENN — Mockup 3"
+  },
+  "ticker": {
+    "aria": "Keywords",
+    "items": [
+      "FASHION WITH IDENTITY",
+      "DESIGN & TECHNOLOGY",
+      "SPAIN | EST.2025",
+      "REAL FIT",
+      "LASTING OVER TREND",
+      "DIGITAL ATELIER"
+    ]
+  },
+  "dif": {
+    "aria": "What sets us apart",
+    "h1Line1": "WHAT",
+    "h1Line2": "MAKES US",
+    "h1Line3": "DIFFERENT.",
+    "intro": "We’re not a generic collection brand. We’re where design craft, technological precision, and honesty about real bodies meet.",
+    "c1Label": "Design with intent",
+    "c1Text": "Every WAENN piece starts with a question: why does this garment exist? We don’t design for volume. We design so each piece has a reason to be in your wardrobe—and stay there.",
+    "c2Label": "Technology for real fit",
+    "c2Text": "We use technology as a real tool—not marketing—to understand how a body moves, how fabric falls, and how a garment feels when you actually wear it.",
+    "c3Label": "Identity, not trends",
+    "c3Text": "At WAENN we don’t chase seasons. We build pieces that speak to the character of the wearer. Fashion as expression of who you are—not what’s on the feed this week."
+  },
+  "access": {
+    "aria": "Early access",
+    "h2Line1": "BE PART",
+    "h2Line2": "OF WHAT’S",
+    "h2Red": "NEXT.",
+    "sub": "WAENN’s first collection is about to be unveiled. Leave your details and you’ll be among the first to see it—with exclusive access before the public launch."
+  },
+  "form": {
+    "nameLabel": "NAME",
+    "namePlaceholder": "Your name",
+    "emailLabel": "EMAIL",
+    "emailPlaceholder": "you@email.com",
+    "prendaLabel": "WHAT DO YOU LOOK FOR IN A GARMENT?",
+    "prendaPlaceholder": "Choose an option",
+    "optPermanencia": "Longevity and quality",
+    "optIdentidad": "Identity and character",
+    "optFit": "A fit that actually works",
+    "optTodo": "All of the above",
+    "submit": "REQUEST EARLY ACCESS →",
+    "success": "— RECEIVED — THANK YOU !"
+  },
+  "vision": {
+    "aria": "Vision",
+    "tag": "VISION",
+    "h2Line1": "BEYOND",
+    "h2Line2": "THE",
+    "h2Line3": "COLLECTION.",
+    "body1": "WAENN begins with a collection. But the vision is broader. We’re building a space where design from scratch, measurement technology, and atelier experience come together in one offer.",
+    "body2": "A place where your body doesn’t have to adapt to the garment. The garment adapts to you.",
+    "cta": "DIGITAL ATELIER — COMING SOON"
+  },
+  "marca": {
+    "aria": "A brand built on four pillars",
+    "h2Line1": "A BRAND",
+    "h2Line2": "BUILT ON",
+    "h2Line3": "FOUR PILLARS.",
+    "p1Name": "LONGEVITY",
+    "p1Text": "We make clothes meant to last—not in trend cycles, but in value. Pieces that stay yours because they were built right from the start.",
+    "p2Name": "IDENTITY",
+    "p2Text": "Dressing is communication. Every choice says something. At WAENN we want what you say to be exactly what you mean.",
+    "p3Name": "REAL FIT",
+    "p3Text": "Fit isn’t a technical detail. It’s the difference between a garment you wear and one you forget. We design for how the body feels.",
+    "p4Name": "USEFUL INNOVATION",
+    "p4Text": "Technology at WAENN isn’t decorative—it’s functional. We use it to understand, adjust with precision, and create a singular fashion experience."
+  },
+  "mosaic": {
+    "aria": "WAENN SS25 editorial",
+    "label": "WAENN — SS25",
+    "alt1": "WAENN SS25 — Editorial 1",
+    "alt2": "WAENN SS25 — Editorial 2",
+    "alt3": "WAENN SS25 — Editorial 4",
+    "alt4": "WAENN SS25 — Editorial 3",
+    "alt5": "WAENN SS25 — Editorial 5"
+  },
+  "historia": {
+    "aria": "WAENN origin",
+    "tag": "ORIGIN",
+    "h2Line1": "FASHION",
+    "h2Line2": "DESERVED ANOTHER",
+    "h2Red": "CONVERSATION.",
+    "body1": "Fashion today offers too much and says too little. Collections forgotten in weeks. Sizing that ignores how a person feels in their own body.",
+    "body2": "WAENN was born from that discomfort—from the conviction that designing well means listening, understanding, and building something meaningful for who wears it—not only for who sells it.",
+    "imgAlt": "WAENN — Product brochure"
+  },
+  "footer": {
+    "aria": "Footer",
+    "logoAria": "WAENN — Home",
+    "navAria": "Footer navigation",
+    "instagramAria": "Instagram",
+    "linkedinAria": "LinkedIn",
+    "tiktokAria": "TikTok",
+    "copy": "SPAIN · 2025 · All rights reserved."
+  },
+  "mobileDock": {
+    "shellAria": "Mobile navigation",
+    "cta": "ACCESS",
+    "menu": "MENU",
+    "panelAria": "Section links",
+    "linksAria": "Sections",
+    "access": "ACCESS"
+  }
+}

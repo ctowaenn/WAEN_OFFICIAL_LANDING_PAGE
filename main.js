@@ -373,40 +373,46 @@
       e.preventDefault();
       const btn = form.querySelector('button[type="submit"]');
       if (!btn) return;
+      const t = typeof window.i18nT === 'function' ? window.i18nT : (k) => k;
       const orig = btn.textContent;
-      btn.textContent = '¡ RECIBIDO — GRACIAS !';
+      btn.textContent = t('form.success');
       btn.style.background = 'rgba(200,16,46,0.12)';
       btn.style.borderColor = 'rgba(200,16,46,0.4)';
       btn.style.color = '#c8102e';
       setTimeout(() => {
-        btn.textContent = orig;
+        btn.textContent = t('form.submit');
         btn.removeAttribute('style');
       }, 4000);
     });
   }
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener(
-    'resize',
-    () => {
+  function startApp() {
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener(
+      'resize',
+      () => {
+        recalcIntroMaxScroll();
+        onScroll();
+      },
+      { passive: true }
+    );
+    window.addEventListener('load', () => {
       recalcIntroMaxScroll();
       onScroll();
-    },
-    { passive: true }
-  );
-  window.addEventListener('load', () => {
-    recalcIntroMaxScroll();
-    onScroll();
-  });
+    });
 
-  (async () => {
-    recalcIntroMaxScroll();
-    initRevealObserver();
-    initHeroCtaSwitch();
-    initMobileDock();
-    initFormFallback();
-    await initIntroMask();
-    recalcIntroMaxScroll();
-    onScroll();
-  })();
+    (async () => {
+      recalcIntroMaxScroll();
+      initRevealObserver();
+      initHeroCtaSwitch();
+      initMobileDock();
+      initFormFallback();
+      await initIntroMask();
+      recalcIntroMaxScroll();
+      onScroll();
+    })();
+  }
+
+  if (window.i18nReady) startApp();
+  else window.addEventListener('i18n:ready', startApp, { once: true });
 })();

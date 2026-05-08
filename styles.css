@@ -155,6 +155,52 @@ footer[id] {
   padding: 0 22px;
 }
 
+.i18n-preline {
+  white-space: pre-line;
+}
+
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+.lang-toggle__btn {
+  appearance: none;
+  border: 1px solid rgba(26, 26, 26, 0.2);
+  background: transparent;
+  color: #1a1a1a;
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.lang-toggle__btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+.lang-toggle__btn--active {
+  background: rgba(200, 16, 46, 0.08);
+  border-color: var(--red);
+  color: var(--red);
+}
+#nav.dark .lang-toggle__btn {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+}
+#nav.dark .lang-toggle__btn:hover {
+  color: var(--red);
+}
+#nav.dark .lang-toggle__btn--active {
+  background: rgba(200, 16, 46, 0.15);
+  border-color: var(--red);
+  color: #fff;
+}
+
 /* ================================================================
    01 — INTRO / LOGO MASK
 ================================================================ */
@@ -1207,6 +1253,10 @@ select.form-input option:checked {
     display: none !important;
   }
   #nav-links { display: none; }
+  #nav .lang-toggle {
+    margin-left: auto;
+    margin-right: 0;
+  }
   #s-intro { height: calc(100vh + min(720px, 120vw)); }
   .intro-coming {
     letter-spacing: 0.12em;

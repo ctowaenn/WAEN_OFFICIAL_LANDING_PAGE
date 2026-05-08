@@ -17,9 +17,8 @@
   <!-- ============================================================
        NAV
   ============================================================ -->
-  <nav id="nav" role="navigation" aria-label="Navegación principal">
-    <a id="nav-logo" href="#" aria-label="WAENN — Inicio">
-      <!-- Black logo for light bg, inverted via CSS for dark bg -->
+  <nav id="nav" role="navigation" data-i18n-aria-label="nav.ariaNav" aria-label="Navegación principal">
+    <a id="nav-logo" href="#" data-i18n-aria-label="nav.logoAria" aria-label="WAENN — Inicio">
       <img id="nav-logo-img"
            src="assets/LOGO%20WAENN.png"
            alt="WAENN"
@@ -27,19 +26,22 @@
            decoding="async">
     </a>
     <div id="nav-links">
-      <a href="#s-marca">MARCA</a>
-      <a href="#s-dif">DIFERENCIA</a>
-      <a href="#s-vision">VISIÓN</a>
+      <a href="#s-marca" data-i18n="nav.marca">MARCA</a>
+      <a href="#s-dif" data-i18n="nav.diferencia">DIFERENCIA</a>
+      <a href="#s-vision" data-i18n="nav.vision">VISIÓN</a>
     </div>
-    <a href="#s-access" class="btn" role="button">ACCESO ANTICIPADO</a>
+    <div class="lang-toggle" role="group" data-i18n-aria-label="nav.langToggle" aria-label="Idioma del sitio">
+      <button type="button" class="lang-toggle__btn" data-lang="es" aria-pressed="false">ES</button>
+      <button type="button" class="lang-toggle__btn" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <a href="#s-access" class="btn" role="button" data-i18n="nav.earlyAccess">ACCESO ANTICIPADO</a>
   </nav>
 
   <!-- ============================================================
        01 — INTRO / NN MASK SCROLL REVEAL
   ============================================================ -->
-  <section id="s-intro" aria-label="Intro">
+  <section id="s-intro" data-i18n-aria-label="intro.aria" aria-label="Intro">
     <div class="intro-pin" id="introPin">
-      <!-- Revealed layer: only visible inside WAENN letters via CSS mask -->
       <img class="intro-reveal" id="introReveal"
            src="assets/1.jpg"
            alt=""
@@ -48,7 +50,7 @@
            fetchpriority="high">
       <div class="intro-overlay" id="introOverlay" aria-hidden="true">
         <div class="intro-overlay-inner">
-          <div class="intro-coming">COMING SOON SEP 2026</div>
+          <div class="intro-coming" data-i18n="intro.comingSoon">COMING SOON SEP 2026</div>
           <div class="intro-brand">
             <img class="intro-logo" src="assets/LOGO%20WAENN.png" alt="WAENN" decoding="async">
             <span class="intro-tm">™</span>
@@ -64,33 +66,33 @@
   <!-- ============================================================
        02 — HERO TEXT
   ============================================================ -->
-  <section id="s-hero" aria-label="VESTIR CON CRITERIO">
+  <section id="s-hero" data-i18n-aria-label="hero.aria" aria-label="VESTIR CON CRITERIO">
     <img class="hero-bg"
          src="assets/www.figma.com/b963d7bc48ce8109.png"
          alt=""
          decoding="async">
     <div class="hero-inner">
-      <p class="hero-tag rv">SPAIN | EST.2025</p>
+      <p class="hero-tag rv" data-i18n="hero.tag">SPAIN | EST.2025</p>
 
       <div class="hero-h1-wrap">
         <h1>
-          <span class="hero-h1 rv d1">VESTIR<br>CON</span>
-          <span class="hero-h1-red rv d2">CRITERIO.</span>
+          <span class="hero-h1 rv d1 i18n-preline" data-i18n="hero.h1Line1">VESTIR CON</span>
+          <span class="hero-h1-red rv d2" data-i18n="hero.h1Red">CRITERIO.</span>
         </h1>
 
         <aside class="hero-aside">
-          <p class="hero-body rv d2">
+          <p class="hero-body rv d2" data-i18n="hero.body">
             WAENN nace para quienes no compran por impulso. Para quienes buscan una prenda que permanezca, que encaje de verdad y que diga algo sobre quién eres.
           </p>
           <div class="hero-cta-row rv d3" data-hero-cta-switch>
-            <div class="hero-cta-switch" role="group" aria-label="Acciones principales" data-focus="0">
+            <div class="hero-cta-switch" role="group" data-i18n-aria-label="hero.ctaAria" aria-label="Acciones principales" data-focus="0">
               <span class="hero-cta-thumb" aria-hidden="true"></span>
               <a href="#s-access" class="hero-cta-seg" data-hero-cta-index="0">
-                <span class="hero-cta-seg-text">UNIRME A LA LISTA</span>
+                <span class="hero-cta-seg-text" data-i18n="hero.joinList">UNIRME A LA LISTA</span>
               </a>
               <span class="hero-cta-sep" aria-hidden="true">·</span>
               <a href="#s-marca" class="hero-cta-seg" data-hero-cta-index="1">
-                <span class="hero-cta-seg-text">CONOCE LA MARCA</span>
+                <span class="hero-cta-seg-text" data-i18n="hero.knowBrand">CONOCE LA MARCA</span>
                 <span class="hero-cta-arrow" aria-hidden="true">↓</span>
               </a>
             </div>
@@ -104,22 +106,25 @@
   <!-- ============================================================
        04 — APP / PHONE SHOWCASE
   ============================================================ -->
-  <section id="s-app" aria-label="Experiencia Atelier Digital">
+  <section id="s-app" data-i18n-aria-label="app.aria" aria-label="Experiencia Atelier Digital">
     <div class="app-inner">
-      <p class="app-tag rv">EXPERIENCIA ATELIER A MEDIDA</p>
+      <p class="app-tag rv" data-i18n="app.tag">EXPERIENCIA ATELIER A MEDIDA</p>
       <div class="app-phone-wrap">
-        <div class="app-phone-stack" aria-label="Mockups de WAENN en móvil">
+        <div class="app-phone-stack" data-i18n-aria-label="app.stackAria" aria-label="Mockups de WAENN en móvil">
           <img class="app-phone"
                src="assets/www.figma.com/591ba7f0a98b5984.png"
                alt="WAENN — Mockup 1"
+               data-i18n-alt="app.mockupAlt1"
                decoding="async">
           <img class="app-phone"
                src="assets/www.figma.com/591ba7f0a98b5984.png"
                alt="WAENN — Mockup 2"
+               data-i18n-alt="app.mockupAlt2"
                decoding="async">
           <img class="app-phone"
                src="assets/www.figma.com/591ba7f0a98b5984.png"
                alt="WAENN — Mockup 3"
+               data-i18n-alt="app.mockupAlt3"
                decoding="async">
         </div>
       </div>
@@ -129,49 +134,22 @@
   <!-- ============================================================
        03 — TICKER
   ============================================================ -->
-  <div id="s-ticker" role="marquee" aria-label="Keywords">
-    <div class="ticker-track" aria-hidden="true">
-      <!-- Duplicated for seamless loop -->
-      <span class="ticker-item">MODA CON IDENTIDAD</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">DISEÑO &amp; TECNOLOGÍA</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">SPAIN | EST.2025</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">FIT REAL</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">PERMANENCIA SOBRE TENDENCIA</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">ATELIER DIGITAL</span>
-      <span class="ticker-dot">·</span>
-      <!-- duplicate -->
-      <span class="ticker-item">MODA CON IDENTIDAD</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">DISEÑO &amp; TECNOLOGÍA</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">SPAIN | EST.2025</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">FIT REAL</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">PERMANENCIA SOBRE TENDENCIA</span>
-      <span class="ticker-dot">·</span>
-      <span class="ticker-item">ATELIER DIGITAL</span>
-      <span class="ticker-dot">·</span>
-    </div>
+  <div id="s-ticker" role="marquee" data-i18n-aria-label="ticker.aria" aria-label="Palabras clave">
+    <div class="ticker-track" id="ticker-track" aria-hidden="true"></div>
   </div>
 
   <!-- ============================================================
        05 — DIFERENCIA
   ============================================================ -->
-  <section id="s-dif" aria-label="Lo que nos hace distintas">
+  <section id="s-dif" data-i18n-aria-label="dif.aria" aria-label="Lo que nos hace distintas">
     <div class="dif-inner">
       <div class="dif-top">
         <h2 class="dif-h1 rv">
-          LO QUE NOS<br>
-          HACE<br>
-          <span style="color:var(--white)">DISTINTAS.</span>
+          <span class="i18n-preline" data-i18n="dif.h1Line1">LO QUE NOS</span><br>
+          <span class="i18n-preline" data-i18n="dif.h1Line2">HACE</span><br>
+          <span style="color:var(--white)" class="i18n-preline" data-i18n="dif.h1Line3">DISTINTAS.</span>
         </h2>
-        <p class="dif-intro rv d2">
+        <p class="dif-intro rv d2" data-i18n="dif.intro">
           No somos una marca de colección genérica. Somos el punto de encuentro entre la artesanía del diseño, la precisión de la tecnología y la honestidad de entender al cuerpo real.
         </p>
       </div>
@@ -181,18 +159,18 @@
       <div class="dif-cols">
         <div class="dif-col rv d1">
           <p class="dif-num">01</p>
-          <p class="dif-label">Diseño con intención</p>
-          <p class="dif-text">Cada pieza de WAENN parte de una pregunta: ¿por qué existe esta prenda? No diseñamos por volumen. Diseñamos para que cada pieza tenga una razón de estar en tu armario y seguir ahí.</p>
+          <p class="dif-label" data-i18n="dif.c1Label">Diseño con intención</p>
+          <p class="dif-text" data-i18n="dif.c1Text">Cada pieza de WAENN parte de una pregunta: ¿por qué existe esta prenda? No diseñamos por volumen. Diseñamos para que cada pieza tenga una razón de estar en tu armario y seguir ahí.</p>
         </div>
         <div class="dif-col rv d2">
           <p class="dif-num">02</p>
-          <p class="dif-label">Tecnología aplicada al fit</p>
-          <p class="dif-text">Usamos tecnología no como marketing, sino como herramienta real. Para entender cómo se mueve un cuerpo, cómo cae una tela y cómo se siente una prenda cuando te la pones de verdad.</p>
+          <p class="dif-label" data-i18n="dif.c2Label">Tecnología aplicada al fit</p>
+          <p class="dif-text" data-i18n="dif.c2Text">Usamos tecnología no como marketing, sino como herramienta real. Para entender cómo se mueve un cuerpo, cómo cae una tela y cómo se siente una prenda cuando te la pones de verdad.</p>
         </div>
         <div class="dif-col rv d3">
           <p class="dif-num">03</p>
-          <p class="dif-label">Identidad, no tendencia</p>
-          <p class="dif-text">En WAENN no seguimos temporadas. Construimos piezas que hablan del carácter de quien las lleva. La moda como expresión de quién eres, no de lo que está en el feed esta semana.</p>
+          <p class="dif-label" data-i18n="dif.c3Label">Identidad, no tendencia</p>
+          <p class="dif-text" data-i18n="dif.c3Text">En WAENN no seguimos temporadas. Construimos piezas que hablan del carácter de quien las lleva. La moda como expresión de quién eres, no de lo que está en el feed esta semana.</p>
         </div>
       </div>
     </div>
@@ -201,40 +179,39 @@
   <!-- ============================================================
        06 — ACCESO ANTICIPADO
   ============================================================ -->
-  <section id="s-access" aria-label="Acceso anticipado">
+  <section id="s-access" data-i18n-aria-label="access.aria" aria-label="Acceso anticipado">
     <div class="access-inner">
       <div class="access-left">
         <h2 class="access-h2 rv">
-          SÉ PARTE<br>
-          DE LO QUE<br>
-          <span class="access-h2-red">VIENE.</span>
+          <span class="i18n-preline" data-i18n="access.h2Line1">SÉ PARTE</span><br>
+          <span class="i18n-preline" data-i18n="access.h2Line2">DE LO QUE</span><br>
+          <span class="access-h2-red i18n-preline" data-i18n="access.h2Red">VIENE.</span>
         </h2>
-        <p class="access-sub rv d2">
+        <p class="access-sub rv d2" data-i18n="access.sub">
           La primera colección de WAENN está a punto de ser presentada. Déjanos tus datos y serás el/la primerx en conocerla, con acceso exclusivo antes del lanzamiento público.
         </p>
       </div>
       <div class="access-right">
-        <!-- href: conectar con backend / Mailchimp / Convertkit -->
         <form id="access-form" novalidate>
           <div class="form-group rv d1">
-            <label class="form-label" for="f-name">NOMBRE</label>
-            <input class="form-input" id="f-name" type="text" placeholder="Tu nombre" autocomplete="given-name" required>
+            <label class="form-label" for="f-name" data-i18n="form.nameLabel">NOMBRE</label>
+            <input class="form-input" id="f-name" type="text" data-i18n-placeholder="form.namePlaceholder" placeholder="Tu nombre" autocomplete="given-name" required>
           </div>
           <div class="form-group rv d2">
-            <label class="form-label" for="f-email">CORREO ELECTRÓNICO</label>
-            <input class="form-input" id="f-email" type="email" placeholder="tu@correo.com" autocomplete="email" required>
+            <label class="form-label" for="f-email" data-i18n="form.emailLabel">CORREO ELECTRÓNICO</label>
+            <input class="form-input" id="f-email" type="email" data-i18n-placeholder="form.emailPlaceholder" placeholder="tu@correo.com" autocomplete="email" required>
           </div>
           <div class="form-group rv d3">
-            <label class="form-label" for="f-prenda">¿QUÉ BUSCAS EN UNA PRENDA?</label>
+            <label class="form-label" for="f-prenda" data-i18n="form.prendaLabel">¿QUÉ BUSCAS EN UNA PRENDA?</label>
             <select class="form-input" id="f-prenda" required>
-              <option value="" selected disabled hidden>Selecciona una opción</option>
-              <option value="Permanencia y calidad">Permanencia y calidad</option>
-              <option value="Identidad y carácter">Identidad y carácter</option>
-              <option value="Un fit que de verdad funcione">Un fit que de verdad funcione</option>
-              <option value="Todo lo anterior">Todo lo anterior</option>
+              <option value="" selected disabled hidden data-i18n="form.prendaPlaceholder">Selecciona una opción</option>
+              <option value="Permanencia y calidad" data-i18n="form.optPermanencia">Permanencia y calidad</option>
+              <option value="Identidad y carácter" data-i18n="form.optIdentidad">Identidad y carácter</option>
+              <option value="Un fit que de verdad funcione" data-i18n="form.optFit">Un fit que de verdad funcione</option>
+              <option value="Todo lo anterior" data-i18n="form.optTodo">Todo lo anterior</option>
             </select>
           </div>
-          <button type="submit" class="btn rv d4" style="width:100%;height:52px;font-size:11px;letter-spacing:2.2px;margin-top:20px;">
+          <button type="submit" class="btn rv d4" style="width:100%;height:52px;font-size:11px;letter-spacing:2.2px;margin-top:20px;" data-i18n="form.submit">
             SOLICITAR ACCESO ANTICIPADO →
           </button>
         </form>
@@ -245,9 +222,8 @@
   <!-- ============================================================
        07 — VISIÓN
   ============================================================ -->
-  <section id="s-vision" aria-label="Visión">
+  <section id="s-vision" data-i18n-aria-label="vision.aria" aria-label="Visión">
     <div class="vision-left">
-      <!-- Video de moda / atelier — sustituir src por ruta real -->
       <video class="vision-video"
              src="assets/magnific_starting-from-start-image_2895295034.mp4"
              autoplay muted loop playsinline
@@ -257,52 +233,51 @@
       </video>
     </div>
     <div class="vision-right">
-      <p class="vision-tag rv">VISIÓN</p>
+      <p class="vision-tag rv" data-i18n="vision.tag">VISIÓN</p>
       <h2 class="vision-h2 rv d1">
-        MÁS ALLÁ<br>
-        DE LA<br>
-        COLECCIÓN.
+        <span class="i18n-preline" data-i18n="vision.h2Line1">MÁS ALLÁ</span><br>
+        <span class="i18n-preline" data-i18n="vision.h2Line2">DE LA</span><br>
+        <span class="i18n-preline" data-i18n="vision.h2Line3">COLECCIÓN.</span>
       </h2>
       <div>
-        <p class="vision-body rv d2">
+        <p class="vision-body rv d2" data-i18n="vision.body1">
           WAENN empieza con una colección. Pero la visión es más amplia. Estamos construyendo un espacio donde el diseño desde 0, la tecnología de medidas y la experiencia atelier se integran en una sola propuesta.
         </p>
-        <p class="vision-body rv d3">
+        <p class="vision-body rv d3" data-i18n="vision.body2">
           Un lugar donde tu cuerpo no tiene que adaptarse a la prenda. La prenda se adapta a ti.
         </p>
       </div>
-      <!-- href: conectar con página de Atelier cuando esté disponible -->
-      <a href="#" class="btn rv d4">ATELIER DIGITAL — PRÓXIMAMENTE</a>
+      <a href="#" class="btn rv d4" data-i18n="vision.cta">ATELIER DIGITAL — PRÓXIMAMENTE</a>
     </div>
   </section>
 
   <!-- ============================================================
        08 — MARCA / PILARES
   ============================================================ -->
-  <section id="s-marca" aria-label="Una marca construida sobre cuatro pilares">
+  <section id="s-marca" data-i18n-aria-label="marca.aria" aria-label="Una marca construida sobre cuatro pilares">
     <div class="marca-inner">
       <h2 class="marca-h2 rv">
-        UNA MARCA<br>
-        CONSTRUIDA SOBRE<br>
-        CUATRO PILARES.
+        <span class="i18n-preline" data-i18n="marca.h2Line1">UNA MARCA</span><br>
+        <span class="i18n-preline" data-i18n="marca.h2Line2">CONSTRUIDA SOBRE</span><br>
+        <span class="i18n-preline" data-i18n="marca.h2Line3">CUATRO PILARES.</span>
       </h2>
       <hr class="marca-rule">
       <div class="pilares-grid">
         <div class="pilar rv d1">
-          <p class="pilar-name">PERMANENCIA</p>
-          <p class="pilar-text">Creamos prendas pensadas para durar. No en tendencia, sino en valor. Piezas que siguen siendo tuyas con el tiempo porque se construyeron bien desde el principio.</p>
+          <p class="pilar-name" data-i18n="marca.p1Name">PERMANENCIA</p>
+          <p class="pilar-text" data-i18n="marca.p1Text">Creamos prendas pensadas para durar. No en tendencia, sino en valor. Piezas que siguen siendo tuyas con el tiempo porque se construyeron bien desde el principio.</p>
         </div>
         <div class="pilar rv d2">
-          <p class="pilar-name">IDENTIDAD</p>
-          <p class="pilar-text">Vestir es un acto de comunicación. Cada elección dice algo. En WAENN queremos que lo que digas sea exactamente lo que quieres decir.</p>
+          <p class="pilar-name" data-i18n="marca.p2Name">IDENTIDAD</p>
+          <p class="pilar-text" data-i18n="marca.p2Text">Vestir es un acto de comunicación. Cada elección dice algo. En WAENN queremos que lo que digas sea exactamente lo que quieres decir.</p>
         </div>
         <div class="pilar rv d3">
-          <p class="pilar-name">FIT REAL</p>
-          <p class="pilar-text">El fit no es un detalle técnico. Es la diferencia entre una prenda que usas y una que olvidas. Diseñamos para cómo se siente el cuerpo.</p>
+          <p class="pilar-name" data-i18n="marca.p3Name">FIT REAL</p>
+          <p class="pilar-text" data-i18n="marca.p3Text">El fit no es un detalle técnico. Es la diferencia entre una prenda que usas y una que olvidas. Diseñamos para cómo se siente el cuerpo.</p>
         </div>
         <div class="pilar rv d4">
-          <p class="pilar-name">INNOVACIÓN ÚTIL</p>
-          <p class="pilar-text">La tecnología en WAENN no es decorativa. Es funcional. La usamos para entender y ajustar con más precisión y crear una experiencia de moda única.</p>
+          <p class="pilar-name" data-i18n="marca.p4Name">INNOVACIÓN ÚTIL</p>
+          <p class="pilar-text" data-i18n="marca.p4Text">La tecnología en WAENN no es decorativa. Es funcional. La usamos para entender y ajustar con más precisión y crear una experiencia de moda única.</p>
         </div>
       </div>
     </div>
@@ -311,35 +286,40 @@
   <!-- ============================================================
        09 — EDITORIAL MOSAIC
   ============================================================ -->
-  <section id="s-mosaic" aria-label="Editorial WAENN SS25">
+  <section id="s-mosaic" data-i18n-aria-label="mosaic.aria" aria-label="Editorial WAENN SS25">
     <div class="mosaic-cell mosaic-cell-1 rv-fade">
       <img src="assets/www.figma.com/cf1684d058bc617b.jpg"
            alt="WAENN SS25 — Editorial 1"
+           data-i18n-alt="mosaic.alt1"
            loading="lazy"
            decoding="async">
-      <span class="mosaic-label">WAENN — SS25</span>
+      <span class="mosaic-label" data-i18n="mosaic.label">WAENN — SS25</span>
     </div>
     <div class="mosaic-cell rv-fade d1">
       <img src="assets/www.figma.com/77822a47e521b4a5.jpg"
            alt="WAENN SS25 — Editorial 2"
+           data-i18n-alt="mosaic.alt2"
            loading="lazy"
            decoding="async">
     </div>
     <div class="mosaic-cell rv-fade d2">
       <img src="assets/www.figma.com/47b2b92d98a4c628.jpg"
            alt="WAENN SS25 — Editorial 4"
+           data-i18n-alt="mosaic.alt3"
            loading="lazy"
            decoding="async">
     </div>
     <div class="mosaic-cell rv-fade d1">
       <img src="assets/www.figma.com/dde4941140048cd5.jpg"
            alt="WAENN SS25 — Editorial 3"
+           data-i18n-alt="mosaic.alt4"
            loading="lazy"
            decoding="async">
     </div>
     <div class="mosaic-cell rv-fade d3">
       <img src="assets/www.figma.com/23f49cb9b29135ec.jpg"
            alt="WAENN SS25 — Editorial 5"
+           data-i18n-alt="mosaic.alt5"
            loading="lazy"
            decoding="async">
     </div>
@@ -348,19 +328,19 @@
   <!-- ============================================================
        10 — HISTORIA / ORIGEN
   ============================================================ -->
-  <section id="s-historia" aria-label="Origen de WAENN">
+  <section id="s-historia" data-i18n-aria-label="historia.aria" aria-label="Origen de WAENN">
     <div class="historia-left">
-      <p class="historia-tag rv">ORIGEN</p>
+      <p class="historia-tag rv" data-i18n="historia.tag">ORIGEN</p>
       <h2 class="historia-h2 rv d1">
-        LA MODA<br>
-        MERECÍA OTRA<br>
-        <span class="historia-h2-red">CONVERSACIÓN.</span>
+        <span class="i18n-preline" data-i18n="historia.h2Line1">LA MODA</span><br>
+        <span class="i18n-preline" data-i18n="historia.h2Line2">MERECÍA OTRA</span><br>
+        <span class="historia-h2-red i18n-preline" data-i18n="historia.h2Red">CONVERSACIÓN.</span>
       </h2>
       <div>
-        <p class="historia-body rv d2">
+        <p class="historia-body rv d2" data-i18n="historia.body1">
           La moda actual ofrece demasiado y dice muy poco. Colecciones que se olvidan en semanas. Tallas que no tienen en cuenta cómo se siente una persona en su propio cuerpo.
         </p>
-        <p class="historia-body rv d3">
+        <p class="historia-body rv d3" data-i18n="historia.body2">
           WAENN nació de esa incomodidad. De la convicción de que diseñar bien implica escuchar, entender y construir algo que tenga sentido para quien lo viste, no solo para quien lo vende.
         </p>
       </div>
@@ -368,6 +348,7 @@
     <div class="historia-right rv-fade">
       <img src="assets/www.figma.com/a225a8fc81b0d377.png"
            alt="WAENN — Folleto de producto"
+           data-i18n-alt="historia.imgAlt"
            loading="lazy"
            decoding="async">
     </div>
@@ -376,32 +357,31 @@
   <!-- ============================================================
        11 — FOOTER
   ============================================================ -->
-  <footer id="s-footer" aria-label="Footer">
+  <footer id="s-footer" data-i18n-aria-label="footer.aria" aria-label="Pie de página">
     <hr class="footer-top-rule">
     <div class="footer-inner">
-      <a href="#" aria-label="WAENN — Inicio">
+      <a href="#" data-i18n-aria-label="footer.logoAria" aria-label="WAENN — Inicio">
         <img class="footer-logo"
              src="assets/www.figma.com/c5cd53efd98cf178.png"
              alt="WAENN"
              loading="lazy"
              decoding="async">
       </a>
-      <nav class="footer-nav" aria-label="Footer navigation">
-        <a href="#s-marca">MARCA</a>
-        <a href="#s-dif">DIFERENCIA</a>
-        <a href="#s-vision">VISIÓN</a>
-        <a href="#s-access">ACCESO ANTICIPADO</a>
+      <nav class="footer-nav" data-i18n-aria-label="footer.navAria" aria-label="Navegación del pie">
+        <a href="#s-marca" data-i18n="nav.marca">MARCA</a>
+        <a href="#s-dif" data-i18n="nav.diferencia">DIFERENCIA</a>
+        <a href="#s-vision" data-i18n="nav.vision">VISIÓN</a>
+        <a href="#s-access" data-i18n="nav.earlyAccess">ACCESO ANTICIPADO</a>
       </nav>
     </div>
     <div class="footer-bottom">
       <hr class="footer-bottom-rule">
       <div class="footer-meta">
-        <p class="footer-copy">ESPAÑA · 2025 · Todos los derechos reservados.</p>
+        <p class="footer-copy" data-i18n="footer.copy">ESPAÑA · 2025 · Todos los derechos reservados.</p>
         <div class="footer-social">
-          <!-- href: reemplazar con URLs reales de redes sociales -->
-          <a href="#" aria-label="Instagram">INSTAGRAM</a>
-          <a href="#" aria-label="LinkedIn">LINKEDIN</a>
-          <a href="#" aria-label="TikTok">TIKTOK</a>
+          <a href="#" data-i18n-aria-label="footer.instagramAria" aria-label="Instagram">INSTAGRAM</a>
+          <a href="#" data-i18n-aria-label="footer.linkedinAria" aria-label="LinkedIn">LINKEDIN</a>
+          <a href="#" data-i18n-aria-label="footer.tiktokAria" aria-label="TikTok">TIKTOK</a>
         </div>
       </div>
     </div>
@@ -412,28 +392,29 @@
   ============================================================ -->
   <div id="mobileDock" class="mobile-dock">
     <div class="mobile-dock__backdrop" id="mobileDockBackdrop" aria-hidden="true"></div>
-    <div class="mobile-dock__shell" aria-label="Navegación móvil">
+    <div class="mobile-dock__shell" data-i18n-aria-label="mobileDock.shellAria" aria-label="Navegación móvil">
       <div class="mobile-dock__compact">
-        <a href="#s-access" class="mobile-dock__cta btn">ACCESO</a>
+        <a href="#s-access" class="mobile-dock__cta btn" data-i18n="mobileDock.cta">ACCESO</a>
         <button type="button" class="mobile-dock__toggle btn" id="mobileDockToggle"
-                aria-expanded="false" aria-controls="mobileDockPanel">
+                aria-expanded="false" aria-controls="mobileDockPanel" data-i18n="mobileDock.menu">
           MENÚ
         </button>
       </div>
-      <div id="mobileDockPanel" class="mobile-dock__panel" role="region" aria-label="Enlaces de sección" hidden>
-        <nav class="mobile-dock__links" aria-label="Secciones">
-          <a href="#s-marca" class="mobile-dock__link" data-mobile-dock-section="s-marca">MARCA</a>
-          <a href="#s-dif" class="mobile-dock__link" data-mobile-dock-section="s-dif">DIFERENCIA</a>
-          <a href="#s-vision" class="mobile-dock__link" data-mobile-dock-section="s-vision">VISIÓN</a>
-          <a href="#s-access" class="mobile-dock__link" data-mobile-dock-section="s-access">ACCESO</a>
+      <div id="mobileDockPanel" class="mobile-dock__panel" role="region" data-i18n-aria-label="mobileDock.panelAria" aria-label="Enlaces de sección" hidden>
+        <nav class="mobile-dock__links" data-i18n-aria-label="mobileDock.linksAria" aria-label="Secciones">
+          <a href="#s-marca" class="mobile-dock__link" data-mobile-dock-section="s-marca" data-i18n="nav.marca">MARCA</a>
+          <a href="#s-dif" class="mobile-dock__link" data-mobile-dock-section="s-dif" data-i18n="nav.diferencia">DIFERENCIA</a>
+          <a href="#s-vision" class="mobile-dock__link" data-mobile-dock-section="s-vision" data-i18n="nav.vision">VISIÓN</a>
+          <a href="#s-access" class="mobile-dock__link" data-mobile-dock-section="s-access" data-i18n="mobileDock.access">ACCESO</a>
         </nav>
       </div>
     </div>
   </div>
 
-  <!-- ============================================================
-       JAVASCRIPT
-  ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/npm/i18next@23.15.2/i18next.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@2.6.2/i18nextHttpBackend.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@8.0.0/i18nextBrowserLanguageDetector.min.js"></script>
+  <script src="i18n-init.js"></script>
   <script src="main.js" defer></script>
 </body>
 </html>

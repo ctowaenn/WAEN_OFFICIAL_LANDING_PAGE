@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "title": "WAENN — Vestir con Criterio",
+    "description": "WAENN — Moda con criterio. Diseño, tecnología y fit real. Spain, Est. 2025."
+  },
+  "nav": {
+    "ariaNav": "Navegación principal",
+    "logoAria": "WAENN — Inicio",
+    "marca": "MARCA",
+    "diferencia": "DIFERENCIA",
+    "vision": "VISIÓN",
+    "earlyAccess": "ACCESO ANTICIPADO",
+    "langToggle": "Idioma del sitio"
+  },
+  "intro": {
+    "aria": "Intro",
+    "comingSoon": "COMING SOON SEP 2026"
+  },
+  "hero": {
+    "aria": "VESTIR CON CRITERIO",
+    "tag": "SPAIN | EST.2025",
+    "h1Line1": "VESTIR\nCON",
+    "h1Red": "CRITERIO.",
+    "body": "WAENN nace para quienes no compran por impulso. Para quienes buscan una prenda que permanezca, que encaje de verdad y que diga algo sobre quién eres.",
+    "ctaAria": "Acciones principales",
+    "joinList": "UNIRME A LA LISTA",
+    "knowBrand": "CONOCE LA MARCA"
+  },
+  "app": {
+    "aria": "Experiencia Atelier Digital",
+    "tag": "EXPERIENCIA ATELIER A MEDIDA",
+    "stackAria": "Mockups de WAENN en móvil",
+    "mockupAlt1": "WAENN — Mockup 1",
+    "mockupAlt2": "WAENN — Mockup 2",
+    "mockupAlt3": "WAENN — Mockup 3"
+  },
+  "ticker": {
+    "aria": "Palabras clave",
+    "items": [
+      "MODA CON IDENTIDAD",
+      "DISEÑO & TECNOLOGÍA",
+      "SPAIN | EST.2025",
+      "FIT REAL",
+      "PERMANENCIA SOBRE TENDENCIA",
+      "ATELIER DIGITAL"
+    ]
+  },
+  "dif": {
+    "aria": "Lo que nos hace distintas",
+    "h1Line1": "LO QUE NOS",
+    "h1Line2": "HACE",
+    "h1Line3": "DISTINTAS.",
+    "intro": "No somos una marca de colección genérica. Somos el punto de encuentro entre la artesanía del diseño, la precisión de la tecnología y la honestidad de entender al cuerpo real.",
+    "c1Label": "Diseño con intención",
+    "c1Text": "Cada pieza de WAENN parte de una pregunta: ¿por qué existe esta prenda? No diseñamos por volumen. Diseñamos para que cada pieza tenga una razón de estar en tu armario y seguir ahí.",
+    "c2Label": "Tecnología aplicada al fit",
+    "c2Text": "Usamos tecnología no como marketing, sino como herramienta real. Para entender cómo se mueve un cuerpo, cómo cae una tela y cómo se siente una prenda cuando te la pones de verdad.",
+    "c3Label": "Identidad, no tendencia",
+    "c3Text": "En WAENN no seguimos temporadas. Construimos piezas que hablan del carácter de quien las lleva. La moda como expresión de quién eres, no de lo que está en el feed esta semana."
+  },
+  "access": {
+    "aria": "Acceso anticipado",
+    "h2Line1": "SÉ PARTE",
+    "h2Line2": "DE LO QUE",
+    "h2Red": "VIENE.",
+    "sub": "La primera colección de WAENN está a punto de ser presentada. Déjanos tus datos y serás el/la primerx en conocerla, con acceso exclusivo antes del lanzamiento público."
+  },
+  "form": {
+    "nameLabel": "NOMBRE",
+    "namePlaceholder": "Tu nombre",
+    "emailLabel": "CORREO ELECTRÓNICO",
+    "emailPlaceholder": "tu@correo.com",
+    "prendaLabel": "¿QUÉ BUSCAS EN UNA PRENDA?",
+    "prendaPlaceholder": "Selecciona una opción",
+    "optPermanencia": "Permanencia y calidad",
+    "optIdentidad": "Identidad y carácter",
+    "optFit": "Un fit que de verdad funcione",
+    "optTodo": "Todo lo anterior",
+    "submit": "SOLICITAR ACCESO ANTICIPADO →",
+    "success": "¡ RECIBIDO — GRACIAS !"
+  },
+  "vision": {
+    "aria": "Visión",
+    "tag": "VISIÓN",
+    "h2Line1": "MÁS ALLÁ",
+    "h2Line2": "DE LA",
+    "h2Line3": "COLECCIÓN.",
+    "body1": "WAENN empieza con una colección. Pero la visión es más amplia. Estamos construyendo un espacio donde el diseño desde 0, la tecnología de medidas y la experiencia atelier se integran en una sola propuesta.",
+    "body2": "Un lugar donde tu cuerpo no tiene que adaptarse a la prenda. La prenda se adapta a ti.",
+    "cta": "ATELIER DIGITAL — PRÓXIMAMENTE"
+  },
+  "marca": {
+    "aria": "Una marca construida sobre cuatro pilares",
+    "h2Line1": "UNA MARCA",
+    "h2Line2": "CONSTRUIDA SOBRE",
+    "h2Line3": "CUATRO PILARES.",
+    "p1Name": "PERMANENCIA",
+    "p1Text": "Creamos prendas pensadas para durar. No en tendencia, sino en valor. Piezas que siguen siendo tuyas con el tiempo porque se construyeron bien desde el principio.",
+    "p2Name": "IDENTIDAD",
+    "p2Text": "Vestir es un acto de comunicación. Cada elección dice algo. En WAENN queremos que lo que digas sea exactamente lo que quieres decir.",
+    "p3Name": "FIT REAL",
+    "p3Text": "El fit no es un detalle técnico. Es la diferencia entre una prenda que usas y una que olvidas. Diseñamos para cómo se siente el cuerpo.",
+    "p4Name": "INNOVACIÓN ÚTIL",
+    "p4Text": "La tecnología en WAENN no es decorativa. Es funcional. La usamos para entender y ajustar con más precisión y crear una experiencia de moda única."
+  },
+  "mosaic": {
+    "aria": "Editorial WAENN SS25",
+    "label": "WAENN — SS25",
+    "alt1": "WAENN SS25 — Editorial 1",
+    "alt2": "WAENN SS25 — Editorial 2",
+    "alt3": "WAENN SS25 — Editorial 4",
+    "alt4": "WAENN SS25 — Editorial 3",
+    "alt5": "WAENN SS25 — Editorial 5"
+  },
+  "historia": {
+    "aria": "Origen de WAENN",
+    "tag": "ORIGEN",
+    "h2Line1": "LA MODA",
+    "h2Line2": "MERECÍA OTRA",
+    "h2Red": "CONVERSACIÓN.",
+    "body1": "La moda actual ofrece demasiado y dice muy poco. Colecciones que se olvidan en semanas. Tallas que no tienen en cuenta cómo se siente una persona en su propio cuerpo.",
+    "body2": "WAENN nació de esa incomodidad. De la convicción de que diseñar bien implica escuchar, entender y construir algo que tenga sentido para quien lo viste, no solo para quien lo vende.",
+    "imgAlt": "WAENN — Folleto de producto"
+  },
+  "footer": {
+    "aria": "Pie de página",
+    "logoAria": "WAENN — Inicio",
+    "navAria": "Navegación del pie",
+    "instagramAria": "Instagram",
+    "linkedinAria": "LinkedIn",
+    "tiktokAria": "TikTok",
+    "copy": "ESPAÑA · 2025 · Todos los derechos reservados."
+  },
+  "mobileDock": {
+    "shellAria": "Navegación móvil",
+    "cta": "ACCESO",
+    "menu": "MENÚ",
+    "panelAria": "Enlaces de sección",
+    "linksAria": "Secciones",
+    "access": "ACCESO"
+  }
+}
