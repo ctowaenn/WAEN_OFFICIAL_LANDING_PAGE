@@ -481,11 +481,14 @@
   // ---------------------------------------------------------------------------
   // Brevo integration
   //
-  // Architecture: brevo.html is the single source of truth for the Brevo form
-  // action URL. We never inject Brevo's HTML into the page — we only fetch the
-  // file lazily, parse it, extract <form id="sib-form" action>, validate it,
-  // and assign it to #access-form. Submission goes via fetch (CORS) with a
-  // hidden iframe fallback if the browser blocks the cross-origin response.
+  // Architecture: iframe.html is the single source of truth for the Brevo
+  // hosted-form URL (the <iframe src="https://…sibforms.com/serve/…"> snippet
+  // from Brevo). We fetch it lazily, parse the iframe src, validate it (HTTPS,
+  // *.sibforms.com, /serve/…), and use it for:
+  //   - #access-form action (hybrid custom form + fetch POST), and/or
+  //   - .brevo-embed[data-brevo-dynamic-src] src (visible embed).
+  // Never take the POST URL from query strings or untrusted DOM — only from
+  // our static iframe.html after validation.
   // ---------------------------------------------------------------------------
 
   const BREVO_CACHE_KEY = 'waenn:brevoAction';
@@ -541,13 +544,17 @@
 
     brevoLoaderInflight = (async () => {
       try {
-        const res = await fetch('brevo.html', { cache: 'no-cache', credentials: 'omit' });
-        if (!res.ok) throw new Error('brevo.html responded ' + res.status);
+        const res = await fetch('iframe.html', { cache: 'no-cache', credentials: 'omit' });
+        if (!res.ok) throw new Error('iframe.html responded ' + res.status);
         const html = await res.text();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        const sib = doc.querySelector('form#sib-form, form[action*="sibforms.com/serve/"]');
-        const action = sib && sib.getAttribute('action');
-        if (!isValidBrevoAction(action)) throw new Error('action URL missing or invalid');
+        const wrapped =
+          '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' +
+          html.trim() +
+          '</body></html>';
+        const doc = new DOMParser().parseFromString(wrapped, 'text/html');
+        const ifr = doc.querySelector('iframe[src*="sibforms.com/serve/"], iframe[src*="sibforms.com"]');
+        const action = ifr && (ifr.getAttribute('src') || '').trim();
+        if (!isValidBrevoAction(action)) throw new Error('iframe src missing or invalid');
         writeBrevoCache(action);
         return action;
       } catch (err) {
@@ -606,6 +613,41 @@
     } else {
       window.setTimeout(trigger, 1500);
     }
+  }
+
+  /**
+   * Visible Brevo iframe: src comes only from iframe.html (lazy), not hardcoded in index.
+   */
+  function initBrevoDynamicIframe() {
+    const frame = document.querySelector('iframe.brevo-embed[data-brevo-dynamic-src]');
+    if (!frame) return;
+
+    const applySrc = async () => {
+      const url = await loadBrevoActionUrl();
+      if (url && isValidBrevoAction(url)) frame.setAttribute('src', url);
+    };
+
+    const section = $('s-access');
+    if (section && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              applySrc();
+              io.disconnect();
+              break;
+            }
+          }
+        },
+        { rootMargin: '280px 0px' }
+      );
+      io.observe(section);
+    } else {
+      applySrc();
+    }
+
+    frame.addEventListener('focusin', applySrc, { once: true });
+    frame.addEventListener('pointerenter', applySrc, { once: true });
   }
 
   function resolveLocale() {
@@ -790,6 +832,8 @@
       initHeroCtaSwitch();
       initMobileDock();
       initFormFallback();
+      initBrevoLoader();
+      initBrevoDynamicIframe();
       await initIntroMask();
       recalcIntroMaxScroll();
       introDrivenByST = initIntroScrollEngine();
