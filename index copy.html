@@ -860,7 +860,7 @@
     <div class="intro-pin" id="introPin">
       <!-- Fashion photo behind the mask -->
       <img class="intro-photo"
-           src="assets/www.figma.com/a355e7a996287d78.png"
+           src="assets/BACKGROUND LANDING.jpg"
            alt="">
       <!-- NN cutout mask — black layer with transparent NN, scales on scroll -->
       <img class="intro-mask" id="introMask"
@@ -1015,7 +1015,13 @@
           </div>
           <div class="form-group rv d3">
             <label class="form-label" for="f-prenda">¿QUÉ BUSCAS EN UNA PRENDA?</label>
-            <input class="form-input" id="f-prenda" type="text" placeholder="Cuéntanos">
+            <select class="form-input" id="f-prenda" required>
+              <option value="" selected disabled hidden>Selecciona una opción</option>
+              <option value="Permanencia y calidad">Permanencia y calidad</option>
+              <option value="Identidad y carácter">Identidad y carácter</option>
+              <option value="Un fit que de verdad funcione">Un fit que de verdad funcione</option>
+              <option value="Todo lo anterior">Todo lo anterior</option>
+            </select>
           </div>
           <button type="submit" class="btn rv d4" style="width:100%;height:52px;font-size:11px;letter-spacing:2.2px;margin-top:20px;">
             SOLICITAR ACCESO ANTICIPADO →

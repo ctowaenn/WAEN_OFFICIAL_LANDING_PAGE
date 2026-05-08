@@ -14,7 +14,7 @@ body {
 }
 img { display: block; max-width: 100%; }
 a { text-decoration: none; color: inherit; }
-button, input, textarea { font-family: inherit; }
+button, input, textarea, select { font-family: inherit; }
 
 /* ================================================================
    VARIABLES
@@ -559,6 +559,23 @@ button, input, textarea { font-family: inherit; }
 }
 .form-input::placeholder { color: rgba(26,26,26,0.20); }
 .form-input:focus { border-color: rgba(26,26,26,0.45); }
+
+/* Make selects match the input look */
+select.form-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  padding-right: 28px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(26,26,26,0.35) 50%),
+    linear-gradient(135deg, rgba(26,26,26,0.35) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 45%,
+    calc(100% - 9px) 45%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
 .access-right .btn {
   height: 52px;
   width: 100%;
