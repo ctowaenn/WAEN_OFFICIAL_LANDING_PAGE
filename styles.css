@@ -555,7 +555,7 @@ button, input, textarea, select { font-family: inherit; }
   font-size: 18px;
   color: var(--dark);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
 }
 .form-input::placeholder { color: rgba(26,26,26,0.20); }
 .form-input:focus { border-color: rgba(26,26,26,0.45); }
@@ -566,15 +566,44 @@ select.form-input {
   -webkit-appearance: none;
   -moz-appearance: none;
   cursor: pointer;
-  padding-right: 28px;
+  padding-right: 34px;
+  border-radius: 10px;
+  padding-left: 10px;
+  margin-left: -10px;
+  padding-top: 6px;
+  padding-bottom: 12px;
   background-image:
-    linear-gradient(45deg, transparent 50%, rgba(26,26,26,0.35) 50%),
-    linear-gradient(135deg, rgba(26,26,26,0.35) 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, rgba(26,26,26,0.42) 50%),
+    linear-gradient(135deg, rgba(26,26,26,0.42) 50%, transparent 50%);
   background-position:
-    calc(100% - 14px) 45%,
-    calc(100% - 9px) 45%;
+    calc(100% - 18px) 48%,
+    calc(100% - 13px) 48%;
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
+}
+
+select.form-input:hover {
+  border-color: rgba(26,26,26,0.35);
+  background-color: rgba(200,16,46,0.04);
+}
+
+select.form-input:focus-visible {
+  border-color: rgba(200,16,46,0.55);
+  background-color: rgba(200,16,46,0.06);
+  box-shadow: 0 0 0 4px rgba(200,16,46,0.10);
+}
+
+/* Placeholder (first disabled option) look */
+select.form-input:invalid {
+  color: rgba(26,26,26,0.38);
+}
+
+/* Option styling is browser-limited, but helps where supported */
+select.form-input option {
+  color: #1a1a1a;
+}
+select.form-input option:checked {
+  background: rgba(200,16,46,0.14);
 }
 .access-right .btn {
   height: 52px;
