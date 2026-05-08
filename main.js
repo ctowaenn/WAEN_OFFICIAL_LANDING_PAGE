@@ -12,10 +12,23 @@
   const difSection = $('s-dif');
 
   let introMaxScroll = 1;
+  let introComingLine = null;
+  let introBrandRow = null;
+  /** When true, intro progress comes from GSAP ScrollTrigger (smoothed scrub), not raw scroll. */
+  let introDrivenByST = false;
 
   const clamp01 = (n) => Math.min(Math.max(n, 0), 1);
   const lerp = (a, b, t) => a + (b - a) * t;
   const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  /** Softer, more “premium” scrub curve for the intro mask (less mechanical than cubic). */
+  const easeInOutQuint = (t) =>
+    t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
+  /** Settle / “luxury” ease — common in motion design for entrances (exponential decay). */
+  const easeOutExpo = (t) => {
+    const x = clamp01(t);
+    return x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
+  };
+  const easeOutCubic = (t) => 1 - Math.pow(1 - clamp01(t), 3);
   const smoothstep = (edge0, edge1, x) => {
     const t = clamp01((x - edge0) / Math.max(edge1 - edge0, 1e-6));
     return t * t * (3 - 2 * t);
@@ -87,11 +100,17 @@
     introMaxScroll = Math.max(introSection.offsetHeight - vh, 1);
   }
 
-  function updateIntro() {
+  function cacheIntroOverlayParts() {
+    if (!introOverlay || introComingLine) return;
+    introComingLine = introOverlay.querySelector('.intro-coming');
+    introBrandRow = introOverlay.querySelector('.intro-brand');
+  }
+
+  function updateIntroFromProgress(pRaw) {
     if (!introSection || !introReveal) return;
 
-    const p = clamp01(window.scrollY / introMaxScroll);
-    const pe = easeInOutCubic(p);
+    const p = clamp01(pRaw);
+    const pe = easeInOutQuint(p);
 
     // Scale the mask from small → massive so the letters expand and then disappear.
     // Use vmin so it behaves consistently across aspect ratios.
@@ -105,24 +124,88 @@
       introOverlay.style.maskSize = `${size}vmin`;
     }
 
-    // Cinematic crossfade into the full background image.
-    // By the time we reach the end, you see the full photo (not black).
-    const bgIn = smoothstep(0.78, 0.95, p);
-    const maskOut = 1 - smoothstep(0.82, 0.98, p);
-    const microZoom = lerp(1.0, 1.06, smoothstep(0.0, 0.95, p));
+    // Cinematic crossfade — wider ranges so the hand-off feels smooth, not abrupt.
+    const bgIn = smoothstep(0.68, 0.93, p);
+    const maskOut = 1 - smoothstep(0.74, 0.97, p);
+    const microZoom = lerp(1.0, 1.045, smoothstep(0.0, 1, p));
 
     document.documentElement.style.setProperty('--intro-bg-opacity', String(bgIn));
     document.documentElement.style.setProperty('--intro-bg-scale', String(microZoom));
 
     introReveal.style.opacity = String(maskOut);
     introReveal.style.transform = `scale(${microZoom})`;
+
+    const reduceMotion =
+      typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     if (introOverlay) {
-      // Show the text earlier, then gently fade it near the end.
-      const textIn = smoothstep(0.10, 0.28, p);
-      const textOut = 1 - smoothstep(0.78, 0.94, p);
-      introOverlay.style.opacity = String(textIn * textOut);
-      introOverlay.style.transform = `scale(${microZoom})`;
+      cacheIntroOverlayParts();
+
+      // Whole block: quick ramp so stagger reads clearly; stays solid through the end.
+      const shellIn = smoothstep(0.012, 0.09, p);
+      introOverlay.style.opacity = String(shellIn);
+      const driftPx = reduceMotion ? 0 : lerp(12, 0, easeInOutCubic(smoothstep(0, 0.38, p)));
+      introOverlay.style.transform = `translate3d(0, ${driftPx}px, 0) scale(${microZoom})`;
+
+      // “Coming soon”: blur → sharp, tracking tightens, slight rise + scale settle.
+      if (introComingLine) {
+        const vis = smoothstep(0.04, 0.27, p);
+        const move = easeOutExpo(smoothstep(0, 0.36, p));
+        const y = reduceMotion ? 0 : lerp(20, 0, move);
+        const sc = reduceMotion ? 1 : lerp(0.96, 1, move);
+        const blurCap =
+          reduceMotion || (window.matchMedia && window.matchMedia('(max-width: 600px)').matches) ? 4 : 7;
+        const blurPx = reduceMotion ? 0 : lerp(blurCap, 0, easeOutCubic(vis));
+        const trackingEm = lerp(0.4, 0.18, easeInOutCubic(smoothstep(0, 0.52, p)));
+        introComingLine.style.opacity = String(Math.min(1, vis * 0.94));
+        introComingLine.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(${sc.toFixed(4)})`;
+        introComingLine.style.letterSpacing = reduceMotion ? '' : `${trackingEm.toFixed(3)}em`;
+        introComingLine.style.filter = blurPx > 0.04 ? `blur(${blurPx.toFixed(2)}px)` : 'none';
+      }
+
+      // Logo row: delayed stagger (motion-design overlap), gentler scale-up.
+      if (introBrandRow) {
+        const vis = smoothstep(0.11, 0.4, p);
+        const move = easeOutExpo(smoothstep(0.06, 0.44, p));
+        const y = reduceMotion ? 0 : lerp(26, 0, move);
+        const sc = reduceMotion ? 1 : lerp(0.93, 1, move);
+        introBrandRow.style.opacity = String(Math.min(1, vis * 0.98));
+        introBrandRow.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(${sc.toFixed(4)})`;
+      }
     }
+  }
+
+  function updateIntroFromScroll() {
+    if (!introSection || !introReveal) return;
+    const denom = Math.max(introMaxScroll, 1);
+    updateIntroFromProgress(window.scrollY / denom);
+  }
+
+  /**
+   * GSAP ScrollTrigger: scrub con inercia (mejor sensación que scroll 1:1).
+   * Motion (ex-Framer Motion) no aplica aquí al ser HTML sin React.
+   */
+  function initIntroScrollEngine() {
+    if (!introSection || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      return false;
+    }
+    gsap.registerPlugin(ScrollTrigger);
+    const reduce =
+      typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const scrub = reduce ? 0 : 0.85;
+
+    const st = ScrollTrigger.create({
+      id: 'intro-pin-scrub',
+      trigger: introSection,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub,
+      onUpdate: (self) => {
+        updateIntroFromProgress(self.progress);
+      },
+    });
+    updateIntroFromProgress(st.progress);
+    return true;
   }
 
   function updateApp() {
@@ -182,7 +265,7 @@
     if (rafPending) return;
     rafPending = true;
     requestAnimationFrame(() => {
-      updateIntro();
+      if (!introDrivenByST) updateIntroFromScroll();
       updateApp();
       updateNav();
       rafPending = false;
@@ -425,12 +508,14 @@
       'resize',
       () => {
         recalcIntroMaxScroll();
+        if (introDrivenByST && typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
         onScroll();
       },
       { passive: true }
     );
     window.addEventListener('load', () => {
       recalcIntroMaxScroll();
+      if (introDrivenByST && typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
       onScroll();
     });
 
@@ -442,6 +527,9 @@
       initFormFallback();
       await initIntroMask();
       recalcIntroMaxScroll();
+      introDrivenByST = initIntroScrollEngine();
+      if (!introDrivenByST) updateIntroFromScroll();
+      if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
       onScroll();
     })();
   }
