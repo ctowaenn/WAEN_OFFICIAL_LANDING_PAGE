@@ -10,6 +10,14 @@
   const appPhoneStack = document.querySelector('.app-phone-stack');
   const difSection = $('s-dif');
 
+  const clamp01 = (n) => Math.min(Math.max(n, 0), 1);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const smoothstep = (edge0, edge1, x) => {
+    const t = clamp01((x - edge0) / Math.max(edge1 - edge0, 1e-6));
+    return t * t * (3 - 2 * t);
+  };
+
   function supportsMask() {
     return (
       (window.CSS && CSS.supports && (CSS.supports('mask-image', 'url("x")') || CSS.supports('-webkit-mask-image', 'url("x")'))) ||
@@ -60,6 +68,8 @@
     }
 
     try {
+      // Use the reveal image as background too, so the end state is the full photo.
+      document.documentElement.style.setProperty('--intro-bg-url', `url("${introReveal.currentSrc || introReveal.src}")`);
       const dataUrl = await buildInvertedMaskDataUrl('assets/waenn_logo.jpeg');
       document.documentElement.style.setProperty('--waenn-mask-url', `url("${dataUrl}")`);
     } catch {
@@ -73,18 +83,28 @@
 
     const vh = window.innerHeight;
     const maxScroll = introSection.offsetHeight - vh;
-    const p = Math.min(Math.max(window.scrollY / Math.max(maxScroll, 1), 0), 1);
+    const p = clamp01(window.scrollY / Math.max(maxScroll, 1));
+    const pe = easeInOutCubic(p);
 
     // Scale the mask from small → massive so the letters expand and then disappear.
     // Use vmin so it behaves consistently across aspect ratios.
-    const start = 32; // vmin
-    const end = 900; // vmin (effectively exits viewport)
-    const size = start + (end - start) * p;
+    const start = 26; // vmin
+    const end = 1200; // vmin (guarantee offscreen on ultrawide)
+    const size = lerp(start, end, pe);
     introReveal.style.webkitMaskSize = `${size}vmin`;
     introReveal.style.maskSize = `${size}vmin`;
 
-    // Hard-cut near the end to guarantee hero reveals without a lingering edge.
-    introReveal.style.opacity = p > 0.92 ? '0' : '1';
+    // Cinematic crossfade into the full background image.
+    // By the time we reach the end, you see the full photo (not black).
+    const bgIn = smoothstep(0.78, 0.95, p);
+    const maskOut = 1 - smoothstep(0.82, 0.98, p);
+    const microZoom = lerp(1.0, 1.06, smoothstep(0.0, 0.95, p));
+
+    document.documentElement.style.setProperty('--intro-bg-opacity', String(bgIn));
+    document.documentElement.style.setProperty('--intro-bg-scale', String(microZoom));
+
+    introReveal.style.opacity = String(maskOut);
+    introReveal.style.transform = `scale(${microZoom})`;
   }
 
   function updateApp() {

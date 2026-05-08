@@ -28,6 +28,9 @@ button, input, textarea { font-family: inherit; }
   --tan:     #7a756e;
   --nav-h:   72px;
   --waenn-mask-url: none;
+  --intro-bg-url: none;
+  --intro-bg-opacity: 0;
+  --intro-bg-scale: 1;
 }
 
 /* ================================================================
@@ -160,6 +163,21 @@ button, input, textarea { font-family: inherit; }
   overflow: hidden;
   background: var(--black);
 }
+/* Dedicated background layer for cinematic finish (no black cut) */
+.intro-pin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--intro-bg-url);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: var(--intro-bg-opacity);
+  transform: scale(var(--intro-bg-scale));
+  filter: saturate(1.02) contrast(1.02);
+  will-change: opacity, transform;
+  z-index: 0;
+}
 /* intro-photo removed: reveal layer is masked into letters */
 
 /* New: video/photo revealed only inside the WAENN letters */
@@ -169,8 +187,9 @@ button, input, textarea { font-family: inherit; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.95;
+  opacity: 1;
   will-change: transform, -webkit-mask-size, mask-size, opacity;
+  z-index: 1;
 
   -webkit-mask-image: var(--waenn-mask-url);
   mask-image: var(--waenn-mask-url);
