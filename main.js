@@ -70,7 +70,7 @@
     try {
       // Use the reveal image as background too, so the end state is the full photo.
       document.documentElement.style.setProperty('--intro-bg-url', `url("${introReveal.currentSrc || introReveal.src}")`);
-      const dataUrl = await buildInvertedMaskDataUrl('assets/waenn_logo.jpeg');
+      const dataUrl = await buildInvertedMaskDataUrl('assets/NN.png');
       document.documentElement.style.setProperty('--waenn-mask-url', `url("${dataUrl}")`);
     } catch {
       // If anything fails, degrade gracefully.
