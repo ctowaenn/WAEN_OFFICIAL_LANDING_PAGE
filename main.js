@@ -5,6 +5,7 @@
 
   const introSection = $('s-intro');
   const introReveal = $('introReveal');
+  const introOverlay = $('introOverlay');
   const nav = $('nav');
   const appSection = $('s-app');
   const appPhoneStack = document.querySelector('.app-phone-stack');
@@ -93,6 +94,10 @@
     const size = lerp(start, end, pe);
     introReveal.style.webkitMaskSize = `${size}vmin`;
     introReveal.style.maskSize = `${size}vmin`;
+    if (introOverlay) {
+      introOverlay.style.webkitMaskSize = `${size}vmin`;
+      introOverlay.style.maskSize = `${size}vmin`;
+    }
 
     // Cinematic crossfade into the full background image.
     // By the time we reach the end, you see the full photo (not black).
@@ -105,6 +110,9 @@
 
     introReveal.style.opacity = String(maskOut);
     introReveal.style.transform = `scale(${microZoom})`;
+    if (introOverlay) {
+      introOverlay.style.transform = `scale(${microZoom})`;
+    }
   }
 
   function updateApp() {
