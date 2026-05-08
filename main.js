@@ -111,6 +111,10 @@
     introReveal.style.opacity = String(maskOut);
     introReveal.style.transform = `scale(${microZoom})`;
     if (introOverlay) {
+      // Show the text earlier, then gently fade it near the end.
+      const textIn = smoothstep(0.10, 0.28, p);
+      const textOut = 1 - smoothstep(0.78, 0.94, p);
+      introOverlay.style.opacity = String(textIn * textOut);
       introOverlay.style.transform = `scale(${microZoom})`;
     }
   }

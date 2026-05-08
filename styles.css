@@ -218,7 +218,7 @@ button, input, textarea, select { font-family: inherit; }
 .intro-overlay {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 4;
   pointer-events: none;
   display: grid;
   place-items: center;
@@ -235,6 +235,9 @@ button, input, textarea, select { font-family: inherit; }
   mask-size: 32vmin;
   -webkit-mask-mode: luminance;
   mask-mode: luminance;
+
+  opacity: 0;
+  will-change: opacity, transform, -webkit-mask-size, mask-size;
 }
 .intro-overlay-inner {
   position: relative;
@@ -248,15 +251,15 @@ button, input, textarea, select { font-family: inherit; }
   transform: translateY(4px);
 }
 .intro-coming {
-  font-family: "Barlow Condensed", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   font-weight: 700;
   font-size: clamp(14px, 1.7vw, 20px);
   opacity: 0.88;
 }
 .intro-brand {
   margin-top: clamp(10px, 1.8vw, 18px);
-  font-family: "Barlow Condensed", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-weight: 700;
+  font-family: "Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-weight: 800;
   font-size: clamp(42px, 6.4vw, 86px);
   letter-spacing: 0.22em;
   line-height: 0.92;
@@ -690,12 +693,14 @@ select.form-input option:checked {
 ================================================================ */
 #s-vision {
   display: grid;
-  /* Exact desktop layout: 592px video + 466px text */
-  grid-template-columns: 592px 466px;
+  /* Video fixed, text expands to avoid clipping */
+  grid-template-columns: 592px minmax(0, 1fr);
   min-height: 760px;
-  justify-content: center;
+  justify-content: stretch;
   background: var(--black);
-  width: 100%;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
 }
 .vision-left {
   position: relative;
@@ -711,7 +716,7 @@ select.form-input option:checked {
 }
 .vision-right {
   background: var(--black);
-  padding: 60px 56px 60px 56px;
+  padding: 60px 44px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
