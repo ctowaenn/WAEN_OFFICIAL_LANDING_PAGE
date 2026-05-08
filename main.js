@@ -11,6 +11,8 @@
   const appPhoneStack = document.querySelector('.app-phone-stack');
   const difSection = $('s-dif');
 
+  let introMaxScroll = 1;
+
   const clamp01 = (n) => Math.min(Math.max(n, 0), 1);
   const lerp = (a, b, t) => a + (b - a) * t;
   const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -79,12 +81,16 @@
     }
   }
 
+  function recalcIntroMaxScroll() {
+    if (!introSection) return;
+    const vh = window.innerHeight;
+    introMaxScroll = Math.max(introSection.offsetHeight - vh, 1);
+  }
+
   function updateIntro() {
     if (!introSection || !introReveal) return;
 
-    const vh = window.innerHeight;
-    const maxScroll = introSection.offsetHeight - vh;
-    const p = clamp01(window.scrollY / Math.max(maxScroll, 1));
+    const p = clamp01(window.scrollY / introMaxScroll);
     const pe = easeInOutCubic(p);
 
     // Scale the mask from small → massive so the letters expand and then disappear.
@@ -159,12 +165,13 @@
     const vh = window.innerHeight;
     const isDark = window.scrollY > introH - vh * 0.3;
 
+    const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 72;
     const darkSections = [difSection, $('s-vision'), $('s-footer')];
     let overDark = false;
     for (const sec of darkSections) {
       if (!sec) continue;
       const r = sec.getBoundingClientRect();
-      if (r.top < 60 && r.bottom > 0) overDark = true;
+      if (r.top < navH && r.bottom > 0) overDark = true;
     }
 
     nav.classList.toggle('dark', isDark || overDark);
@@ -276,6 +283,85 @@
     });
   }
 
+  function initMobileDock() {
+    const dock = $('mobileDock');
+    const toggle = $('mobileDockToggle');
+    const panel = $('mobileDockPanel');
+    const backdrop = $('mobileDockBackdrop');
+    if (!dock || !toggle || !panel || !backdrop) return;
+
+    const mq = window.matchMedia('(max-width: 900px)');
+    const sectionIds = ['s-marca', 's-dif', 's-vision', 's-access'];
+    const sections = sectionIds.map((id) => $(id)).filter(Boolean);
+    const links = Array.from(document.querySelectorAll('[data-mobile-dock-section]'));
+
+    function setActiveById(id) {
+      links.forEach((l) => {
+        l.classList.toggle('is-active', l.getAttribute('data-mobile-dock-section') === id);
+      });
+    }
+
+    function setOpen(open) {
+      dock.classList.toggle('mobile-dock--open', open);
+      document.body.classList.toggle('mobile-dock--expanded', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      panel.hidden = !open;
+      backdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
+    }
+
+    function close() {
+      setOpen(false);
+    }
+
+    toggle.addEventListener('click', () => {
+      setOpen(!dock.classList.contains('mobile-dock--open'));
+    });
+    backdrop.addEventListener('click', close);
+
+    links.forEach((a) => {
+      a.addEventListener('click', () => {
+        window.setTimeout(close, 320);
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (!dock.classList.contains('mobile-dock--open')) return;
+      e.preventDefault();
+      close();
+      toggle.focus();
+    });
+
+    function applyHashActive() {
+      const raw = (location.hash || '').replace(/^#/, '');
+      if (sectionIds.includes(raw)) setActiveById(raw);
+    }
+
+    window.addEventListener('hashchange', applyHashActive);
+
+    if (sections.length && links.length && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting && e.intersectionRatio >= 0.2)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          if (!visible.length) return;
+          const id = visible[0].target.id;
+          if (sectionIds.includes(id)) setActiveById(id);
+        },
+        { threshold: [0.2, 0.35, 0.5], rootMargin: '-22% 0px -38% 0px' }
+      );
+      sections.forEach((s) => io.observe(s));
+    }
+
+    function onMqChange() {
+      if (!mq.matches) close();
+    }
+    mq.addEventListener('change', onMqChange);
+    onMqChange();
+    applyHashActive();
+  }
+
   function initFormFallback() {
     // If Brevo embed isn't installed yet, keep the original UX feedback.
     const form = $('access-form');
@@ -300,12 +386,27 @@
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener(
+    'resize',
+    () => {
+      recalcIntroMaxScroll();
+      onScroll();
+    },
+    { passive: true }
+  );
+  window.addEventListener('load', () => {
+    recalcIntroMaxScroll();
+    onScroll();
+  });
 
   (async () => {
+    recalcIntroMaxScroll();
     initRevealObserver();
     initHeroCtaSwitch();
+    initMobileDock();
     initFormFallback();
     await initIntroMask();
+    recalcIntroMaxScroll();
     onScroll();
   })();
 })();

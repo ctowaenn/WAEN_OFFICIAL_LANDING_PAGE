@@ -23,7 +23,8 @@
       <img id="nav-logo-img"
            src="assets/LOGO%20WAENN.png"
            alt="WAENN"
-           height="20">
+           height="20"
+           decoding="async">
     </a>
     <div id="nav-links">
       <a href="#s-marca">MARCA</a>
@@ -42,12 +43,14 @@
       <img class="intro-reveal" id="introReveal"
            src="assets/1.jpg"
            alt=""
-           aria-hidden="true">
+           aria-hidden="true"
+           decoding="async"
+           fetchpriority="high">
       <div class="intro-overlay" id="introOverlay" aria-hidden="true">
         <div class="intro-overlay-inner">
           <div class="intro-coming">COMING SOON SEP 2026</div>
           <div class="intro-brand">
-            <img class="intro-logo" src="assets/LOGO%20WAENN.png" alt="WAENN">
+            <img class="intro-logo" src="assets/LOGO%20WAENN.png" alt="WAENN" decoding="async">
             <span class="intro-tm">™</span>
           </div>
         </div>
@@ -64,7 +67,8 @@
   <section id="s-hero" aria-label="VESTIR CON CRITERIO">
     <img class="hero-bg"
          src="assets/www.figma.com/b963d7bc48ce8109.png"
-         alt="">
+         alt=""
+         decoding="async">
     <div class="hero-inner">
       <p class="hero-tag rv">SPAIN | EST.2025</p>
 
@@ -107,13 +111,16 @@
         <div class="app-phone-stack" aria-label="Mockups de WAENN en móvil">
           <img class="app-phone"
                src="assets/www.figma.com/591ba7f0a98b5984.png"
-               alt="WAENN — Mockup 1">
+               alt="WAENN — Mockup 1"
+               decoding="async">
           <img class="app-phone"
                src="assets/www.figma.com/591ba7f0a98b5984.png"
-               alt="WAENN — Mockup 2">
+               alt="WAENN — Mockup 2"
+               decoding="async">
           <img class="app-phone"
                src="assets/www.figma.com/591ba7f0a98b5984.png"
-               alt="WAENN — Mockup 3">
+               alt="WAENN — Mockup 3"
+               decoding="async">
         </div>
       </div>
     </div>
@@ -244,6 +251,7 @@
       <video class="vision-video"
              src="assets/magnific_starting-from-start-image_2895295034.mp4"
              autoplay muted loop playsinline
+             preload="metadata"
              poster="assets/1.jpg"
              aria-hidden="true">
       </video>
@@ -306,24 +314,34 @@
   <section id="s-mosaic" aria-label="Editorial WAENN SS25">
     <div class="mosaic-cell mosaic-cell-1 rv-fade">
       <img src="assets/www.figma.com/cf1684d058bc617b.jpg"
-           alt="WAENN SS25 — Editorial 1">
+           alt="WAENN SS25 — Editorial 1"
+           loading="lazy"
+           decoding="async">
       <span class="mosaic-label">WAENN — SS25</span>
     </div>
     <div class="mosaic-cell rv-fade d1">
       <img src="assets/www.figma.com/77822a47e521b4a5.jpg"
-           alt="WAENN SS25 — Editorial 2">
+           alt="WAENN SS25 — Editorial 2"
+           loading="lazy"
+           decoding="async">
     </div>
     <div class="mosaic-cell rv-fade d2">
       <img src="assets/www.figma.com/47b2b92d98a4c628.jpg"
-           alt="WAENN SS25 — Editorial 4">
+           alt="WAENN SS25 — Editorial 4"
+           loading="lazy"
+           decoding="async">
     </div>
     <div class="mosaic-cell rv-fade d1">
       <img src="assets/www.figma.com/dde4941140048cd5.jpg"
-           alt="WAENN SS25 — Editorial 3">
+           alt="WAENN SS25 — Editorial 3"
+           loading="lazy"
+           decoding="async">
     </div>
     <div class="mosaic-cell rv-fade d3">
       <img src="assets/www.figma.com/23f49cb9b29135ec.jpg"
-           alt="WAENN SS25 — Editorial 5">
+           alt="WAENN SS25 — Editorial 5"
+           loading="lazy"
+           decoding="async">
     </div>
   </section>
 
@@ -349,7 +367,9 @@
     </div>
     <div class="historia-right rv-fade">
       <img src="assets/www.figma.com/a225a8fc81b0d377.png"
-           alt="WAENN — Folleto de producto">
+           alt="WAENN — Folleto de producto"
+           loading="lazy"
+           decoding="async">
     </div>
   </section>
 
@@ -362,7 +382,9 @@
       <a href="#" aria-label="WAENN — Inicio">
         <img class="footer-logo"
              src="assets/www.figma.com/c5cd53efd98cf178.png"
-             alt="WAENN">
+             alt="WAENN"
+             loading="lazy"
+             decoding="async">
       </a>
       <nav class="footer-nav" aria-label="Footer navigation">
         <a href="#s-marca">MARCA</a>
@@ -384,6 +406,30 @@
       </div>
     </div>
   </footer>
+
+  <!-- ============================================================
+       MOBILE — PILL DOCK (≤900px)
+  ============================================================ -->
+  <div id="mobileDock" class="mobile-dock">
+    <div class="mobile-dock__backdrop" id="mobileDockBackdrop" aria-hidden="true"></div>
+    <div class="mobile-dock__shell" aria-label="Navegación móvil">
+      <div class="mobile-dock__compact">
+        <a href="#s-access" class="mobile-dock__cta btn">ACCESO</a>
+        <button type="button" class="mobile-dock__toggle btn" id="mobileDockToggle"
+                aria-expanded="false" aria-controls="mobileDockPanel">
+          MENÚ
+        </button>
+      </div>
+      <div id="mobileDockPanel" class="mobile-dock__panel" role="region" aria-label="Enlaces de sección" hidden>
+        <nav class="mobile-dock__links" aria-label="Secciones">
+          <a href="#s-marca" class="mobile-dock__link" data-mobile-dock-section="s-marca">MARCA</a>
+          <a href="#s-dif" class="mobile-dock__link" data-mobile-dock-section="s-dif">DIFERENCIA</a>
+          <a href="#s-vision" class="mobile-dock__link" data-mobile-dock-section="s-vision">VISIÓN</a>
+          <a href="#s-access" class="mobile-dock__link" data-mobile-dock-section="s-access">ACCESO</a>
+        </nav>
+      </div>
+    </div>
+  </div>
 
   <!-- ============================================================
        JAVASCRIPT
