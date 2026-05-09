@@ -123,7 +123,9 @@
 
     <label id="ws-consent-block" class="ws-consent" hidden>
       <input type="checkbox" form="access-form" name="ACEPTA_MARKETING" id="access-consent" value="1" />
-      <span data-i18n-key="accessGame.consent">Acepto recibir comunicaciones de WAENN y la política de privacidad.</span>
+      <span class="ws-consent__text">
+        <span data-i18n-key="accessGame.consentBefore">Acepto recibir comunicaciones de WAENN y la </span><a href="/privacy" class="ws-consent__link" data-i18n-key="accessGame.consentPrivacyLink" data-i18n-aria-label="accessGame.consentPrivacyAria">política de privacidad</a><span data-i18n-key="accessGame.consentAfter">.</span>
+      </span>
     </label>
 
     <form id="access-form" data-brevo="true" method="POST" action="#" target="brevo-hidden-frame" novalidate>

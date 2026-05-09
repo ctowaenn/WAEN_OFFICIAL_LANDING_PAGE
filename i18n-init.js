@@ -8,12 +8,15 @@
 
   function setDocumentMeta() {
     document.documentElement.lang = resolvedLang();
-    var title = i18next.t('meta.title');
-    if (title && title !== 'meta.title') document.title = title;
+    var page = document.body && document.body.getAttribute('data-i18n-page');
+    var titleKey = page === 'privacy' ? 'privacyPage.meta.title' : 'meta.title';
+    var descKey = page === 'privacy' ? 'privacyPage.meta.description' : 'meta.description';
+    var title = i18next.t(titleKey);
+    if (title && title !== titleKey) document.title = title;
     var metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
-      var d = i18next.t('meta.description');
-      if (d && d !== 'meta.description') metaDesc.setAttribute('content', d);
+      var d = i18next.t(descKey);
+      if (d && d !== descKey) metaDesc.setAttribute('content', d);
     }
   }
 

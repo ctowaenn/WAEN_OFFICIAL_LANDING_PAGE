@@ -1031,12 +1031,16 @@
             error: 'Error',
             mockSuccess: 'Modo prueba: no se envió',
             mockToggle: 'Envío real',
-            consent: 'Acepto comunicaciones',
+            consentBefore: 'Acepto comunicaciones y la ',
+            consentPrivacyLink: 'política de privacidad',
+            consentPrivacyAria: 'Política de privacidad',
+            consentAfter: '.',
             validationName: 'Nombre',
             validationEmail: 'Email',
             validationInterest: 'Elige interés',
           },
         };
+        applyI18nToDom();
         bootEmbedded();
       });
   } else if (window.i18nReady) {

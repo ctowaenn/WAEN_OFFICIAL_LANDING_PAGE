@@ -90,7 +90,10 @@
     "cartNeedInterest": "Añade al menos un interés; después pulsa el carrito.",
     "cartSubmitCta": "Enviar suscripción — pulsa el carrito",
     "cartSubmit": "Toca la cesta para enviar",
-    "consent": "Acepto recibir comunicaciones de WAENN y la política de privacidad.",
+    "consentBefore": "Acepto recibir comunicaciones de WAENN y la ",
+    "consentPrivacyLink": "política de privacidad",
+    "consentPrivacyAria": "Política de privacidad (abre en la misma ventana)",
+    "consentAfter": ".",
     "validationName": "Escribe tu nombre.",
     "validationEmail": "Escribe un email válido.",
     "validationInterest": "Añade al menos un interés a la cesta.",
@@ -185,5 +188,33 @@
     "panelAria": "Enlaces de sección",
     "linksAria": "Secciones",
     "access": "ACCESO"
+  },
+  "privacyPage": {
+    "meta": {
+      "title": "WAENN — Política de privacidad",
+      "description": "Información sobre el tratamiento de datos personales en la lista de acceso anticipado de WAENN, Brevo, Vercel y sus derechos."
+    },
+    "h1": "Política de privacidad",
+    "updated": "Última actualización: 9 de mayo de 2026",
+    "s1h2": "1. Responsable del tratamiento",
+    "s1p1": "El responsable del tratamiento de los datos personales recogidos a través del formulario de acceso anticipado en este sitio es WAENN (en adelante, «WAENN» o «nosotros»). Para ejercer sus derechos o resolver dudas sobre privacidad, puede contactarnos en la dirección de correo que indiquemos en este sitio o en comunicaciones oficiales.",
+    "s2h2": "2. Datos que tratamos y origen",
+    "s2p1": "Tratamos los datos que usted nos facilita de forma activa al solicitar formar parte de la lista de acceso anticipado: nombre, dirección de correo electrónico, sus preferencias de interés relacionadas con la moda (por ejemplo, identidad de la prenda, calidad y permanencia, o ajuste), e idioma de preferencia cuando lo indique o deduzcamos del navegador. El envío del formulario implica que la información es veraz y le corresponde a usted.",
+    "s3h2": "3. Finalidad y base legal",
+    "s3p1": "Los datos se tratan para gestionar su inscripción en la lista de interesados, enviarle comunicaciones sobre el lanzamiento, novedades y acceso anticipado de WAENN, y cumplir obligaciones legales aplicables. La base jurídica principal es su consentimiento (art. 6.1.a RGPD), que se recoge mediante la casilla correspondiente del formulario. El registro puede completarse mediante doble opt-in por correo (confirmación) según la configuración de nuestro proveedor de email.",
+    "s4h2": "4. Encargados y destinatarios",
+    "s4p1": "Utilizamos Brevo (antes Sendinblue) como proveedor de email marketing y gestión de contactos y listas, incluido el envío de mensajes y el flujo de doble opt-in. Los datos pueden alojarse o procesarse en servidores de Brevo, que puede implicar transferencias internacionales amparadas en las garantías previstas por la normativa (por ejemplo, cláusulas contractuales tipo). El sitio y la función de suscripción se alojan en Vercel, que presta infraestructura de alojamiento y ejecución; el código fuente del proyecto puede estar en GitHub, sin que el repositorio almacene datos de suscriptores de producción.",
+    "s5h2": "5. Plazo de conservación",
+    "s5p1": "Conservamos sus datos mientras mantenga su inscripción y el interés sea pertinente a la finalidad indicada, o el tiempo necesario para cumplir obligaciones legales. Puede darse de baja con los medios indicados en nuestros correos o solicitándolo al responsable; tras la baja dejaremos de utilizar sus datos para esas comunicaciones salvo obligación legal de conservación.",
+    "s6h2": "6. Sus derechos",
+    "s6p1": "Puede acceder, rectificar, suprimir u oponerse al tratamiento, limitarlo, portar sus datos cuando proceda y retirar el consentimiento en cualquier momento, sin afectar a la licitud del tratamiento previo. Puede dirigir su solicitud al contacto del responsable. También tiene derecho a reclamar ante la Agencia Española de Protección de Datos (www.aepd.es) u otra autoridad competente.",
+    "s7h2": "7. Menores",
+    "s7p1": "Los servicios y comunicaciones de WAENN no están dirigidos a menores de edad. Si tiene conocimiento de que hemos recopilado datos de un menor, contacte con nosotros para su eliminación.",
+    "s8h2": "8. Seguridad y tráfico técnico",
+    "s8p1": "Aplicamos medidas técnicas y organizativas razonables para proteger los datos. La solicitud de suscripción puede pasar por un endpoint en Vercel; con fines de seguridad puede aplicarse limitación de frecuencia por dirección IP en memoria del servidor, sin perseguir un perfilado de usuarios.",
+    "s9h2": "9. Cookies y almacenamiento local",
+    "s9p1": "Este sitio puede usar almacenamiento local (por ejemplo, preferencia de idioma mediante la configuración del sitio) para mejorar la experiencia. No utilizamos cookies de analítica invasiva en esta política genérica; si en el futuro se incorporan, actualizaremos este documento y, si procede, su consentimiento.",
+    "s10h2": "10. Cambios",
+    "s10p1": "Podemos actualizar esta política para reflejar cambios en el tratamiento o en la normativa. La fecha de «última actualización» indicará la revisión vigente; el uso continuado del formulario tras cambios relevantes implicará que ha tomado conocimiento de la versión publicada."
   }
 }

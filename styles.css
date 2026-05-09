@@ -1806,3 +1806,125 @@ select.form-input option:checked {
     transform: none;
   }
 }
+
+/* ================================================================
+   PRIVACY (satellite page, sin intro / mobile dock)
+================================================================ */
+body[data-i18n-page='privacy'] {
+  background: var(--white, #fff);
+  color: var(--dark, #1a1a1a);
+  padding-top: var(--nav-h, 72px);
+}
+
+body[data-i18n-page='privacy'] #nav {
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid var(--beige);
+}
+
+body[data-i18n-page='privacy'] #nav.dark {
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid var(--beige);
+}
+
+body[data-i18n-page='privacy'] #nav.dark #nav-logo-img {
+  filter: none;
+}
+
+body[data-i18n-page='privacy'] #nav.dark #nav-links a {
+  color: #1a1a1a;
+}
+
+body[data-i18n-page='privacy'] #nav.dark .lang-toggle__btn {
+  border-color: rgba(26, 26, 26, 0.2);
+  color: #1a1a1a;
+}
+
+.privacy-main {
+  min-height: 50vh;
+  padding: 48px 28px 80px;
+}
+
+.privacy-inner {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.privacy-h1 {
+  font-family: 'Barlow Condensed', system-ui, sans-serif;
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  color: var(--black, #0c0c0c);
+}
+
+.privacy-updated {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: rgba(26, 26, 26, 0.55);
+  margin: 0 0 36px;
+}
+
+.privacy-section {
+  margin-bottom: 28px;
+}
+
+.privacy-h2 {
+  font-family: 'Barlow Condensed', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  color: var(--black, #0c0c0c);
+}
+
+.privacy-p {
+  font-size: 15px;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  margin: 0;
+  color: rgba(26, 26, 26, 0.88);
+}
+
+@media screen and (max-width: 900px) {
+  body[data-i18n-page='privacy'] {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  body[data-i18n-page='privacy'] #nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px 20px;
+    max-width: min(52vw, 220px);
+    margin-left: auto;
+    margin-right: 8px;
+  }
+
+  body[data-i18n-page='privacy'] #nav-links a {
+    font-size: 9px;
+    letter-spacing: 1.6px;
+  }
+
+  body[data-i18n-page='privacy'] nav#nav > a.btn,
+  body[data-i18n-page='privacy'] #nav > a.btn {
+    display: inline-flex !important;
+    align-items: center;
+    height: 32px;
+    padding: 0 14px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  body[data-i18n-page='privacy'] .lang-toggle {
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
+  .privacy-main {
+    padding: 32px 18px 64px;
+  }
+}
