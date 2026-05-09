@@ -472,6 +472,74 @@
     }
   }
 
+  /** Google reCAPTCHA v3 for Sibforms POST (same as Brevo end-form: `execute` + field `g-recaptcha-response`). */
+  let waennRecaptchaScriptPromise = null;
+
+  function getBrevoRecaptchaSiteKey() {
+    const wx = document.getElementById('access-experience');
+    if (!wx) return '';
+    const k = wx.getAttribute('data-brevo-recaptcha-sitekey');
+    return k && typeof k === 'string' ? k.trim() : '';
+  }
+
+  function ensureRecaptchaV3Script(siteKey) {
+    if (!siteKey) return Promise.reject(new Error('no_recaptcha_sitekey'));
+    if (window.grecaptcha && typeof window.grecaptcha.ready === 'function') {
+      return Promise.resolve();
+    }
+    if (waennRecaptchaScriptPromise) return waennRecaptchaScriptPromise;
+    waennRecaptchaScriptPromise = new Promise(function (resolve, reject) {
+      const id = 'waenn-google-recaptcha';
+      const existing = document.getElementById(id);
+      if (existing) {
+        function onErr() {
+          waennRecaptchaScriptPromise = null;
+          reject(new Error('recaptcha_script_failed'));
+        }
+        if (window.grecaptcha && window.grecaptcha.ready) {
+          window.grecaptcha.ready(resolve);
+        } else {
+          existing.addEventListener('load', function () {
+            if (window.grecaptcha && window.grecaptcha.ready) window.grecaptcha.ready(resolve);
+            else {
+              waennRecaptchaScriptPromise = null;
+              reject(new Error('recaptcha_no_api'));
+            }
+          });
+          existing.addEventListener('error', onErr);
+        }
+        return;
+      }
+      const s = document.createElement('script');
+      s.id = id;
+      s.async = true;
+      s.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(siteKey);
+      s.onload = function () {
+        if (window.grecaptcha && window.grecaptcha.ready) window.grecaptcha.ready(resolve);
+        else {
+          waennRecaptchaScriptPromise = null;
+          reject(new Error('recaptcha_no_api'));
+        }
+      };
+      s.onerror = function () {
+        waennRecaptchaScriptPromise = null;
+        reject(new Error('recaptcha_script_failed'));
+      };
+      document.head.appendChild(s);
+    });
+    return waennRecaptchaScriptPromise;
+  }
+
+  function executeBrevoRecaptchaV3(siteKey) {
+    return ensureRecaptchaV3Script(siteKey).then(function () {
+      return new Promise(function (resolve, reject) {
+        window.grecaptcha.ready(function () {
+          window.grecaptcha.execute(siteKey, { action: 'submit' }).then(resolve).catch(reject);
+        });
+      });
+    });
+  }
+
   function readBrevoCache() {
     try {
       const raw = sessionStorage.getItem(BREVO_CACHE_KEY);
@@ -536,9 +604,30 @@
     return true;
   }
 
+  /** @returns {'waenn-proxy'|'waenn-sibforms'|'brevo-iframe'} */
+  function getAccessProvider() {
+    const section = $('s-access');
+    if (!section) return 'waenn-sibforms';
+    const p = String(section.getAttribute('data-access-provider') || 'waenn-sibforms').toLowerCase();
+    if (p === 'waenn-sibforms' || p === 'brevo-iframe' || p === 'waenn-proxy') return p;
+    return 'waenn-sibforms';
+  }
+
+  /** `/api/subscribe` solo existe con origen http(s); `file://` o similar → Sibforms */
+  function subscribeApiAvailable() {
+    const proto = window.location.protocol;
+    return proto === 'http:' || proto === 'https:';
+  }
+
+  /** Precargar action Sibforms salvo modo solo iframe visible (form WAENN oculto). */
+  function needsSibformsActionPreload() {
+    return getAccessProvider() !== 'brevo-iframe';
+  }
+
   function initBrevoLoader() {
     const form = $('access-form');
     if (!form || form.getAttribute('data-brevo') !== 'true') return;
+    if (!needsSibformsActionPreload()) return;
 
     let triggered = false;
     const trigger = async () => {
@@ -579,6 +668,7 @@
    * Visible Brevo iframe: src comes only from iframe.html (lazy), not hardcoded in index.
    */
   function initBrevoDynamicIframe() {
+    if (getAccessProvider() !== 'brevo-iframe') return;
     const frame = document.querySelector('iframe.brevo-embed[data-brevo-dynamic-src]');
     if (!frame) return;
 
@@ -628,9 +718,26 @@
   function initFormFallback() {
     const form = $('access-form');
     if (!form) return;
+    if (getAccessProvider() === 'brevo-iframe') return;
     const btn = form.querySelector('button[type="submit"]');
     const localeEl = $('f-locale');
     const t = (k) => (typeof window.i18nT === 'function' ? window.i18nT(k) : k);
+    const isAccessGame = Boolean(form.closest('#access-experience'));
+
+    function mapFlashKey(messageKey) {
+      if (!isAccessGame) return messageKey;
+      if (messageKey === 'form.loading') return 'accessGame.loading';
+      if (messageKey === 'form.success') return 'accessGame.success';
+      if (messageKey === 'form.error') return 'accessGame.error';
+      if (messageKey === 'form.submit') return 'accessGame.cartSubmit';
+      return messageKey;
+    }
+
+    function feedbackKindFromKey(key, tone) {
+      if (key.includes('loading')) return 'loading';
+      if (tone === 'error') return 'error';
+      return 'success';
+    }
 
     // Capture the button's original inline style ONCE so we can restore it
     // exactly (the button uses inline width/height/font-size that we must keep).
@@ -638,16 +745,36 @@
     let restoreTimer = null;
 
     function flash(messageKey, kind) {
+      const key = mapFlashKey(messageKey);
+      const cartStatus = $('access-cart-status');
+      if (cartStatus && isAccessGame) {
+        const txt = t(key);
+        if (txt && txt !== key) cartStatus.textContent = txt;
+      }
+      try {
+        window.dispatchEvent(
+          new CustomEvent('waenn:formFeedback', {
+            detail: { key, kind: feedbackKindFromKey(key, kind) },
+          })
+        );
+      } catch {
+        /* ignore */
+      }
       if (!btn) return;
-      btn.textContent = t(messageKey);
+      btn.textContent = t(key);
       btn.style.background = kind === 'error' ? 'rgba(200,16,46,0.06)' : 'rgba(200,16,46,0.12)';
       btn.style.borderColor = 'rgba(200,16,46,0.4)';
       btn.style.color = '#c8102e';
       if (restoreTimer) window.clearTimeout(restoreTimer);
       restoreTimer = window.setTimeout(() => {
-        btn.textContent = t('form.submit');
+        const submitKey = isAccessGame ? 'accessGame.cartSubmit' : 'form.submit';
+        btn.textContent = t(submitKey);
         if (originalBtnStyle) btn.setAttribute('style', originalBtnStyle);
         else btn.removeAttribute('style');
+        if (isAccessGame) {
+          const cs = $('access-cart-status');
+          if (cs) cs.textContent = t('accessGame.cartEmpty');
+        }
         restoreTimer = null;
       }, 4000);
     }
@@ -663,6 +790,80 @@
       const url = await loadBrevoActionUrl();
       if (url) applyBrevoActionTo(form, url);
       return form.getAttribute('action');
+    }
+
+    /** POST del formulario a la URL Sibforms ya validada (fetch + fallback iframe). */
+    async function postAccessFormToSibforms(actionUrl) {
+      try {
+        let recaptchaToken = '';
+        const recSite = getBrevoRecaptchaSiteKey();
+        if (recSite) {
+          try {
+            recaptchaToken = await executeBrevoRecaptchaV3(recSite);
+          } catch (err) {
+            console.warn('[brevo] reCAPTCHA v3 token failed:', err);
+          }
+        }
+        let recField = form.querySelector('input[name="g-recaptcha-response"]');
+        if (!recField) {
+          recField = document.createElement('input');
+          recField.type = 'hidden';
+          recField.name = 'g-recaptcha-response';
+          recField.setAttribute('autocomplete', 'off');
+          form.appendChild(recField);
+        }
+        recField.value = recaptchaToken || '';
+        const fd = new FormData(form);
+
+        // Timeout solo para el fetch: reCAPTCHA (script + execute) puede tardar >9s y no debe consumir el presupuesto.
+        const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = ac
+          ? window.setTimeout(() => ac.abort(), BREVO_FETCH_TIMEOUT_MS)
+          : null;
+        let res;
+        try {
+          res = await fetch(actionUrl, {
+            method: 'POST',
+            body: fd,
+            mode: 'cors',
+            credentials: 'omit',
+            signal: ac ? ac.signal : undefined,
+          });
+        } finally {
+          if (timeoutId) window.clearTimeout(timeoutId);
+        }
+        if (res.ok) {
+          flash('form.success', 'success');
+          try {
+            form.reset();
+          } catch {
+            /* ignore */
+          }
+          return true;
+        }
+        if (nativeIframeSubmit()) {
+          flash('form.success', 'success');
+          try {
+            form.reset();
+          } catch {
+            /* ignore */
+          }
+          return true;
+        }
+        return false;
+      } catch (err) {
+        console.warn('[brevo] sibforms fetch failed, iframe fallback:', err);
+        if (nativeIframeSubmit()) {
+          flash('form.success', 'success');
+          try {
+            form.reset();
+          } catch {
+            /* ignore */
+          }
+          return true;
+        }
+        return false;
+      }
     }
 
     function nativeIframeSubmit() {
@@ -718,6 +919,73 @@
       // Sync locale so Brevo sends the double opt-in email in the right language.
       if (localeEl) localeEl.value = resolveLocale();
 
+      const provider = getAccessProvider();
+      const tryProxyFirst =
+        provider === 'waenn-proxy' && subscribeApiAvailable() && isAccessGame;
+
+      if (tryProxyFirst) {
+        setLoading(true);
+        flash('form.loading', 'success');
+
+        const consentEl = $('access-consent');
+        const interests = Array.from(
+          form.querySelectorAll('input[name="PRENDA_INTERES[]"]:checked')
+        ).map((n) => n.value);
+
+        const payload = {
+          NOMBRE: nameEl ? String(nameEl.value).trim() : '',
+          EMAIL: emailEl ? String(emailEl.value).trim().toLowerCase() : '',
+          locale: localeEl ? String(localeEl.value || 'es') : 'es',
+          PRENDA_INTERES: interests,
+          ACEPTA_MARKETING: consentEl && consentEl.checked ? '1' : '',
+          email_address_check: '',
+        };
+
+        const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = ac
+          ? window.setTimeout(() => ac.abort(), BREVO_FETCH_TIMEOUT_MS)
+          : null;
+
+        let proxyOk = false;
+        try {
+          const res = await fetch('/api/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(payload),
+            credentials: 'same-origin',
+            signal: ac ? ac.signal : undefined,
+          });
+          if (timeoutId) window.clearTimeout(timeoutId);
+
+          let data = null;
+          try {
+            data = await res.json();
+          } catch {
+            data = null;
+          }
+          if (res.ok && data && data.ok === true) {
+            flash('form.success', 'success');
+            try {
+              form.reset();
+            } catch {
+              /* ignore */
+            }
+            proxyOk = true;
+          } else {
+            console.warn('[brevo] proxy subscribe not confirmed', res.status, data);
+          }
+        } catch (err) {
+          if (timeoutId) window.clearTimeout(timeoutId);
+          console.warn('[brevo] proxy subscribe failed:', err);
+        }
+
+        if (!proxyOk) {
+          flash('form.error', 'error');
+        }
+        window.setTimeout(() => setLoading(false), 4000);
+        return;
+      }
+
       const action = await ensureAction();
       if (!isValidBrevoAction(action)) {
         flash('form.error', 'error');
@@ -727,45 +995,9 @@
       setLoading(true);
       flash('form.loading', 'success');
 
-      const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timeoutId = ac
-        ? window.setTimeout(() => ac.abort(), BREVO_FETCH_TIMEOUT_MS)
-        : null;
-
-      try {
-        const res = await fetch(action, {
-          method: 'POST',
-          body: new FormData(form),
-          mode: 'cors',
-          credentials: 'omit',
-          signal: ac ? ac.signal : undefined,
-        });
-        if (timeoutId) window.clearTimeout(timeoutId);
-
-        if (res.ok) {
-          flash('form.success', 'success');
-          try { form.reset(); } catch { /* ignore */ }
-        } else {
-          // Non-2xx — try iframe fallback so the contact still reaches Brevo.
-          if (nativeIframeSubmit()) flash('form.success', 'success');
-          else flash('form.error', 'error');
-        }
-      } catch (err) {
-        if (timeoutId) window.clearTimeout(timeoutId);
-        // CORS, network, or timeout: fall back to native submit via hidden iframe.
-        // We can't read the iframe response (cross-origin), so we optimistically
-        // report success — Brevo confirms the actual subscription via opt-in email.
-        console.warn('[brevo] fetch failed, falling back to iframe submit:', err);
-        if (nativeIframeSubmit()) {
-          flash('form.success', 'success');
-          try { form.reset(); } catch { /* ignore */ }
-        } else {
-          flash('form.error', 'error');
-        }
-      } finally {
-        // Re-enable the button after the flash window so the user can retry.
-        window.setTimeout(() => setLoading(false), 4000);
-      }
+      const ok = await postAccessFormToSibforms(action);
+      if (!ok) flash('form.error', 'error');
+      window.setTimeout(() => setLoading(false), 4000);
     });
   }
 

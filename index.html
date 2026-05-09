@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="assets/waenn-mask-luminance.png">
   <link rel="preload" as="image" href="assets/1.jpg" fetchpriority="high">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="assets/waenn-subscribe.css">
 </head>
 <body>
 
@@ -184,8 +184,19 @@
 
   <!-- ============================================================
        06 — ACCESO ANTICIPADO
+       data-access-provider:
+         waenn-sibforms  — módulo + POST a Sibforms (URL desde iframe.html); mismo flujo DOI que el formulario Brevo.
+         waenn-proxy     — módulo + POST /api/subscribe (Vercel + env DOI). Tras republicar el form en Brevo, sigue sincronizando iframe.html + brevo.html aunque uses solo proxy.
+         brevo-iframe    — formulario Brevo embebido visible (.access-brevo-host); waenn-subscribe.js no arranca.
+       data-access-layout: split (50/50) | stack (copy arriba, formulario abajo).
+       Tras cambiar el formulario en Brevo: actualiza iframe.html (src) y brevo.html (action) para que coincidan.
   ============================================================ -->
-  <section id="s-access" data-i18n-aria-label="access.aria" aria-label="Acceso anticipado">
+  <section
+    id="s-access"
+    data-access-provider="waenn-sibforms"
+    data-access-layout="split"
+    data-i18n-aria-label="access.aria"
+    aria-label="Acceso anticipado">
     <div class="access-inner">
       <div class="access-left">
         <h2 class="access-h2 rv">
@@ -198,20 +209,145 @@
         </p>
       </div>
       <div class="access-right">
-        <!-- Brevo URL: single source of truth in iframe.html; main.js sets src after validation -->
-        <iframe
-          class="brevo-embed rv d1"
-          data-brevo-dynamic-src
-          title="WAENN — formulario de acceso anticipado"
-          width="540"
-          height="760"
-          src="about:blank"
-          frameborder="0"
-          scrolling="auto"
-          loading="lazy"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen>
-        </iframe>
+        <div
+          id="access-experience"
+          class="access-experience rv d1 ws-root"
+          data-cart-base=""
+          data-brevo-recaptcha-sitekey="6LdAWeAsAAAAAACRkoj9vPL7FK13Y0-y8GbvWwV2">
+          <div
+            id="access-subscribe-done"
+            class="access-subscribe-done"
+            hidden
+            role="status"
+            aria-live="polite">
+            <div class="access-subscribe-done__mark" aria-hidden="true">
+              <svg class="access-subscribe-done__svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" opacity="0.2" />
+                <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="1.5" />
+                <path d="M20 33l8 8 16-18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <p class="access-subscribe-done__kicker" data-i18n="accessGame.successPersistKicker">WAENN</p>
+            <h3 class="access-subscribe-done__title" data-i18n="accessGame.successPersistTitle">Lista recibida</h3>
+            <p class="access-subscribe-done__body" data-i18n="accessGame.successPersistBody">
+              Hemos registrado tu petición. Revisa tu correo (y la carpeta de spam) para confirmar y activar el acceso anticipado.
+            </p>
+          </div>
+
+          <p class="ws-title" data-i18n="accessGame.title">SIGUE EL COMIENZO</p>
+          <p id="ws-step-hint" class="ws-hint" aria-live="polite"></p>
+
+          <div class="ws-stage">
+            <div class="ws-main-row">
+              <div class="ws-flow">
+                <div id="ws-step-wrap-name" class="ws-step ws-step--active">
+                  <label class="ws-field-label" for="f-name">
+                    <span data-i18n="accessGame.nameNote">Nombre</span>
+                  </label>
+                  <input
+                    type="text"
+                    form="access-form"
+                    name="NOMBRE"
+                    id="f-name"
+                    class="ws-input"
+                    maxlength="200"
+                    autocomplete="name"
+                    data-i18n-placeholder="form.namePlaceholder"
+                    placeholder="Tu nombre"
+                    required />
+                  <button type="button" id="ws-btn-name-next" class="ws-btn-next" data-i18n="accessGame.continue">Continuar</button>
+                </div>
+
+                <div id="ws-step-wrap-email" class="ws-step" hidden>
+                  <label class="ws-field-label" for="f-email">
+                    <span data-i18n="accessGame.emailNote">Email</span>
+                  </label>
+                  <input
+                    type="email"
+                    form="access-form"
+                    name="EMAIL"
+                    id="f-email"
+                    class="ws-input"
+                    autocomplete="email"
+                    data-i18n-placeholder="form.emailPlaceholder"
+                    placeholder="tu@correo.com"
+                    required />
+                  <button type="button" id="ws-btn-email-next" class="ws-btn-next" data-i18n="accessGame.continue">Continuar</button>
+                </div>
+
+                <div id="ws-step-wrap-interests" class="ws-step" hidden>
+                  <p class="ws-drag-callout" data-i18n="accessGame.dragIntro">
+                    Arrastra cada opción hasta el recuadro de la derecha, o toca la ficha para añadirla.
+                  </p>
+                  <div id="ws-shelf" class="ws-shelf" data-i18n-aria-label="accessGame.shelfAria" aria-label="Intereses"></div>
+                </div>
+              </div>
+
+              <aside class="ws-side-panel">
+                <p class="ws-side-panel__title" data-i18n="accessGame.cartZoneTitle">Tu carrito</p>
+                <p id="ws-cart-zone-caption" class="ws-side-panel__caption" aria-live="polite"></p>
+                <div
+                  id="ws-drop-target"
+                  class="ws-drop-target"
+                  data-i18n-aria-label="accessGame.dropTargetAria"
+                  role="region">
+                  <div id="ws-profile-slots" class="ws-profile-slots" aria-live="polite"></div>
+                  <button
+                    type="button"
+                    id="ws-cart-btn"
+                    class="ws-cart-btn"
+                    aria-describedby="access-cart-status"
+                    aria-label="Cesta">
+                    <span class="ws-cart-btn__tilt" aria-hidden="true">
+                      <svg class="ws-cart-btn__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M6 6h15l-1.5 9h-11z" />
+                        <path d="M6 6L5 3H2" />
+                        <circle cx="9" cy="20" r="1.35" />
+                        <circle cx="17" cy="20" r="1.35" />
+                      </svg>
+                    </span>
+                    <span id="access-cart-count" class="ws-badge" aria-hidden="true">0</span>
+                  </button>
+                  <div id="access-cart-chips" class="ws-cart-chips" aria-hidden="true"></div>
+                  <span id="access-cart-status" class="ws-cart-status" data-i18n="accessGame.cartEmpty" aria-live="polite">Cesta vacía</span>
+                </div>
+              </aside>
+            </div>
+          </div>
+
+          <label id="ws-consent-block" class="ws-consent" hidden>
+            <input type="checkbox" form="access-form" name="ACEPTA_MARKETING" id="access-consent" value="1" />
+            <span data-i18n="accessGame.consent">Acepto recibir comunicaciones de WAENN y la política de privacidad.</span>
+          </label>
+
+          <form id="access-form" data-brevo="true" method="POST" action="#" target="brevo-hidden-frame" novalidate>
+            <input type="hidden" name="locale" id="f-locale" value="es" />
+            <input type="text" name="email_address_check" value="" class="ws-visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <input type="text" id="access-interest-gate" class="ws-visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+            <div class="ws-checkboxes ws-visually-hidden" aria-hidden="true">
+              <input type="checkbox" name="PRENDA_INTERES[]" value="Identity and character" data-interest="Identity and character" />
+              <input type="checkbox" name="PRENDA_INTERES[]" value="Longevity and quality" data-interest="Longevity and quality" />
+              <input type="checkbox" name="PRENDA_INTERES[]" value="A fit that truly works" data-interest="A fit that truly works" />
+            </div>
+
+            <button type="submit" class="ws-visually-hidden" id="access-hidden-submit" tabindex="-1">Submit</button>
+          </form>
+
+          <iframe name="brevo-hidden-frame" id="brevo-hidden-frame" title="Brevo" class="ws-hidden-iframe"></iframe>
+        </div>
+
+        <div class="access-brevo-host" data-access-brevo-embed>
+          <iframe
+            class="brevo-embed access-brevo-iframe"
+            data-brevo-dynamic-src
+            title="Formulario de suscripción Brevo"
+            width="540"
+            height="305"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen></iframe>
+        </div>
       </div>
     </div>
   </section>
@@ -422,6 +558,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/i18next-http-backend@2.6.2/i18nextHttpBackend.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@8.0.0/i18nextBrowserLanguageDetector.min.js"></script>
   <script defer src="i18n-init.js"></script>
+  <script defer src="assets/waenn-subscribe.js"></script>
   <script defer src="main.js"></script>
 </body>
 </html>

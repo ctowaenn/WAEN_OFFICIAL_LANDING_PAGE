@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es" data-cart-base="../">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAENN — waenn-subscribe playground</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../assets/waenn-subscribe.css">
+</head>
+<body class="ws-playground-body">
+  <label class="ws-playground-flag">
+    <input type="checkbox" id="ws-playground-live" />
+    <span data-i18n-key="accessGame.mockToggle">Modo envío real a Brevo</span>
+  </label>
+
+  <div id="access-experience" class="ws-root" data-cart-base="../">
+    <p class="ws-title" data-i18n-key="accessGame.title">SIGUE EL COMIENZO</p>
+    <p id="ws-step-hint" class="ws-hint" aria-live="polite"></p>
+
+    <div class="ws-stage">
+      <div class="ws-main-row">
+        <div class="ws-flow">
+          <div id="ws-step-wrap-name" class="ws-step ws-step--active">
+            <label class="ws-field-label" for="f-name">
+              <span data-i18n-key="accessGame.nameNote">Nombre</span>
+            </label>
+            <input
+              type="text"
+              form="access-form"
+              name="NOMBRE"
+              id="f-name"
+              class="ws-input"
+              maxlength="200"
+              autocomplete="name"
+              data-i18n-placeholder-key="form.namePlaceholder"
+              placeholder="Tu nombre"
+              required />
+            <button type="button" id="ws-btn-name-next" class="ws-btn-next" data-i18n-key="accessGame.continue">Continuar</button>
+          </div>
+
+          <div id="ws-step-wrap-email" class="ws-step" hidden>
+            <label class="ws-field-label" for="f-email">
+              <span data-i18n-key="accessGame.emailNote">Email</span>
+            </label>
+            <input
+              type="email"
+              form="access-form"
+              name="EMAIL"
+              id="f-email"
+              class="ws-input"
+              autocomplete="email"
+              data-i18n-placeholder-key="form.emailPlaceholder"
+              placeholder="tu@correo.com"
+              required />
+            <button type="button" id="ws-btn-email-next" class="ws-btn-next" data-i18n-key="accessGame.continue">Continuar</button>
+          </div>
+
+          <div id="ws-step-wrap-interests" class="ws-step" hidden>
+            <p class="ws-drag-callout" data-i18n-key="accessGame.dragIntro">
+              Arrastra cada opción hasta el recuadro de la derecha, o toca la ficha para añadirla.
+            </p>
+            <div id="ws-shelf" class="ws-shelf" data-i18n-aria-label="accessGame.shelfAria" aria-label="Intereses"></div>
+          </div>
+        </div>
+
+        <aside class="ws-side-panel">
+          <p class="ws-side-panel__title" data-i18n-key="accessGame.cartZoneTitle">Tu carrito</p>
+          <p id="ws-cart-zone-caption" class="ws-side-panel__caption" aria-live="polite"></p>
+          <div
+            id="ws-drop-target"
+            class="ws-drop-target"
+            data-i18n-aria-label="accessGame.dropTargetAria"
+            role="region">
+            <div id="ws-profile-slots" class="ws-profile-slots" aria-live="polite"></div>
+            <button
+              type="button"
+              id="ws-cart-btn"
+              class="ws-cart-btn"
+              aria-describedby="access-cart-status"
+              aria-label="Cesta">
+              <span class="ws-cart-btn__tilt" aria-hidden="true">
+                <svg class="ws-cart-btn__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M6 6h15l-1.5 9h-11z" />
+                  <path d="M6 6L5 3H2" />
+                  <circle cx="9" cy="20" r="1.35" />
+                  <circle cx="17" cy="20" r="1.35" />
+                </svg>
+              </span>
+              <span id="access-cart-count" class="ws-badge" aria-hidden="true">0</span>
+            </button>
+            <div id="access-cart-chips" class="ws-cart-chips" aria-hidden="true"></div>
+            <span id="access-cart-status" class="ws-cart-status" data-i18n-key="accessGame.cartEmpty" aria-live="polite">Cesta vacía</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <label id="ws-consent-block" class="ws-consent" hidden>
+      <input type="checkbox" form="access-form" name="ACEPTA_MARKETING" id="access-consent" value="1" />
+      <span data-i18n-key="accessGame.consent">Acepto recibir comunicaciones de WAENN y la política de privacidad.</span>
+    </label>
+
+    <form id="access-form" data-brevo="true" method="POST" action="#" target="brevo-hidden-frame" novalidate>
+      <input type="hidden" name="locale" id="f-locale" value="es" />
+      <input type="text" name="email_address_check" value="" class="ws-visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <input type="text" id="access-interest-gate" class="ws-visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+      <div class="ws-checkboxes ws-visually-hidden" aria-hidden="true">
+        <input type="checkbox" name="PRENDA_INTERES[]" value="Identity and character" data-interest="Identity and character" />
+        <input type="checkbox" name="PRENDA_INTERES[]" value="Longevity and quality" data-interest="Longevity and quality" />
+        <input type="checkbox" name="PRENDA_INTERES[]" value="A fit that truly works" data-interest="A fit that truly works" />
+      </div>
+
+      <button type="submit" class="ws-visually-hidden" id="access-hidden-submit" tabindex="-1">Submit</button>
+    </form>
+
+    <iframe name="brevo-hidden-frame" id="brevo-hidden-frame" title="Brevo" class="ws-hidden-iframe"></iframe>
+  </div>
+
+  <script defer src="../assets/waenn-subscribe.js"></script>
+</body>
+</html>

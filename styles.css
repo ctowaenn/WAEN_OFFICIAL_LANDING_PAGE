@@ -766,13 +766,31 @@ footer[id] {
   grid-template-columns: 1fr 1fr;
   min-height: 680px;
 }
+
+/* Layout stack: copy a ancho completo arriba, formulario / iframe abajo */
+#s-access[data-access-layout='stack'] .access-inner {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+}
+#s-access[data-access-layout='stack'] .access-left {
+  height: auto;
+  min-height: 0;
+  border-right: none;
+  border-bottom: 1px solid var(--beige);
+}
+#s-access[data-access-layout='stack'] .access-right {
+  min-height: 560px;
+}
+
 .access-left {
-  padding: 72px 56px;
+  padding: 72px clamp(40px, 5vw, 72px);
   height: 850px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   border-right: 1px solid var(--beige);
+  box-sizing: border-box;
 }
 .access-h2 {
   font-family: 'Arial Black', Arial, sans-serif;
@@ -792,11 +810,46 @@ footer[id] {
   margin-top: 60px;
 }
 .access-right {
-  padding: 0;
+  padding: 72px clamp(40px, 5vw, 72px);
   display: flex;
+  flex-direction: column;
   align-items: stretch;
-  justify-content: stretch;
+  justify-content: center;
   overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Iframe Brevo visible: ocupar altura sin “flotar” en el centro */
+#s-access[data-access-provider='brevo-iframe'] .access-right {
+  justify-content: flex-start;
+}
+
+/* Modo brevo-iframe: ocultar módulo WAENN; modo waenn*: ocultar embed visible */
+.access-brevo-host {
+  display: none;
+  flex: 1;
+  width: 100%;
+  min-height: 560px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(0.5rem, 2vw, 1rem) 0;
+  box-sizing: border-box;
+  background: transparent;
+}
+#s-access[data-access-provider^='waenn'] .access-brevo-host {
+  display: none !important;
+}
+#s-access[data-access-provider='brevo-iframe'] #access-experience {
+  display: none !important;
+}
+#s-access[data-access-provider='brevo-iframe'] .access-brevo-host {
+  display: flex !important;
+}
+.access-brevo-iframe {
+  display: block;
+  max-width: 100%;
+  border: 0;
+  margin: 0 auto;
 }
 .form-group { margin-bottom: 60px; }
 .form-label {
@@ -933,17 +986,80 @@ select.form-input option:checked {
   pointer-events: none !important;
 }
 
-/* Brevo embed container — fills the entire .access-right cell */
-.brevo-embed {
+/* Access cart experience — centrado vertical en .access-right (altura natural) */
+#access-experience.access-experience {
+  position: relative;
   display: block;
   width: 100%;
   max-width: none;
-  height: 100%;
-  min-height: 680px;
+  height: auto;
+  flex: 0 0 auto;
+  min-height: 560px;
   border: 0;
-  margin: 0;
+  margin: 0 auto;
   overflow: hidden;
   background: transparent;
+  align-self: center;
+}
+
+/* Confirmación persistente hasta recargar */
+.access-subscribe-done {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  box-sizing: border-box;
+  background: linear-gradient(165deg, rgba(250, 249, 247, 0.97) 0%, #fff 45%, rgba(232, 227, 220, 0.35) 100%);
+  border: 1px solid rgba(26, 26, 26, 0.08);
+  box-shadow: 0 12px 40px rgba(26, 26, 26, 0.06);
+}
+.access-subscribe-done[hidden] {
+  display: none !important;
+}
+.access-subscribe-done__mark {
+  color: var(--red);
+  margin-bottom: 1rem;
+}
+.access-subscribe-done__svg {
+  width: 72px;
+  height: 72px;
+  display: block;
+}
+.access-subscribe-done__kicker {
+  font-family: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 26, 0.45);
+  margin: 0 0 0.5rem;
+}
+.access-subscribe-done__title {
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  font-weight: 900;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--dark);
+  margin: 0 0 1rem;
+  max-width: 22rem;
+}
+.access-subscribe-done__body {
+  font-family: 'Barlow Condensed', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  line-height: 1.55;
+  color: rgba(26, 26, 26, 0.72);
+  margin: 0;
+  max-width: 26rem;
+}
+#access-experience.access-experience--submitted {
+  min-height: 420px;
 }
 
 /* ================================================================
@@ -1481,15 +1597,15 @@ select.form-input option:checked {
   .dif-col { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 0 28px; margin-bottom: 28px; }
   .dif-col + .dif-col { padding-left: 0; }
   .access-inner { grid-template-columns: 1fr; min-height: 0; }
-  .access-left { padding: 72px 22px 40px; height: auto; border-right: none; border-bottom: 1px solid var(--beige); }
-  .access-right { padding: 0; }
+  .access-left { padding: 56px 22px 40px; height: auto; border-right: none; border-bottom: 1px solid var(--beige); }
+  .access-right { padding: 40px 22px 48px; }
   .access-h2 { font-size: clamp(36px, 9vw, 64px); }
   .access-sub { margin-top: 32px; font-size: clamp(15px, 3.6vw, 18px); }
   .form-group { margin-bottom: 40px; }
   .form-label { letter-spacing: 2.2px; margin-bottom: 18px; }
   .form-consent { margin-bottom: 24px; }
   .form-consent-text { font-size: 12px; line-height: 1.45; }
-  .brevo-embed { min-height: 760px; }
+  #access-experience.access-experience { min-height: 580px; }
   #s-vision { grid-template-columns: 1fr; width: 100%; min-height: 0; }
   .vision-left { min-height: min(52vw, 420px); aspect-ratio: 16 / 11; }
   .vision-right {

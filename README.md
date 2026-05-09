@@ -1,44 +1,71 @@
 # WAENN — Official Landing Page
 
-Landing page estática lista para desplegar en Vercel.
+Landing estática lista para desplegar en Vercel: una sola `index.html`, `styles.css`, `main.js`, assets en `assets/`, textos en `locales/`.
 
-## Deploy en Vercel (recomendado)
-- Importa el repo en Vercel.
+## Mapa de secciones (`index.html`)
+
+| Ancla | Contenido (resumen) |
+|--------|----------------------|
+| `#s-intro` | Máscara scroll-reveal sobre imagen / logo WAENN |
+| `#s-hero` | Hero principal |
+| `#s-app` | Bloque app / teléfonos |
+| `#s-ticker` | Cinta / ticker |
+| `#s-dif` | Diferenciación |
+| `#s-access` | Acceso anticipado: `data-access-provider` (`waenn-proxy` \| `waenn-sibforms` \| `brevo-iframe`) y `data-access-layout` (`split` \| `stack`). Ver [`waenn-subscribe/MODE.md`](waenn-subscribe/MODE.md). |
+| `#s-vision` | Visión con vídeo |
+| `#s-marca` | Pilares de marca |
+| … | Footer y demás bloques según el HTML |
+
+## Stack
+
+- HTML + CSS + JS vanilla (sin bundler).
+- **i18n**: `i18n-init.js` + `locales/<lang>/translation.json`; atributo `data-i18n` en nodos traducibles.
+- **Motion**: GSAP / ScrollTrigger donde aplica (intro y reveals en `main.js`).
+- **Brevo**: por defecto en la landing **`waenn-sibforms`** — el widget envía `POST` a la URL Sibforms leída de [`iframe.html`](iframe.html) (debe coincidir con el `action` del export en [`brevo.html`](brevo.html)). Alternativa **`waenn-proxy`**: `POST /api/subscribe` en Vercel con Double Opt-In en servidor. **`brevo-iframe`**: formulario embebido visible.
+
+## Deploy en Vercel
+
+- Importar el repo.
 - Framework preset: **Other** (sitio estático).
 - Build command: **none**
-- Output: **root** (Vercel detecta `index.html`).
+- Output: **root** (`index.html` en la raíz).
 
-## Assets
-Todo lo que se sirva en producción está en `assets/`:
-- `assets/waenn_logo.jpeg`
-- `assets/image.png`
-- `assets/magnific_starting-from-start-image_2895295034.mp4`
+## Módulo `waenn-subscribe`
 
-## Intro cinematográfica (máscara por scroll)
-La intro usa `assets/waenn_logo.jpeg` como máscara (se invierte en runtime con canvas para que **solo se vea el interior de las letras**). Si el navegador no soporta `mask-image`, cae a un fallback.
+- **CSS / JS**: `assets/waenn-subscribe.css`, `assets/waenn-subscribe.js`
+- **Markup**: bloque `#access-experience` en `index.html` (clases prefijo `ws-`).
+- **Flujo UX**: pasos nombre → email → tres intereses (arrastre al icono carrito SVG) → consentimiento → toque en carrito para `requestSubmit` al formulario Brevo.
+- **Demo aislada** (solo widget): [`waenn-subscribe/playground.html`](waenn-subscribe/playground.html) — ver [`waenn-subscribe/README.md`](waenn-subscribe/README.md).
+- **Contrato de campos y checklist Brevo**: [`docs/BREVO_ACCESS_FIELD_CONTRACT.md`](docs/BREVO_ACCESS_FIELD_CONTRACT.md).
+- **Referencia HTML export de Brevo**: [`brevo.html`](brevo.html).
 
-## Acceso anticipado (Brevo)
-### Opción A — Sin backend (la más segura)
-Usa el **formulario embebido de Brevo** (double opt-in si queréis) y reemplaza el placeholder en `index.html` por el embed oficial.
+### Mantenimiento URL Sibforms
 
-Ventajas:
-- No expones API keys
-- Gestión completa desde Brevo (listas, segmentación, double opt-in)
-
-### Opción B — Con endpoint serverless (recomendado si queréis UX 100% custom)
-Si queréis mantener **vuestro formulario HTML** y enviar los datos a Brevo con su API **sin exponer la API key**, necesitáis un endpoint (serverless) en Vercel:
-- `/api/subscribe` recibe `name`, `email`, `prenda`
-- desde ahí llama a Brevo API para crear/actualizar el contacto y añadirlo a una lista
-
-Esto **sí es backend**, pero “sin servidor”: se ejecuta como Function en Vercel y escala bien.
-
-### Estado actual en este repo
-Ahora mismo el formulario es un **placeholder**: muestra feedback de “recibido” si no está conectado a Brevo.
+Tras **republicar** el formulario en Brevo, copia el nuevo `action` del `<form>` al atributo `src` del iframe en [`iframe.html`](iframe.html) y alinea [`brevo.html`](brevo.html). Si solo cambias `brevo.html`, la landing **no** lo usa: [`main.js`](main.js) solo hace `fetch('iframe.html')` para obtener la URL.
 
 ## Desarrollo local
-Puedes abrir `index.html` directamente, pero para que el video/caché se comporte igual que en Vercel es mejor servirlo:
 
 ```bash
 npx serve .
 ```
 
+Probar `/` (landing) y `/waenn-subscribe/playground.html`.
+
+## Guía para agentes (Cursor)
+
+Ver [`CLAUDE.md`](CLAUDE.md): tokens, i18n, límites del módulo subscribe e IDs que no conviene romper.
+
+## API + serverless (`waenn-proxy`)
+
+Implementado en [`api/subscribe.js`](api/subscribe.js). Pon `data-access-provider="waenn-proxy"` en `#s-access` cuando quieras este modo.
+
+**Variables en Vercel:** `BREVO_API_KEY`, `BREVO_LIST_ID`, `BREVO_DOUBLE_OPTIN_TEMPLATE_ID`, `BREVO_REDIRECTION_URL` (opcional `BREVO_LOCALE_ATTRIBUTE`).
+
+**Verificación antes de dar por bueno el proxy**
+
+1. `vercel dev` (o preview con env) y envío con email nuevo.
+2. Network: `POST /api/subscribe` → **200** y cuerpo **`{"ok":true}`**.
+3. Logs de la función: respuesta Brevo **201** o **204**.
+4. Email DOI en bandeja; contacto en lista tras confirmar.
+
+El cliente solo muestra éxito si la respuesta es `{ "ok": true }`; no hay fallback automático a Sibforms. Detalle en [`waenn-subscribe/MODE.md`](waenn-subscribe/MODE.md) y [`docs/BREVO_ACCESS_FIELD_CONTRACT.md`](docs/BREVO_ACCESS_FIELD_CONTRACT.md).
