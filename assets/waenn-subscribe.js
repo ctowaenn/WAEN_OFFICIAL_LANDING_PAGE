@@ -174,6 +174,39 @@
   const consentBlock = document.getElementById('ws-consent-block');
   const btnNameNext = document.getElementById('ws-btn-name-next');
   const btnEmailNext = document.getElementById('ws-btn-email-next');
+  const interestsHelpBtn = document.getElementById('ws-interests-help-btn');
+  const interestsHelpPop = document.getElementById('ws-interests-help-pop');
+
+  function setInterestsHelpOpen(open) {
+    if (!interestsHelpBtn || !interestsHelpPop) return;
+    interestsHelpBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) interestsHelpPop.removeAttribute('hidden');
+    else interestsHelpPop.setAttribute('hidden', '');
+  }
+
+  function closeInterestsHelpPopover() {
+    setInterestsHelpOpen(false);
+  }
+
+  function wireInterestsHelp() {
+    if (!interestsHelpBtn || !interestsHelpPop) return;
+    interestsHelpBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const open = interestsHelpBtn.getAttribute('aria-expanded') === 'true';
+      setInterestsHelpOpen(!open);
+    });
+    document.addEventListener('click', function (e) {
+      if (interestsHelpPop.hasAttribute('hidden')) return;
+      const t = e.target;
+      if (interestsHelpBtn.contains(t) || interestsHelpPop.contains(t)) return;
+      closeInterestsHelpPopover();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeInterestsHelpPopover();
+    });
+  }
+
+  wireInterestsHelp();
 
   function syncLocaleField() {
     if (!localeEl) return;
@@ -518,6 +551,7 @@
     if (wrapName) wrapName.hidden = currentStep !== 1;
     if (wrapEmail) wrapEmail.hidden = currentStep !== 2;
     if (wrapInterests) wrapInterests.hidden = currentStep !== 3;
+    if (currentStep !== 3) closeInterestsHelpPopover();
     if (consentBlock) consentBlock.hidden = currentStep !== 3;
     if (cartZoneCaption) {
       const ckey =
@@ -974,7 +1008,12 @@
             cartZoneStep1: 'Aquí irá tu nombre y email.',
             cartZoneStep2: 'Luego añadirás intereses en esta zona.',
             cartZoneStep3: 'Suelta las fichas dentro del recuadro.',
-            dragIntro: 'Arrastra al recuadro o toca.',
+            interestsQuestion:
+              '¿Qué te importa en una prenda? Identidad, que dure o un buen encaje — elige una o varias.',
+            interestsHelpToggle: 'Instrucciones: cómo añadir al carrito',
+            interestsHelpPanelAria: 'Instrucciones para usar el carrito de intereses',
+            dragIntro:
+              'Arrastra cada opción hasta el recuadro punteado de la derecha, o toca la ficha para añadirla al carrito.',
             dropTargetAria: 'Zona del carrito',
             tagDragTitle: 'Arrastra al recuadro o toca',
             profileNameSlot: 'Nombre en tu carrito',

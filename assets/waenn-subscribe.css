@@ -90,7 +90,7 @@
   border-radius: 0;
   background: var(--ws-paper);
   overflow: visible;
-  padding: clamp(1rem, 2.5vw, 1.35rem);
+  padding: clamp(0.85rem, 2vw, 1.15rem);
 }
 
 .ws-main-row {
@@ -562,15 +562,83 @@
   max-width: 16rem;
 }
 
-.ws-drag-callout {
+.ws-interests-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
   margin: 0 0 0.75rem;
-  padding: 0.55rem 0.65rem;
-  font-size: 12px;
-  line-height: 1.5;
+}
+
+.ws-drag-headline {
+  flex: 1;
+  margin: 0;
+  min-width: 0;
+  font-family: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+  font-size: clamp(0.9rem, 1.45vw, 1.05rem);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ws-ink);
+}
+
+.ws-interests-help {
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+  z-index: 30;
+}
+
+.ws-info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1px solid var(--ws-line);
+  border-radius: 50%;
+  background: #fff;
   color: var(--ws-ink-soft);
-  background: rgba(255, 255, 255, 0.85);
-  border-left: 3px solid rgba(200, 16, 46, 0.45);
-  border-radius: 0 2px 2px 0;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.ws-info-btn:hover,
+.ws-info-btn[aria-expanded='true'] {
+  border-color: rgba(200, 16, 46, 0.45);
+  color: var(--ws-red);
+}
+
+.ws-info-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.2);
+}
+
+.ws-info-btn__icon {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.ws-info-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 200;
+  width: min(300px, max(100%, calc(100vw - 2.5rem)));
+  padding: 0.75rem 0.85rem;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ws-ink);
+  background: #fff;
+  border: 1px solid var(--ws-line);
+  border-radius: 2px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.14);
+}
+
+.ws-info-popover__text {
+  margin: 0;
 }
 
 .ws-shelf {
