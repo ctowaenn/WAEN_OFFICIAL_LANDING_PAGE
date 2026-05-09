@@ -216,18 +216,58 @@
             hidden
             role="status"
             aria-live="polite">
-            <div class="access-subscribe-done__mark" aria-hidden="true">
-              <svg class="access-subscribe-done__svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" opacity="0.2" />
-                <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="1.5" />
-                <path d="M20 33l8 8 16-18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
+            <div class="access-subscribe-done__card">
+              <div class="access-subscribe-done__letter" aria-hidden="true">
+                <svg
+                  class="access-subscribe-done__letter-svg"
+                  viewBox="0 0 280 220"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M32 52h216a8 8 0 0 1 8 8v108a8 8 0 0 1-8 8H32a8 8 0 0 1-8-8V60a8 8 0 0 1 8-8Z"
+                    fill="currentColor"
+                    fill-opacity="0.06" />
+                  <path
+                    d="M24 60c0-4.42 3.58-8 8-8h216c4.42 0 8 3.58 8 8v8l-116 72L24 68v-8Z"
+                    fill="currentColor"
+                    fill-opacity="0.1" />
+                  <path
+                    d="M24 68 140 140 256 68M24 68l116 72 116-72"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-opacity="0.35" />
+                  <path
+                    d="M32 52h216a8 8 0 0 1 8 8v108a8 8 0 0 1-8 8H32a8 8 0 0 1-8-8V60a8 8 0 0 1 8-8Z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linejoin="round"
+                    stroke-opacity="0.45" />
+                  <path
+                    d="M88 96h104a6 6 0 0 1 6 6v36a6 6 0 0 1-6 6H88a6 6 0 0 1-6-6v-36a6 6 0 0 1 6-6Z"
+                    fill="currentColor"
+                    fill-opacity="0.04"
+                    stroke="currentColor"
+                    stroke-width="1.25"
+                    stroke-opacity="0.25" />
+                </svg>
+              </div>
+              <div class="access-subscribe-done__content">
+                <div class="access-subscribe-done__mark" aria-hidden="true">
+                  <svg class="access-subscribe-done__svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" opacity="0.2" />
+                    <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M20 33l8 8 16-18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <p class="access-subscribe-done__kicker" data-i18n="accessGame.successPersistKicker">WAENN</p>
+                <h3 class="access-subscribe-done__title" data-i18n="accessGame.successPersistTitle">Lista recibida</h3>
+                <p class="access-subscribe-done__body" data-i18n="accessGame.successPersistBody">
+                  Hemos registrado tu petición. Revisa tu correo (y la carpeta de spam) para confirmar y activar el acceso anticipado.
+                </p>
+              </div>
             </div>
-            <p class="access-subscribe-done__kicker" data-i18n="accessGame.successPersistKicker">WAENN</p>
-            <h3 class="access-subscribe-done__title" data-i18n="accessGame.successPersistTitle">Lista recibida</h3>
-            <p class="access-subscribe-done__body" data-i18n="accessGame.successPersistBody">
-              Hemos registrado tu petición. Revisa tu correo (y la carpeta de spam) para confirmar y activar el acceso anticipado.
-            </p>
           </div>
 
           <p class="ws-title" data-i18n="accessGame.title">SIGUE EL COMIENZO</p>

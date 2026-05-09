@@ -1020,22 +1020,65 @@ select.form-input option:checked {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: clamp(1.25rem, 4vw, 2.25rem);
+  padding: clamp(1rem, 3.5vw, 1.75rem);
   box-sizing: border-box;
-  background: linear-gradient(165deg, #faf9f7 0%, #fff 45%, var(--beige) 100%);
-  border: 1px solid rgba(26, 26, 26, 0.08);
-  box-shadow: 0 12px 40px rgba(26, 26, 26, 0.06);
+  background: linear-gradient(180deg, rgba(250, 249, 247, 0.97) 0%, rgba(245, 242, 237, 0.88) 100%);
+  border: 0;
+  box-shadow: none;
 }
 .access-subscribe-done[hidden] {
   display: none !important;
 }
+.access-subscribe-done__card {
+  position: relative;
+  width: 100%;
+  max-width: min(100%, 28rem);
+  margin: 0 auto;
+  padding: clamp(1.6rem, 4.5vw, 2.35rem) clamp(1.35rem, 3.8vw, 2rem) clamp(1.85rem, 5vw, 2.6rem);
+  box-sizing: border-box;
+  border-radius: 22px;
+  background: linear-gradient(165deg, #fff 0%, #faf9f7 42%, #f3f0ea 100%);
+  border: 1px solid rgba(26, 26, 26, 0.07);
+  box-shadow:
+    0 1px 1px rgba(26, 26, 26, 0.04),
+    0 6px 16px rgba(26, 26, 26, 0.06),
+    0 20px 44px rgba(26, 26, 26, 0.09),
+    0 40px 80px rgba(26, 26, 26, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  overflow: hidden;
+}
+.access-subscribe-done__letter {
+  position: absolute;
+  left: 50%;
+  bottom: -4%;
+  width: 118%;
+  max-width: none;
+  transform: translateX(-50%);
+  pointer-events: none;
+  color: var(--red);
+}
+.access-subscribe-done__letter-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0.92;
+  filter: drop-shadow(0 10px 28px rgba(26, 26, 26, 0.06));
+}
+.access-subscribe-done__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
 .access-subscribe-done__mark {
   color: var(--red);
-  margin-bottom: 1rem;
+  margin-bottom: 0.65rem;
 }
 .access-subscribe-done__svg {
-  width: 72px;
-  height: 72px;
+  width: 56px;
+  height: 56px;
   display: block;
 }
 .access-subscribe-done__kicker {
