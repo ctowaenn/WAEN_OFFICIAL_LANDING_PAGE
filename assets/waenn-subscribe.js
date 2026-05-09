@@ -942,8 +942,9 @@
     const root = document.getElementById('access-experience');
     const done = document.getElementById('access-subscribe-done');
     if (!root || !done) return;
-    done.removeAttribute('hidden');
+    /* Primero ocultar el funnel (CSS --submitted), luego mostrar el panel: evita un frame con UI encima */
     root.classList.add('access-experience--submitted');
+    done.removeAttribute('hidden');
     try {
       const t = done.querySelector('.access-subscribe-done__title');
       t && t.focus && t.setAttribute('tabindex', '-1');

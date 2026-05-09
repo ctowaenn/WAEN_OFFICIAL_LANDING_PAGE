@@ -1014,15 +1014,16 @@ select.form-input option:checked {
 .access-subscribe-done {
   position: absolute;
   inset: 0;
-  z-index: 20;
+  z-index: 100;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
   text-align: center;
-  padding: clamp(1rem, 3.5vw, 1.75rem);
+  padding: clamp(0.75rem, 2.5vw, 1.25rem);
   box-sizing: border-box;
-  background: linear-gradient(180deg, rgba(250, 249, 247, 0.97) 0%, rgba(245, 242, 237, 0.88) 100%);
+  /* Opaco al 100%: tapa el formulario que queda debajo */
+  background: var(--beige, #e8e3dc);
   border: 0;
   box-shadow: none;
 }
@@ -1031,38 +1032,42 @@ select.form-input option:checked {
 }
 .access-subscribe-done__card {
   position: relative;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-rows: 1fr minmax(5.5rem, auto);
+  align-items: stretch;
   width: 100%;
-  max-width: min(100%, 28rem);
-  margin: 0 auto;
-  padding: clamp(1.6rem, 4.5vw, 2.35rem) clamp(1.35rem, 3.8vw, 2rem) clamp(1.85rem, 5vw, 2.6rem);
+  max-width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: clamp(1.5rem, 4vw, 2.25rem) clamp(1.25rem, 3.5vw, 1.85rem) clamp(1rem, 2.5vw, 1.35rem);
   box-sizing: border-box;
-  border-radius: 22px;
-  background: linear-gradient(165deg, #fff 0%, #faf9f7 42%, #f3f0ea 100%);
-  border: 1px solid rgba(26, 26, 26, 0.07);
+  border-radius: 18px;
+  background: #fdfcfa;
+  border: 1px solid rgba(26, 26, 26, 0.08);
   box-shadow:
-    0 1px 1px rgba(26, 26, 26, 0.04),
-    0 6px 16px rgba(26, 26, 26, 0.06),
-    0 20px 44px rgba(26, 26, 26, 0.09),
-    0 40px 80px rgba(26, 26, 26, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    0 1px 2px rgba(26, 26, 26, 0.05),
+    0 10px 28px rgba(26, 26, 26, 0.08),
+    0 28px 56px rgba(26, 26, 26, 0.06);
   overflow: hidden;
 }
 .access-subscribe-done__letter {
-  position: absolute;
-  left: 50%;
-  bottom: -4%;
-  width: 118%;
-  max-width: none;
-  transform: translateX(-50%);
+  position: relative;
+  align-self: end;
+  justify-self: center;
+  width: min(72%, 220px);
+  max-width: 100%;
+  margin: 0 auto;
   pointer-events: none;
   color: var(--red);
+  opacity: 0.42;
 }
 .access-subscribe-done__letter-svg {
   display: block;
   width: 100%;
   height: auto;
-  opacity: 0.92;
-  filter: drop-shadow(0 10px 28px rgba(26, 26, 26, 0.06));
+  max-height: 100px;
+  filter: none;
 }
 .access-subscribe-done__content {
   position: relative;
@@ -1070,15 +1075,22 @@ select.form-input option:checked {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
+  align-self: center;
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 0 0.25rem;
 }
 .access-subscribe-done__mark {
   color: var(--red);
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
 }
 .access-subscribe-done__svg {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   display: block;
 }
 .access-subscribe-done__kicker {
@@ -1087,28 +1099,35 @@ select.form-input option:checked {
   font-weight: 700;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(26, 26, 26, 0.45);
-  margin: 0 0 0.5rem;
+  color: rgba(26, 26, 26, 0.5);
+  margin: 0 0 0.45rem;
 }
 .access-subscribe-done__title {
   font-family: 'Arial Black', Arial, sans-serif;
-  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  font-size: clamp(1.25rem, 2.6vw, 1.65rem);
   font-weight: 900;
-  line-height: 1.15;
+  line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: -0.02em;
   color: var(--dark);
-  margin: 0 0 1rem;
-  max-width: 22rem;
+  margin: 0 0 0.85rem;
+  max-width: 100%;
+  text-wrap: balance;
 }
 .access-subscribe-done__body {
   font-family: 'Barlow Condensed', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: clamp(1rem, 1.6vw, 1.15rem);
-  line-height: 1.55;
-  color: rgba(26, 26, 26, 0.72);
+  font-size: clamp(1rem, 1.55vw, 1.125rem);
+  line-height: 1.6;
+  color: rgba(26, 26, 26, 0.82);
   margin: 0;
-  max-width: 26rem;
+  max-width: 100%;
+  text-wrap: pretty;
 }
+/* Tras envío correcto: el funnel deja de pintarse (no solo taparse — evita bleed y z-index internos p. ej. .ws-info-popover) */
+#access-experience.access-experience--submitted > *:not(#access-subscribe-done) {
+  display: none !important;
+}
+
 #access-experience.access-experience--submitted {
   min-height: 420px;
 }
