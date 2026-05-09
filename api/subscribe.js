@@ -125,6 +125,15 @@ function parsePositiveIntFromEnv(raw) {
   return Number.isNaN(n) ? NaN : n;
 }
 
+/** Primer env no vacío (por si el nombre en Vercel no coincide). */
+function firstEnv(keys) {
+  for (let i = 0; i < keys.length; i++) {
+    const v = process.env[keys[i]];
+    if (v != null && String(v).trim() !== '') return v;
+  }
+  return '';
+}
+
 /** URL de gracias en el mismo dominio que el visitante (Vercel envía Host / X-Forwarded-*). */
 function defaultGraciasUrlFromRequest(req) {
   const xfHost = req.headers['x-forwarded-host'];
@@ -193,11 +202,17 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const apiKey = trimEnvQuotes(process.env.BREVO_API_KEY);
-  const listIdRaw = trimEnvQuotes(process.env.BREVO_LIST_ID);
-  const listId = parsePositiveIntFromEnv(process.env.BREVO_LIST_ID);
-  const templateIdRaw = trimEnvQuotes(process.env.BREVO_DOUBLE_OPTIN_TEMPLATE_ID);
-  const templateId = parsePositiveIntFromEnv(process.env.BREVO_DOUBLE_OPTIN_TEMPLATE_ID);
+  const apiKey = trimEnvQuotes(firstEnv(['BREVO_API_KEY', 'SENDINBLUE_API_KEY', 'SIB_API_KEY']));
+  const listIdSource = firstEnv(['BREVO_LIST_ID', 'LIST_ID', 'BREVO_LISTID', 'SENDINBLUE_LIST_ID']);
+  const listIdRaw = trimEnvQuotes(listIdSource);
+  const listId = parsePositiveIntFromEnv(listIdSource);
+  const templateIdSource = firstEnv([
+    'BREVO_DOUBLE_OPTIN_TEMPLATE_ID',
+    'BREVO_DOI_TEMPLATE_ID',
+    'BREVO_TEMPLATE_ID',
+  ]);
+  const templateIdRaw = trimEnvQuotes(templateIdSource);
+  const templateId = parsePositiveIntFromEnv(templateIdSource);
   const redirectionUrl = resolveRedirectionUrl(req, process.env.BREVO_REDIRECTION_URL);
   const localeAttrName = process.env.BREVO_LOCALE_ATTRIBUTE
     ? trimEnvQuotes(process.env.BREVO_LOCALE_ATTRIBUTE)
