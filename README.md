@@ -72,7 +72,7 @@ Ver [`CLAUDE.md`](CLAUDE.md): tokens, i18n, límites del módulo subscribe e IDs
 
 Implementado en [`api/subscribe.js`](api/subscribe.js). En [`index.html`](index.html), `#s-access` usa por defecto `data-access-provider="waenn-proxy"`.
 
-**Variables en Vercel:** `BREVO_API_KEY`, `BREVO_LIST_ID`, `BREVO_DOUBLE_OPTIN_TEMPLATE_ID`, `BREVO_REDIRECTION_URL` (opcional `BREVO_LOCALE_ATTRIBUTE`).
+**Variables en Vercel:** `BREVO_API_KEY`, `BREVO_LIST_ID`, `BREVO_DOUBLE_OPTIN_TEMPLATE_ID`, `BREVO_REDIRECTION_URL` (opcional `BREVO_LOCALE_ATTRIBUTE`). Plantilla de referencia local: [`.env.example`](.env.example) (lista WAENN = `3`, DOI suele ser plantilla `1`).
 
 **Verificación antes de dar por bueno el proxy**
 
