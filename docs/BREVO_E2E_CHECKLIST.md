@@ -1,5 +1,13 @@
 # Checklist E2E — suscripción Brevo (`waenn-proxy`)
 
+## Brevo: API key e IPs (causa típica de 502)
+
+Si `POST /api/subscribe` devuelve **502** con `brevoStatus: 401` y un mensaje de **IP no reconocida**, en Brevo tienes activa la restricción **Security → Authorized IPs** para la API key.
+
+Las funciones de Vercel salen por **IPs dinámicas**; no puedes listar una sola IP fija salvo planes/features específicos.
+
+**Solución recomendada:** desactiva el bloqueo por IP para la API key que usa el servidor (o crea una key **sin** restricción IP solo para `api/subscribe`). No afecta al SMTP con IP distinta.
+
 ## Pre-requisitos (Vercel)
 
 En el proyecto Vercel (Production y Preview si pruebas previews):
