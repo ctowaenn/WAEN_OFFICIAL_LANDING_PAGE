@@ -1018,6 +1018,10 @@
   }
 
   if (!IS_PLAYGROUND) {
+    window.addEventListener('waenn:accessCartSync', function () {
+      updateCartUi();
+    });
+
     window.addEventListener('i18n:updated', function () {
       buildShelf();
       updateStepUi();

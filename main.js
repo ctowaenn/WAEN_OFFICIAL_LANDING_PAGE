@@ -800,8 +800,12 @@
         if (originalBtnStyle) btn.setAttribute('style', originalBtnStyle);
         else btn.removeAttribute('style');
         if (isAccessGame) {
-          const cs = $('access-cart-status');
-          if (cs) cs.textContent = t('accessGame.cartEmpty');
+          // No forzar "cesta vacía": el carrito vive en waenn-subscribe (cartSet + chips).
+          try {
+            window.dispatchEvent(new CustomEvent('waenn:accessCartSync'));
+          } catch {
+            /* ignore */
+          }
         }
         restoreTimer = null;
       }, 4000);
