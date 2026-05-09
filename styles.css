@@ -1014,7 +1014,7 @@ select.form-input option:checked {
   text-align: center;
   padding: clamp(1.25rem, 4vw, 2.25rem);
   box-sizing: border-box;
-  background: linear-gradient(165deg, rgba(250, 249, 247, 0.97) 0%, #fff 45%, rgba(232, 227, 220, 0.35) 100%);
+  background: linear-gradient(165deg, #faf9f7 0%, #fff 45%, var(--beige) 100%);
   border: 1px solid rgba(26, 26, 26, 0.08);
   box-shadow: 0 12px 40px rgba(26, 26, 26, 0.06);
 }
