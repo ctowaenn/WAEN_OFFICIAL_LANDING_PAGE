@@ -52,15 +52,13 @@ La URL del `POST` se obtiene solo desde [`iframe.html`](../iframe.html) (dominio
 3. Actualiza este documento y las claves `accessGame.*` / `form.*` en `locales/es` y `locales/en` si cambia el copy.
 4. Con `waenn-proxy`, mantén alineados **lista**, **plantilla DOI** y **atributos** con lo que envía [`api/subscribe.js`](../api/subscribe.js).
 
-## reCAPTCHA v3 (Sibforms)
-
-Si el formulario Brevo usa **reCAPTCHA v3** (como en [`brevo.html`](../brevo.html)), la **site key** pública va en **`#access-experience`** como `data-brevo-recaptcha-sitekey` (mismo valor que `data-sitekey` del bloque Brevo). El párrafo legal lo crea el módulo [`assets/waenn-subscribe.js`](../assets/waenn-subscribe.js); [`main.js`](../main.js) carga `api.js?render=…`, ejecuta `grecaptcha.execute(siteKey, { action: 'submit' })` y envía el token en **`g-recaptcha-response`**. Para desactivar, quita el atributo del widget. La CSP en [`vercel.json`](../vercel.json) incluye `www.google.com` y `www.gstatic.com`.
-
 ## Demo del widget
 
 Abre [`waenn-subscribe/playground.html`](../waenn-subscribe/playground.html) sirviendo la **raíz** del repo (`npx serve .`) y visita `/waenn-subscribe/playground.html`. Por defecto el envío está en **modo prueba** hasta marcar el toggle de envío real (solo playground).
 
 ## Prueba manual end-to-end (Vercel + Brevo)
+
+Resumen ampliado: [`BREVO_E2E_CHECKLIST.md`](BREVO_E2E_CHECKLIST.md) y script `node scripts/verify-subscribe-api.js`.
 
 1. `vercel dev` en la raíz del repo con las env vars configuradas (o proyecto enlazado con `vercel env pull`).
 2. Enviar con un email nuevo: en DevTools, `POST /api/subscribe` → **200** y cuerpo **`{ "ok": true }`**.

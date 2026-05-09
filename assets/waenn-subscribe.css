@@ -699,40 +699,6 @@
   margin-top: 1rem;
 }
 
-/* Aviso legal reCAPTCHA v3 (Google); solo visible si el widget tiene data-brevo-recaptcha-sitekey */
-.ws-recaptcha-notice {
-  display: none;
-  margin: 0.65rem 0 0;
-  max-width: 42em;
-  font-size: 11px;
-  line-height: 1.45;
-  letter-spacing: 0.02em;
-  color: rgba(26, 26, 26, 0.55);
-}
-
-#access-experience.ws-root[data-brevo-recaptcha-sitekey]:not([data-brevo-recaptcha-sitekey='']) .ws-recaptcha-notice {
-  display: block;
-}
-
-/*
- * reCAPTCHA v3 inyecta una insignia fija en el viewport (body).
- * La ocultamos: la obligación de mostrar marca Google queda cubierta con
- * .ws-recaptcha-notice dentro del widget (texto legal + enlaces).
- * @see https://developers.google.com/recaptcha/docs/faq#id-like-to-hide-the-recaptcha-badge.-what-is-allowed
- */
-body .grecaptcha-badge {
-  visibility: hidden !important;
-  opacity: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-  pointer-events: none !important;
-  position: fixed !important;
-  bottom: 0 !important;
-  right: 0 !important;
-  z-index: -1 !important;
-}
-
 @media (max-width: 720px) {
   .ws-main-row {
     grid-template-columns: 1fr;

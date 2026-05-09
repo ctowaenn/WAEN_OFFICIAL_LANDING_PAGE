@@ -21,7 +21,7 @@ Landing estática lista para desplegar en Vercel: una sola `index.html`, `styles
 - HTML + CSS + JS vanilla (sin bundler).
 - **i18n**: `i18n-init.js` + `locales/<lang>/translation.json`; atributo `data-i18n` en nodos traducibles.
 - **Motion**: GSAP / ScrollTrigger donde aplica (intro y reveals en `main.js`).
-- **Brevo**: por defecto en la landing **`waenn-sibforms`** — el widget envía `POST` a la URL Sibforms leída de [`iframe.html`](iframe.html) (debe coincidir con el `action` del export en [`brevo.html`](brevo.html)). Alternativa **`waenn-proxy`**: `POST /api/subscribe` en Vercel con Double Opt-In en servidor. **`brevo-iframe`**: formulario embebido visible.
+- **Brevo**: por defecto en la landing **`waenn-proxy`** — el widget envía JSON a `POST /api/subscribe` (Vercel) y el servidor llama a la API DOI de Brevo; éxito solo si la respuesta es `{"ok":true}`. Opcional **`waenn-sibforms`**: `POST` a Sibforms desde [`iframe.html`](iframe.html) (debe coincidir con [`brevo.html`](brevo.html)). **`brevo-iframe`**: formulario embebido visible.
 
 ## Deploy en Vercel
 
@@ -37,6 +37,7 @@ Landing estática lista para desplegar en Vercel: una sola `index.html`, `styles
 - **Flujo UX**: pasos nombre → email → tres intereses (arrastre al icono carrito SVG) → consentimiento → toque en carrito para `requestSubmit` al formulario Brevo.
 - **Demo aislada** (solo widget): [`waenn-subscribe/playground.html`](waenn-subscribe/playground.html) — ver [`waenn-subscribe/README.md`](waenn-subscribe/README.md).
 - **Contrato de campos y checklist Brevo**: [`docs/BREVO_ACCESS_FIELD_CONTRACT.md`](docs/BREVO_ACCESS_FIELD_CONTRACT.md).
+- **Checklist E2E (proxy + Brevo)**: [`docs/BREVO_E2E_CHECKLIST.md`](docs/BREVO_E2E_CHECKLIST.md) — incluye `node scripts/verify-subscribe-api.js`.
 - **Referencia HTML export de Brevo**: [`brevo.html`](brevo.html).
 
 ### Mantenimiento URL Sibforms
@@ -57,7 +58,7 @@ Ver [`CLAUDE.md`](CLAUDE.md): tokens, i18n, límites del módulo subscribe e IDs
 
 ## API + serverless (`waenn-proxy`)
 
-Implementado en [`api/subscribe.js`](api/subscribe.js). Pon `data-access-provider="waenn-proxy"` en `#s-access` cuando quieras este modo.
+Implementado en [`api/subscribe.js`](api/subscribe.js). En [`index.html`](index.html), `#s-access` usa por defecto `data-access-provider="waenn-proxy"`.
 
 **Variables en Vercel:** `BREVO_API_KEY`, `BREVO_LIST_ID`, `BREVO_DOUBLE_OPTIN_TEMPLATE_ID`, `BREVO_REDIRECTION_URL` (opcional `BREVO_LOCALE_ATTRIBUTE`).
 

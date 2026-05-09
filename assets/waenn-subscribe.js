@@ -809,22 +809,55 @@
         signal: ac ? ac.signal : undefined,
       });
       if (timeoutId) window.clearTimeout(timeoutId);
-      if (res.ok) {
-        showCartMessage('accessGame.success');
-        try {
-          form.reset();
-        } catch {
-          /* ignore */
-        }
-        resetCartVisual();
-      } else {
-        try {
-          form.submit();
-        } catch {
-          /* ignore */
-        }
-        showCartMessage('accessGame.success');
+      var bodyText = '';
+      try {
+        bodyText = await res.text();
+      } catch (e2) {
+        bodyText = '';
       }
+      if (res.ok) {
+        if (!bodyText || bodyText.trim().length < 64) {
+          showCartMessage('accessGame.success');
+          try {
+            form.reset();
+          } catch {
+            /* ignore */
+          }
+          resetCartVisual();
+          setCartBusy(false);
+          return;
+        }
+        var okPhrase =
+          /subscription has been successful|your subscription has been successful|suscripci[oó]n ha sido correcta|te has suscrito/i.test(
+            bodyText
+          );
+        var errPhrase = /could not be saved|subscription could not|no se pudo guardar/i.test(bodyText);
+        if (errPhrase && !okPhrase) {
+          showCartMessage('accessGame.error');
+          setCartBusy(false);
+          return;
+        }
+        if (okPhrase && !errPhrase) {
+          showCartMessage('accessGame.success');
+          try {
+            form.reset();
+          } catch {
+            /* ignore */
+          }
+          resetCartVisual();
+          setCartBusy(false);
+          return;
+        }
+        showCartMessage('accessGame.sibformsUncertain');
+        setCartBusy(false);
+        return;
+      }
+      try {
+        form.submit();
+      } catch {
+        /* ignore */
+      }
+      showCartMessage('accessGame.success');
     } catch (err) {
       if (timeoutId) window.clearTimeout(timeoutId);
       console.warn('[waenn-subscribe]', err);
@@ -885,7 +918,10 @@
     window.addEventListener('waenn:formFeedback', function (ev) {
       const d = (ev && ev.detail) || {};
       if (d.key === 'accessGame.loading') setCartBusy(true);
-      if (d.kind === 'success' && d.key === 'accessGame.success') {
+      if (
+        d.kind === 'success' &&
+        (d.key === 'accessGame.success' || d.key === 'accessGame.successPending')
+      ) {
         showSubscribeSuccessPersist();
         resetCartAfterSubmitSuccess();
         resetStepFlow();
@@ -894,30 +930,7 @@
     });
   }
 
-  /** Aviso legal reCAPTCHA v3 solo dentro del widget (#access-experience); no vive en index.html. */
-  function ensureRecaptchaNoticeInWidget() {
-    const root = document.getElementById('access-experience');
-    if (!root) return;
-    const sk = root.getAttribute('data-brevo-recaptcha-sitekey');
-    if (!sk || !String(sk).trim()) return;
-    if (root.querySelector('.ws-recaptcha-notice')) return;
-    const consent = root.querySelector('#ws-consent-block');
-    const p = document.createElement('p');
-    p.className = 'ws-recaptcha-notice';
-    p.setAttribute('data-i18n', 'accessGame.recaptchaNotice');
-    p.setAttribute('data-i18n-key', 'accessGame.recaptchaNotice');
-    p.setAttribute('aria-live', 'polite');
-    p.textContent = Tkey('accessGame.recaptchaNotice');
-    if (consent && consent.parentNode === root) {
-      consent.insertAdjacentElement('afterend', p);
-    } else {
-      root.appendChild(p);
-    }
-    if (i18nDict) applyI18nToDom();
-  }
-
   function bootEmbedded() {
-    ensureRecaptchaNoticeInWidget();
     currentStep = 1;
     clearProfileSlots();
     buildShelf();
@@ -975,6 +988,7 @@
             cartAria: 'Carrito',
             loading: 'Enviando…',
             success: 'Revisa tu correo',
+            successPending: 'Enviado; revisa correo/spam en unos minutos.',
             error: 'Error',
             mockSuccess: 'Modo prueba: no se envió',
             mockToggle: 'Envío real',
@@ -982,8 +996,6 @@
             validationName: 'Nombre',
             validationEmail: 'Email',
             validationInterest: 'Elige interés',
-            recaptchaNotice:
-              'Este sitio está protegido por reCAPTCHA y aplican la Política de privacidad y los Términos del servicio de Google: https://policies.google.com/privacy y https://policies.google.com/terms (la insignia flotante no se muestra; solo este aviso en el widget).',
           },
         };
         bootEmbedded();

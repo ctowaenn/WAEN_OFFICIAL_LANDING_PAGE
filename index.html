@@ -185,15 +185,15 @@
   <!-- ============================================================
        06 — ACCESO ANTICIPADO
        data-access-provider:
-         waenn-sibforms  — módulo + POST a Sibforms (URL desde iframe.html); mismo flujo DOI que el formulario Brevo.
-         waenn-proxy     — módulo + POST /api/subscribe (Vercel + env DOI). Tras republicar el form en Brevo, sigue sincronizando iframe.html + brevo.html aunque uses solo proxy.
+         waenn-proxy     — predeterminado: módulo + POST /api/subscribe (Vercel + env DOI Brevo). Éxito solo con `{ ok: true }` del servidor.
+         waenn-sibforms  — módulo + POST a Sibforms (URL desde iframe.html); sin backend; menos fiable que el proxy.
          brevo-iframe    — formulario Brevo embebido visible (.access-brevo-host); waenn-subscribe.js no arranca.
        data-access-layout: split (50/50) | stack (copy arriba, formulario abajo).
        Tras cambiar el formulario en Brevo: actualiza iframe.html (src) y brevo.html (action) para que coincidan.
   ============================================================ -->
   <section
     id="s-access"
-    data-access-provider="waenn-sibforms"
+    data-access-provider="waenn-proxy"
     data-access-layout="split"
     data-i18n-aria-label="access.aria"
     aria-label="Acceso anticipado">
@@ -209,11 +209,7 @@
         </p>
       </div>
       <div class="access-right">
-        <div
-          id="access-experience"
-          class="access-experience rv d1 ws-root"
-          data-cart-base=""
-          data-brevo-recaptcha-sitekey="6LdAWeAsAAAAAACRkoj9vPL7FK13Y0-y8GbvWwV2">
+        <div id="access-experience" class="access-experience rv d1 ws-root" data-cart-base="">
           <div
             id="access-subscribe-done"
             class="access-subscribe-done"
@@ -558,7 +554,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/i18next-http-backend@2.6.2/i18nextHttpBackend.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@8.0.0/i18nextBrowserLanguageDetector.min.js"></script>
   <script defer src="i18n-init.js"></script>
-  <script defer src="assets/waenn-subscribe.js"></script>
-  <script defer src="main.js"></script>
+  <script defer src="assets/waenn-subscribe.js?v=20260210"></script>
+  <script defer src="main.js?v=20260210"></script>
 </body>
 </html>

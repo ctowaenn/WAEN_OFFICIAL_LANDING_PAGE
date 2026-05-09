@@ -2,7 +2,7 @@
 
 ## Qué es este repo
 
-Sitio de una sola página (`index.html`) para la marca WAENN: intro con máscara scroll, secciones de marca, app, diferenciación, **acceso anticipado** con formulario gamificado, visión, etc. Despliegue típico: **Vercel** (estático; función `api/subscribe.js` solo si `#s-access` usa `data-access-provider="waenn-proxy"` — por defecto la landing usa `waenn-sibforms` y la URL Sibforms sale de `iframe.html`).
+Sitio de una sola página (`index.html`) para la marca WAENN: intro con máscara scroll, secciones de marca, app, diferenciación, **acceso anticipado** con formulario gamificado, visión, etc. Despliegue típico: **Vercel** (estático + función `api/subscribe.js`). Por defecto `#s-access` usa **`waenn-proxy`** (POST `/api/subscribe` con DOI en servidor). Opcional **`waenn-sibforms`**: POST a Sibforms; la URL sale solo de `iframe.html`.
 
 ## Estilo y tokens
 
@@ -25,7 +25,7 @@ Sitio de una sola página (`index.html`) para la marca WAENN: intro con máscara
 - **Solo tocar** `assets/waenn-subscribe.css`, `assets/waenn-subscribe.js`, el bloque `#s-access` / `#access-experience` en `index.html`, y traducciones relacionadas con `accessGame` / `form.opt*` de intereses.
 - **No renombrar** sin actualizar `main.js`: IDs usados por el fallback Brevo / feedback — `access-form`, `f-name`, `f-email`, `f-locale`, `access-consent`, `access-interest-gate`, `access-hidden-submit`, `access-cart-status`, `access-cart-count`, `brevo-hidden-frame`.
 - El botón del carrito es `#ws-cart-btn` (clases `ws-cart-btn--ready`, `ws-cart-btn--busy`). `main.js` despacha `waenn:formFeedback` con claves `accessGame.loading|success|error` para sincronizar estado.
-- **Modos** (`data-access-provider` en `#s-access`): `waenn-sibforms` (predeterminado: POST Sibforms; URL solo desde `iframe.html`), `waenn-proxy` (POST `/api/subscribe` → Brevo DOI en servidor, env en Vercel; sin fallback Sibforms si falla), `brevo-iframe` (iframe visible; `waenn-subscribe.js` no arranca). Tras republicar el form en Brevo, sincronizar `iframe.html` + `brevo.html`. Detalle: [`waenn-subscribe/MODE.md`](waenn-subscribe/MODE.md).
+- **Modos** (`data-access-provider` en `#s-access`): `waenn-proxy` (predeterminado: POST `/api/subscribe` → Brevo DOI en servidor; éxito solo con `{ ok: true }`; sin fallback Sibforms), `waenn-sibforms` (POST Sibforms; URL solo desde `iframe.html`), `brevo-iframe` (iframe visible; `waenn-subscribe.js` no arranca). Tras republicar el form en Brevo, sincronizar `iframe.html` + `brevo.html`. Detalle: [`waenn-subscribe/MODE.md`](waenn-subscribe/MODE.md).
 - En `waenn-sibforms` / iframe, la URL `action` del POST sale solo de `iframe.html` (dominio `sibforms.com`), validada en `main.js`.
 
 ## Contrato Brevo

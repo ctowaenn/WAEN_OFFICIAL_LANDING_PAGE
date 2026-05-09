@@ -1706,6 +1706,76 @@ select.form-input option:checked {
 }
 
 /* ================================================================
+   THANKS / DOI CONFIRMATION (gracias.html)
+================================================================ */
+.thanks-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--nav-h);
+  padding: 0 clamp(16px, 4vw, 40px);
+  background: var(--white);
+  border-bottom: 1px solid rgba(12, 12, 12, 0.08);
+}
+.thanks-nav__logo img {
+  display: block;
+}
+.thanks-main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--nav-h) + 48px) 24px 64px;
+  background: var(--beige);
+}
+.thanks-card {
+  max-width: 520px;
+  width: 100%;
+  padding: clamp(28px, 5vw, 40px);
+  background: var(--white);
+  border: 1px solid rgba(12, 12, 12, 0.1);
+  border-radius: 2px;
+  text-align: center;
+}
+.thanks-kicker {
+  font-family: 'Barlow Condensed', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tan);
+  margin-bottom: 12px;
+}
+.thanks-title {
+  font-family: 'Barlow Condensed', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--black);
+  margin-bottom: 20px;
+}
+.thanks-body {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--dark);
+  margin-bottom: 14px;
+}
+.thanks-body--muted {
+  font-size: 0.9375rem;
+  color: var(--tan);
+  margin-bottom: 28px;
+}
+.thanks-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================================================================
    REDUCED MOTION
 ================================================================ */
 @media (prefers-reduced-motion: reduce) {

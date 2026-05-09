@@ -92,16 +92,18 @@
     "validationEmail": "Escribe un email válido.",
     "validationInterest": "Añade al menos un interés a la cesta.",
     "success": "Revisa tu correo para confirmar — gracias.",
+    "successPending": "Petición enviada. Revisa tu correo para confirmar.",
+    "proxyUnavailable": "Envío por servidor no disponible. Inténtalo más tarde.",
+    "sibformsUncertain": "No se pudo confirmar el envío. Inténtalo de nuevo.",
     "successPersistKicker": "WAENN — acceso anticipado",
     "successPersistTitle": "Te has apuntado",
-    "successPersistBody": "Hemos registrado tu petición. Revisa tu bandeja de entrada y la carpeta de spam para confirmar el email y activar el acceso anticipado.",
+    "successPersistBody": "Hemos recibido tu petición. Abre el email de confirmación y revisa spam si no lo ves.",
     "error": "No se pudo enviar. Inténtalo de nuevo.",
     "loading": "Enviando…",
     "mockToggle": "Modo envío real a Brevo (desactivado = solo prueba local)",
     "mockSuccess": "Modo prueba: no se envió nada. Activa el envío real en el playground para probar Brevo.",
     "shelfAria": "Intereses — arrastra o toca para añadir a la cesta",
-    "cartAria": "Carrito — toca para enviar tu suscripción",
-    "recaptchaNotice": "Este sitio está protegido por reCAPTCHA y aplican la Política de privacidad y los Términos del servicio de Google: https://policies.google.com/privacy y https://policies.google.com/terms (la insignia de reCAPTCHA no se muestra flotando en la página; solo este aviso dentro del acceso anticipado)."
+    "cartAria": "Carrito — toca para enviar tu suscripción"
   },
   "form": {
     "nameLabel": "NOMBRE",

@@ -472,74 +472,6 @@
     }
   }
 
-  /** Google reCAPTCHA v3 for Sibforms POST (same as Brevo end-form: `execute` + field `g-recaptcha-response`). */
-  let waennRecaptchaScriptPromise = null;
-
-  function getBrevoRecaptchaSiteKey() {
-    const wx = document.getElementById('access-experience');
-    if (!wx) return '';
-    const k = wx.getAttribute('data-brevo-recaptcha-sitekey');
-    return k && typeof k === 'string' ? k.trim() : '';
-  }
-
-  function ensureRecaptchaV3Script(siteKey) {
-    if (!siteKey) return Promise.reject(new Error('no_recaptcha_sitekey'));
-    if (window.grecaptcha && typeof window.grecaptcha.ready === 'function') {
-      return Promise.resolve();
-    }
-    if (waennRecaptchaScriptPromise) return waennRecaptchaScriptPromise;
-    waennRecaptchaScriptPromise = new Promise(function (resolve, reject) {
-      const id = 'waenn-google-recaptcha';
-      const existing = document.getElementById(id);
-      if (existing) {
-        function onErr() {
-          waennRecaptchaScriptPromise = null;
-          reject(new Error('recaptcha_script_failed'));
-        }
-        if (window.grecaptcha && window.grecaptcha.ready) {
-          window.grecaptcha.ready(resolve);
-        } else {
-          existing.addEventListener('load', function () {
-            if (window.grecaptcha && window.grecaptcha.ready) window.grecaptcha.ready(resolve);
-            else {
-              waennRecaptchaScriptPromise = null;
-              reject(new Error('recaptcha_no_api'));
-            }
-          });
-          existing.addEventListener('error', onErr);
-        }
-        return;
-      }
-      const s = document.createElement('script');
-      s.id = id;
-      s.async = true;
-      s.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(siteKey);
-      s.onload = function () {
-        if (window.grecaptcha && window.grecaptcha.ready) window.grecaptcha.ready(resolve);
-        else {
-          waennRecaptchaScriptPromise = null;
-          reject(new Error('recaptcha_no_api'));
-        }
-      };
-      s.onerror = function () {
-        waennRecaptchaScriptPromise = null;
-        reject(new Error('recaptcha_script_failed'));
-      };
-      document.head.appendChild(s);
-    });
-    return waennRecaptchaScriptPromise;
-  }
-
-  function executeBrevoRecaptchaV3(siteKey) {
-    return ensureRecaptchaV3Script(siteKey).then(function () {
-      return new Promise(function (resolve, reject) {
-        window.grecaptcha.ready(function () {
-          window.grecaptcha.execute(siteKey, { action: 'submit' }).then(resolve).catch(reject);
-        });
-      });
-    });
-  }
-
   function readBrevoCache() {
     try {
       const raw = sessionStorage.getItem(BREVO_CACHE_KEY);
@@ -728,6 +660,9 @@
       if (!isAccessGame) return messageKey;
       if (messageKey === 'form.loading') return 'accessGame.loading';
       if (messageKey === 'form.success') return 'accessGame.success';
+      if (messageKey === 'form.successPending') return 'accessGame.successPending';
+      if (messageKey === 'form.proxyUnavailable') return 'accessGame.proxyUnavailable';
+      if (messageKey === 'form.sibformsUncertain') return 'accessGame.sibformsUncertain';
       if (messageKey === 'form.error') return 'accessGame.error';
       if (messageKey === 'form.submit') return 'accessGame.cartSubmit';
       return messageKey;
@@ -736,7 +671,100 @@
     function feedbackKindFromKey(key, tone) {
       if (key.includes('loading')) return 'loading';
       if (tone === 'error') return 'error';
+      if (key.includes('proxyUnavailable') || key.includes('sibformsUncertain')) return 'error';
+      if (key.includes('successPending')) return 'success';
       return 'success';
+    }
+
+    /**
+     * HTML devuelto por Sibforms tras POST. La plantilla estática suele incluir texto de error y de éxito a la vez;
+     * no marques fallo solo por subcadenas globales. Brevo a veces responde 200 con cuerpo vacío (no verificable).
+     */
+    function sibformsPostHtmlOutcome(html) {
+      const s = String(html || '').trim();
+      if (s.length < 64) return 'empty';
+
+      try {
+        const doc = new DOMParser().parseFromString(s, 'text/html');
+        const okInner = doc.querySelector('#success-message .sib-form-message-panel__inner-text');
+        const errInner = doc.querySelector('#error-message .sib-form-message-panel__inner-text');
+        const okText = okInner ? String(okInner.textContent || '').trim() : '';
+        const errText = errInner ? String(errInner.textContent || '').trim() : '';
+
+        const okSignal = /successful|correcta|te has suscrito|has sido registrad/i.test(okText);
+        const errSignal =
+          /could not be saved|subscription could not|no se pudo guardar|tu suscripción no se pudo|invalid|no es válida/i.test(
+            errText
+          );
+        const boilerplateBoth =
+          /your subscription has been successful|subscription has been successful/i.test(okText) &&
+          /could not be saved|subscription could not/i.test(errText) &&
+          okText.length < 260 &&
+          errText.length < 260;
+
+        if (boilerplateBoth) return 'ambiguous';
+        if (okSignal && !errSignal) return 'ok';
+        if (errSignal && !okSignal) return 'fail';
+      } catch {
+        /* ignore */
+      }
+
+      const low = s.toLowerCase();
+      if (
+        /subscription has been successful|your subscription has been successful|suscripci[oó]n ha sido correcta|te has suscrito/i.test(
+          s
+        ) &&
+        !low.includes('could not be saved')
+      ) {
+        return 'ok';
+      }
+      if (
+        low.includes('could not be saved') ||
+        low.includes('subscription could not') ||
+        low.includes('no se pudo guardar') ||
+        low.includes('tu suscripción no se pudo') ||
+        low.includes('information provided is invalid') ||
+        low.includes('invalid user information') ||
+        low.includes('la información proporcionada no es válida')
+      ) {
+        return 'fail';
+      }
+      return 'unknown';
+    }
+
+    /**
+     * @returns {Promise<{ code: 'ok'|'fail'|'unavailable'|'network'; status: number; data: * }>}
+     */
+    async function attemptAccessProxySubscribe(payload) {
+      const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timeoutId = ac
+        ? window.setTimeout(() => ac.abort(), BREVO_FETCH_TIMEOUT_MS)
+        : null;
+      try {
+        const res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+          credentials: 'same-origin',
+          signal: ac ? ac.signal : undefined,
+        });
+        let data = null;
+        try {
+          data = await res.json();
+        } catch {
+          data = null;
+        }
+        if (res.status === 503) return { code: 'unavailable', status: 503, data };
+        if (res.ok && data && typeof data === 'object' && data.ok === true) {
+          return { code: 'ok', status: res.status, data };
+        }
+        return { code: 'fail', status: res.status, data };
+      } catch (err) {
+        console.warn('[brevo] proxy subscribe failed:', err);
+        return { code: 'network', status: 0, data: null };
+      } finally {
+        if (timeoutId) window.clearTimeout(timeoutId);
+      }
     }
 
     // Capture the button's original inline style ONCE so we can restore it
@@ -792,68 +820,49 @@
       return form.getAttribute('action');
     }
 
-    /** POST del formulario a la URL Sibforms ya validada (fetch + fallback iframe). */
+    /**
+     * POST a Sibforms: el `fetch` ya envía el `FormData` una vez. Sibforms suele responder 200 con cuerpo vacío
+     * en peticiones XHR/fetch (comportamiento real del endpoint); eso cuenta como aceptación si no hay error HTTP.
+     * Si hay HTML, lo interpretamos; si falla la red/CORS, un único `form.submit()` al iframe oculto.
+     */
     async function postAccessFormToSibforms(actionUrl) {
-      try {
-        let recaptchaToken = '';
-        const recSite = getBrevoRecaptchaSiteKey();
-        if (recSite) {
-          try {
-            recaptchaToken = await executeBrevoRecaptchaV3(recSite);
-          } catch (err) {
-            console.warn('[brevo] reCAPTCHA v3 token failed:', err);
-          }
-        }
-        let recField = form.querySelector('input[name="g-recaptcha-response"]');
-        if (!recField) {
-          recField = document.createElement('input');
-          recField.type = 'hidden';
-          recField.name = 'g-recaptcha-response';
-          recField.setAttribute('autocomplete', 'off');
-          form.appendChild(recField);
-        }
-        recField.value = recaptchaToken || '';
-        const fd = new FormData(form);
+      const fd = new FormData(form);
+      const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timeoutId = ac
+        ? window.setTimeout(() => ac.abort(), BREVO_FETCH_TIMEOUT_MS)
+        : null;
 
-        // Timeout solo para el fetch: reCAPTCHA (script + execute) puede tardar >9s y no debe consumir el presupuesto.
-        const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        const timeoutId = ac
-          ? window.setTimeout(() => ac.abort(), BREVO_FETCH_TIMEOUT_MS)
-          : null;
-        let res;
+      let res = null;
+      let bodyText = '';
+      try {
+        res = await fetch(actionUrl, {
+          method: 'POST',
+          body: fd,
+          mode: 'cors',
+          credentials: 'omit',
+          signal: ac ? ac.signal : undefined,
+        });
         try {
-          res = await fetch(actionUrl, {
-            method: 'POST',
-            body: fd,
-            mode: 'cors',
-            credentials: 'omit',
-            signal: ac ? ac.signal : undefined,
-          });
-        } finally {
-          if (timeoutId) window.clearTimeout(timeoutId);
+          bodyText = await res.text();
+        } catch {
+          bodyText = '';
         }
-        if (res.ok) {
-          flash('form.success', 'success');
-          try {
-            form.reset();
-          } catch {
-            /* ignore */
-          }
-          return true;
-        }
-        if (nativeIframeSubmit()) {
-          flash('form.success', 'success');
-          try {
-            form.reset();
-          } catch {
-            /* ignore */
-          }
-          return true;
-        }
-        return false;
       } catch (err) {
         console.warn('[brevo] sibforms fetch failed, iframe fallback:', err);
-        if (nativeIframeSubmit()) {
+        if (!nativeIframeSubmit()) return false;
+        flash('form.success', 'success');
+        try {
+          form.reset();
+        } catch {
+          /* ignore */
+        }
+        return true;
+      } finally {
+        if (timeoutId) window.clearTimeout(timeoutId);
+      }
+
+      if (res.ok) {
+        if (!bodyText || bodyText.trim().length < 64) {
           flash('form.success', 'success');
           try {
             form.reset();
@@ -862,8 +871,33 @@
           }
           return true;
         }
+        const outcome = sibformsPostHtmlOutcome(bodyText);
+        if (outcome === 'fail') {
+          console.warn('[brevo] Sibforms POST HTML indicates validation/server error');
+          return false;
+        }
+        if (outcome === 'ok') {
+          flash('form.success', 'success');
+          try {
+            form.reset();
+          } catch {
+            /* ignore */
+          }
+          return true;
+        }
+        console.warn('[brevo] Sibforms POST HTML outcome ambiguous — cannot verify');
+        flash('form.sibformsUncertain', 'error');
         return false;
       }
+
+      if (!nativeIframeSubmit()) return false;
+      flash('form.success', 'success');
+      try {
+        form.reset();
+      } catch {
+        /* ignore */
+      }
+      return true;
     }
 
     function nativeIframeSubmit() {
@@ -920,68 +954,43 @@
       if (localeEl) localeEl.value = resolveLocale();
 
       const provider = getAccessProvider();
-      const tryProxyFirst =
-        provider === 'waenn-proxy' && subscribeApiAvailable() && isAccessGame;
 
-      if (tryProxyFirst) {
-        setLoading(true);
-        flash('form.loading', 'success');
+      const consentEl = $('access-consent');
+      const interests = Array.from(
+        form.querySelectorAll('input[name="PRENDA_INTERES[]"]:checked')
+      ).map((n) => n.value);
 
-        const consentEl = $('access-consent');
-        const interests = Array.from(
-          form.querySelectorAll('input[name="PRENDA_INTERES[]"]:checked')
-        ).map((n) => n.value);
+      const payload = {
+        NOMBRE: nameEl ? String(nameEl.value).trim() : '',
+        EMAIL: emailEl ? String(emailEl.value).trim().toLowerCase() : '',
+        locale: localeEl ? String(localeEl.value || 'es') : 'es',
+        PRENDA_INTERES: interests,
+        ACEPTA_MARKETING: consentEl && consentEl.checked ? '1' : '',
+        email_address_check: '',
+      };
 
-        const payload = {
-          NOMBRE: nameEl ? String(nameEl.value).trim() : '',
-          EMAIL: emailEl ? String(emailEl.value).trim().toLowerCase() : '',
-          locale: localeEl ? String(localeEl.value || 'es') : 'es',
-          PRENDA_INTERES: interests,
-          ACEPTA_MARKETING: consentEl && consentEl.checked ? '1' : '',
-          email_address_check: '',
-        };
+      setLoading(true);
+      flash('form.loading', 'success');
 
-        const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        const timeoutId = ac
-          ? window.setTimeout(() => ac.abort(), BREVO_FETCH_TIMEOUT_MS)
-          : null;
-
-        let proxyOk = false;
-        try {
-          const res = await fetch('/api/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify(payload),
-            credentials: 'same-origin',
-            signal: ac ? ac.signal : undefined,
-          });
-          if (timeoutId) window.clearTimeout(timeoutId);
-
-          let data = null;
+      if (provider === 'waenn-proxy') {
+        if (!subscribeApiAvailable() || !isAccessGame) {
+          flash('form.proxyUnavailable', 'error');
+          window.setTimeout(() => setLoading(false), 4000);
+          return;
+        }
+        const pr = await attemptAccessProxySubscribe(payload);
+        if (pr.code === 'ok') {
+          flash('form.success', 'success');
           try {
-            data = await res.json();
+            form.reset();
           } catch {
-            data = null;
+            /* ignore */
           }
-          if (res.ok && data && data.ok === true) {
-            flash('form.success', 'success');
-            try {
-              form.reset();
-            } catch {
-              /* ignore */
-            }
-            proxyOk = true;
-          } else {
-            console.warn('[brevo] proxy subscribe not confirmed', res.status, data);
-          }
-        } catch (err) {
-          if (timeoutId) window.clearTimeout(timeoutId);
-          console.warn('[brevo] proxy subscribe failed:', err);
+          window.setTimeout(() => setLoading(false), 4000);
+          return;
         }
-
-        if (!proxyOk) {
-          flash('form.error', 'error');
-        }
+        if (pr.code === 'unavailable') flash('form.proxyUnavailable', 'error');
+        else flash('form.error', 'error');
         window.setTimeout(() => setLoading(false), 4000);
         return;
       }
@@ -989,11 +998,9 @@
       const action = await ensureAction();
       if (!isValidBrevoAction(action)) {
         flash('form.error', 'error');
+        window.setTimeout(() => setLoading(false), 4000);
         return;
       }
-
-      setLoading(true);
-      flash('form.loading', 'success');
 
       const ok = await postAccessFormToSibforms(action);
       if (!ok) flash('form.error', 'error');

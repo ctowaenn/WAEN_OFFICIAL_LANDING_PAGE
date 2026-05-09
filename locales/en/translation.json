@@ -92,16 +92,18 @@
     "validationEmail": "Please enter a valid email.",
     "validationInterest": "Add at least one interest to the cart.",
     "success": "Check your email to confirm — thank you.",
+    "successPending": "Request sent. Check your email to confirm.",
+    "proxyUnavailable": "Server subscribe unavailable. Please try again later.",
+    "sibformsUncertain": "We couldn’t confirm the submission. Please try again.",
     "successPersistKicker": "WAENN — early access",
     "successPersistTitle": "You’re on the list",
-    "successPersistBody": "We’ve received your request. Check your inbox and spam folder to confirm your email and activate early access.",
+    "successPersistBody": "We’ve received your request. Open the confirmation email and check spam if you don’t see it.",
     "error": "Could not send. Please try again.",
     "loading": "Sending…",
     "mockToggle": "Real send to Brevo (off = local test only)",
     "mockSuccess": "Test mode: nothing was sent. Enable real send in the playground to hit Brevo.",
     "shelfAria": "Interests — drag or tap to add to the cart",
-    "cartAria": "Cart — tap to send your subscription",
-    "recaptchaNotice": "This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply: https://policies.google.com/privacy and https://policies.google.com/terms (the floating reCAPTCHA badge is hidden; this notice stays inside early access only)."
+    "cartAria": "Cart — tap to send your subscription"
   },
   "form": {
     "nameLabel": "NAME",
