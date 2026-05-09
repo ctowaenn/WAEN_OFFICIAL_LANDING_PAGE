@@ -25,6 +25,7 @@
   let brevoLoaderFailed = false;
   let currentStep = 1;
   let cartBusyDelayTimer = null;
+  let interestsHelpAutoHideTimer = null;
 
   function getCartBase() {
     const h = document.documentElement.getAttribute('data-cart-base');
@@ -177,11 +178,26 @@
   const interestsHelpBtn = document.getElementById('ws-interests-help-btn');
   const interestsHelpPop = document.getElementById('ws-interests-help-pop');
 
+  function clearInterestsHelpAutoHide() {
+    if (interestsHelpAutoHideTimer != null) {
+      clearTimeout(interestsHelpAutoHideTimer);
+      interestsHelpAutoHideTimer = null;
+    }
+  }
+
   function setInterestsHelpOpen(open) {
     if (!interestsHelpBtn || !interestsHelpPop) return;
+    clearInterestsHelpAutoHide();
     interestsHelpBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) interestsHelpPop.removeAttribute('hidden');
-    else interestsHelpPop.setAttribute('hidden', '');
+    if (open) {
+      interestsHelpPop.removeAttribute('hidden');
+      interestsHelpAutoHideTimer = setTimeout(function () {
+        interestsHelpAutoHideTimer = null;
+        setInterestsHelpOpen(false);
+      }, 10000);
+    } else {
+      interestsHelpPop.setAttribute('hidden', '');
+    }
   }
 
   function closeInterestsHelpPopover() {
