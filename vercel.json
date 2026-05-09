@@ -1,4 +1,8 @@
 {
+  "rewrites": [
+    { "source": "/gracias", "destination": "/gracias.html" },
+    { "source": "/gracias/", "destination": "/gracias.html" }
+  ],
   "headers": [
     {
       "source": "/api/subscribe",

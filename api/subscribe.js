@@ -7,7 +7,7 @@
  *   BREVO_API_KEY (required)
  *   BREVO_LIST_ID (required, número de lista)
  *   BREVO_DOUBLE_OPTIN_TEMPLATE_ID (required, plantilla DOI en Brevo)
- *   BREVO_REDIRECTION_URL (opcional si falta: se usa https://{Host}/gracias.html de la petición, o https://{VERCEL_URL}/gracias.html)
+ *   BREVO_REDIRECTION_URL (opcional: por defecto https://{Host}/gracias → gracias.html en Vercel)
  * Opcional:
  *   BREVO_LOCALE_ATTRIBUTE — si existe en Brevo como atributo de contacto, se envía el valor es|en
  *   SUBSCRIBE_MAX_BODY_BYTES (default 16384)
@@ -150,7 +150,7 @@ function defaultGraciasUrlFromRequest(req) {
     const p = xfProto.split(',')[0].trim().toLowerCase();
     if (p === 'http' || p === 'https') proto = p;
   }
-  return `${proto}://${host}/gracias.html`;
+  return `${proto}://${host}/gracias`;
 }
 
 function resolveRedirectionUrl(req, envRaw) {
@@ -163,7 +163,7 @@ function resolveRedirectionUrl(req, envRaw) {
   const vu = process.env.VERCEL_URL ? trimEnvQuotes(process.env.VERCEL_URL) : '';
   if (vu) {
     const hostOnly = vu.replace(/^https?:\/\//i, '').split('/')[0];
-    const candidate = `https://${hostOnly}/gracias.html`;
+    const candidate = `https://${hostOnly}/gracias`;
     if (isValidRedirectUrl(candidate)) return candidate;
   }
   return '';
@@ -326,9 +326,14 @@ module.exports = async function handler(req, res) {
       /* ignore */
     }
     logBrevoFailure(brevoRes.status, errBody);
-    sendJson(res, 502, { ok: false });
+    const out = { ok: false, code: 'brevo_rejected', brevoStatus: brevoRes.status };
+    if (errBody && typeof errBody === 'object') {
+      if (errBody.code != null) out.brevoCode = String(errBody.code);
+      if (errBody.message != null) out.brevoMessage = String(errBody.message).slice(0, 220);
+    }
+    sendJson(res, 502, out);
   } catch (e) {
     console.warn('[api/subscribe] brevo fetch error', e && e.message ? String(e.message).slice(0, 120) : '');
-    sendJson(res, 502, { ok: false });
+    sendJson(res, 502, { ok: false, code: 'brevo_unreachable' });
   }
 };

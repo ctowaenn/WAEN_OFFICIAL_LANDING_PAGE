@@ -9,7 +9,7 @@ En el proyecto Vercel (Production y Preview si pruebas previews):
 | `BREVO_API_KEY` | API key (servidor únicamente). |
 | `BREVO_LIST_ID` | Lista numérica tras confirmar DOI. |
 | `BREVO_DOUBLE_OPTIN_TEMPLATE_ID` | Plantilla DOI activa en Brevo. |
-| `BREVO_REDIRECTION_URL` | Opcional: si falta, [`api/subscribe.js`](../api/subscribe.js) usa `https://{Host}/gracias.html` según la petición (o `https://{VERCEL_URL}/gracias.html`). Puedes fijarla igualmente, p. ej. `https://www.waenn.com/gracias.html`. |
+| `BREVO_REDIRECTION_URL` | Opcional: por defecto `https://{Host}/gracias` (Vercel reescribe a [`gracias.html`](../gracias.html)). También válido: `https://www.waenn.com/gracias.html`. |
 | `BREVO_LOCALE_ATTRIBUTE` | Opcional: nombre exacto de atributo de contacto para `es`/`en`. |
 
 Atributos de contacto usados por el proxy: **`NOMBRE`**, **`PRENDA_INTERES`** (array de strings), **`ACEPTA_MARKETING`** (boolean). Deben existir en Brevo y ser compatibles con el payload.
