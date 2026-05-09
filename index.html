@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="assets/waenn-mask-luminance.png">
+  <link rel="preload" as="image" href="assets/1.jpg" fetchpriority="high">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -70,6 +72,7 @@
     <img class="hero-bg"
          src="assets/www.figma.com/b963d7bc48ce8109.png"
          alt=""
+         loading="lazy"
          decoding="async">
     <div class="hero-inner">
       <p class="hero-tag rv" data-i18n="hero.tag">SPAIN | EST.2025</p>
@@ -115,16 +118,19 @@
                src="assets/www.figma.com/591ba7f0a98b5984.png"
                alt="WAENN — Mockup 1"
                data-i18n-alt="app.mockupAlt1"
+               loading="lazy"
                decoding="async">
           <img class="app-phone"
                src="assets/www.figma.com/591ba7f0a98b5984.png"
                alt="WAENN — Mockup 2"
                data-i18n-alt="app.mockupAlt2"
+               loading="lazy"
                decoding="async">
           <img class="app-phone"
                src="assets/www.figma.com/591ba7f0a98b5984.png"
                alt="WAENN — Mockup 3"
                data-i18n-alt="app.mockupAlt3"
+               loading="lazy"
                decoding="async">
         </div>
       </div>
@@ -409,13 +415,13 @@
     </div>
   </div>
 
-  <!-- GSAP + ScrollTrigger: scroll-scrub de alta calidad (Motion/Framer es para React) -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/i18next@23.15.2/i18next.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/i18next-http-backend@2.6.2/i18nextHttpBackend.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@8.0.0/i18nextBrowserLanguageDetector.min.js"></script>
-  <script src="i18n-init.js"></script>
-  <script src="main.js" defer></script>
+  <!-- GSAP + ScrollTrigger + i18n + app: defer preserves order, avoids blocking first paint -->
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/i18next@23.15.2/i18next.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/i18next-http-backend@2.6.2/i18nextHttpBackend.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@8.0.0/i18nextBrowserLanguageDetector.min.js"></script>
+  <script defer src="i18n-init.js"></script>
+  <script defer src="main.js"></script>
 </body>
 </html>

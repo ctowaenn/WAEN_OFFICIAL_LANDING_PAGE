@@ -32,8 +32,9 @@ footer[id] {
   --beige:   #e8e3dc;
   --tan:     #7a756e;
   --nav-h:   72px;
-  --waenn-mask-url: none;
-  --intro-bg-url: none;
+  /* Pre-baked luminance mask (same output as former canvas invert of NN.png). Regenerate: python scripts/build-mask.py */
+  --waenn-mask-url: url("assets/waenn-mask-luminance.png");
+  --intro-bg-url: url("assets/1.jpg");
   --intro-bg-opacity: 0;
   --intro-bg-scale: 1;
   --mobile-dock-compact-h: 72px;
@@ -61,6 +62,48 @@ footer[id] {
 .d3 { transition-delay: 0.34s; }
 .d4 { transition-delay: 0.46s; }
 .d5 { transition-delay: 0.58s; }
+
+/* Below intro: skip layout/paint until near viewport (placeholders ≈ min-heights). */
+#s-hero {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 720px;
+}
+#s-app {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 780px;
+}
+#s-ticker {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 48px;
+}
+#s-dif {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 560px;
+}
+#s-access {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 820px;
+}
+#s-vision {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 760px;
+}
+#s-marca {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 620px;
+}
+#s-mosaic {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 900px;
+}
+#s-historia {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 760px;
+}
+#s-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 320px;
+}
 
 /* ================================================================
    GLASS BUTTON

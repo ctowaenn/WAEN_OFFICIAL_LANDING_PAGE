@@ -41,57 +41,15 @@
     );
   }
 
-  async function buildInvertedMaskDataUrl(imageUrl) {
-    const img = new Image();
-    img.decoding = 'async';
-    img.crossOrigin = 'anonymous';
-
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = imageUrl;
-    });
-
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth || img.width;
-    canvas.height = img.naturalHeight || img.height;
-
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    if (!ctx) throw new Error('Canvas context not available');
-
-    ctx.drawImage(img, 0, 0);
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const d = imageData.data;
-
-    // Invert RGB so the black letters become white (visible area in luminance masks).
-    for (let i = 0; i < d.length; i += 4) {
-      d[i + 0] = 255 - d[i + 0];
-      d[i + 1] = 255 - d[i + 1];
-      d[i + 2] = 255 - d[i + 2];
-      // keep alpha
-    }
-    ctx.putImageData(imageData, 0, 0);
-
-    return canvas.toDataURL('image/png');
+  /** Keep --intro-bg-url in sync with the reveal <img> (single source of truth vs CSS default). */
+  function syncIntroBgFromReveal() {
+    if (!introReveal) return;
+    const u = introReveal.currentSrc || introReveal.src;
+    if (u) document.documentElement.style.setProperty('--intro-bg-url', `url("${u}")`);
   }
 
-  async function initIntroMask() {
-    if (!introSection || !introReveal) return;
-
-    if (!supportsMask()) {
-      document.documentElement.classList.add('no-mask');
-      return;
-    }
-
-    try {
-      // Use the reveal image as background too, so the end state is the full photo.
-      document.documentElement.style.setProperty('--intro-bg-url', `url("${introReveal.currentSrc || introReveal.src}")`);
-      const dataUrl = await buildInvertedMaskDataUrl('assets/NN.png');
-      document.documentElement.style.setProperty('--waenn-mask-url', `url("${dataUrl}")`);
-    } catch {
-      // If anything fails, degrade gracefully.
-      document.documentElement.classList.add('no-mask');
-    }
+  function applyIntroMaskSupportClass() {
+    if (!supportsMask()) document.documentElement.classList.add('no-mask');
   }
 
   function recalcIntroMaxScroll() {
@@ -282,7 +240,8 @@
           revealObserver.unobserve(entry.target);
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -48px 0px' }
+      /* Slightly stricter than before: needs a bit more of the block in view (less “wake on micro-scroll”). */
+      { threshold: 0.14, rootMargin: '0px 0px -10% 0px' }
     );
 
     document.querySelectorAll('.rv, .rv-fade').forEach((el) => revealObserver.observe(el));
@@ -816,7 +775,7 @@
     onScroll();
   }
 
-  function startApp() {
+  function wireScrollAndViewport() {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', refreshIntroScrollMetrics, { passive: true });
     window.addEventListener('load', refreshIntroScrollMetrics, { passive: true });
@@ -825,24 +784,32 @@
       vv.addEventListener('resize', refreshIntroScrollMetrics, { passive: true });
       vv.addEventListener('scroll', refreshIntroScrollMetrics, { passive: true });
     }
-
-    (async () => {
-      recalcIntroMaxScroll();
-      initRevealObserver();
-      initHeroCtaSwitch();
-      initMobileDock();
-      initFormFallback();
-      initBrevoLoader();
-      initBrevoDynamicIframe();
-      await initIntroMask();
-      recalcIntroMaxScroll();
-      introDrivenByST = initIntroScrollEngine();
-      if (!introDrivenByST) updateIntroFromScroll();
-      if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
-      onScroll();
-    })();
   }
 
-  if (window.i18nReady) startApp();
-  else window.addEventListener('i18n:ready', startApp, { once: true });
+  /** Intro scroll + mask: runs as soon as main.js loads; does not wait for i18n. */
+  function bootIntroVisual() {
+    applyIntroMaskSupportClass();
+    recalcIntroMaxScroll();
+    syncIntroBgFromReveal();
+    introDrivenByST = initIntroScrollEngine();
+    if (!introDrivenByST) updateIntroFromScroll();
+    if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+    onScroll();
+    initHeroCtaSwitch();
+    initMobileDock();
+  }
+
+  /** Scroll reveals + forms: after i18n so copy/aria matches language before unhiding blocks. */
+  function startAppI18nDependent() {
+    initRevealObserver();
+    initFormFallback();
+    initBrevoLoader();
+    initBrevoDynamicIframe();
+  }
+
+  wireScrollAndViewport();
+  bootIntroVisual();
+
+  if (window.i18nReady) startAppI18nDependent();
+  else window.addEventListener('i18n:ready', startAppI18nDependent, { once: true });
 })();
