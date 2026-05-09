@@ -7,7 +7,7 @@
  *   BREVO_API_KEY (required)
  *   BREVO_LIST_ID (required, número de lista)
  *   BREVO_DOUBLE_OPTIN_TEMPLATE_ID (required, plantilla DOI en Brevo)
- *   BREVO_REDIRECTION_URL (required, URL tras confirmar; puede usarse {{ params.DOIurl }} en plantilla)
+ *   BREVO_REDIRECTION_URL (opcional si falta: se usa https://{Host}/gracias.html de la petición, o https://{VERCEL_URL}/gracias.html)
  * Opcional:
  *   BREVO_LOCALE_ATTRIBUTE — si existe en Brevo como atributo de contacto, se envía el valor es|en
  *   SUBSCRIBE_MAX_BODY_BYTES (default 16384)
@@ -107,6 +107,59 @@ function isValidRedirectUrl(u) {
   }
 }
 
+/** Quita comillas si alguien pegó "123" en Vercel. */
+function trimEnvQuotes(s) {
+  if (s == null) return '';
+  const t = String(s).trim();
+  if (t.length >= 2) {
+    const q = t[0];
+    if ((q === '"' || q === "'") && t[t.length - 1] === q) return t.slice(1, -1).trim();
+  }
+  return t;
+}
+
+function parsePositiveIntFromEnv(raw) {
+  const s = trimEnvQuotes(raw);
+  if (!s) return NaN;
+  const n = parseInt(s, 10);
+  return Number.isNaN(n) ? NaN : n;
+}
+
+/** URL de gracias en el mismo dominio que el visitante (Vercel envía Host / X-Forwarded-*). */
+function defaultGraciasUrlFromRequest(req) {
+  const xfHost = req.headers['x-forwarded-host'];
+  let host = '';
+  if (typeof xfHost === 'string' && xfHost.trim()) {
+    host = xfHost.split(',')[0].trim();
+  } else if (req.headers.host) {
+    host = String(req.headers.host).trim();
+  }
+  if (!host) return '';
+  const xfProto = req.headers['x-forwarded-proto'];
+  let proto = 'https';
+  if (typeof xfProto === 'string' && xfProto.trim()) {
+    const p = xfProto.split(',')[0].trim().toLowerCase();
+    if (p === 'http' || p === 'https') proto = p;
+  }
+  return `${proto}://${host}/gracias.html`;
+}
+
+function resolveRedirectionUrl(req, envRaw) {
+  const fromEnv = trimEnvQuotes(envRaw);
+  if (fromEnv && isValidRedirectUrl(fromEnv)) return fromEnv;
+
+  const fromHost = defaultGraciasUrlFromRequest(req);
+  if (fromHost && isValidRedirectUrl(fromHost)) return fromHost;
+
+  const vu = process.env.VERCEL_URL ? trimEnvQuotes(process.env.VERCEL_URL) : '';
+  if (vu) {
+    const hostOnly = vu.replace(/^https?:\/\//i, '').split('/')[0];
+    const candidate = `https://${hostOnly}/gracias.html`;
+    if (isValidRedirectUrl(candidate)) return candidate;
+  }
+  return '';
+}
+
 function sendJson(res, status, obj) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -140,31 +193,29 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const apiKey = process.env.BREVO_API_KEY;
-  const listIdRaw = process.env.BREVO_LIST_ID;
-  const listId = listIdRaw ? parseInt(String(listIdRaw).trim(), 10) : NaN;
-  const templateIdRaw = process.env.BREVO_DOUBLE_OPTIN_TEMPLATE_ID;
-  const templateId = templateIdRaw ? parseInt(String(templateIdRaw).trim(), 10) : NaN;
-  const redirectionUrl = process.env.BREVO_REDIRECTION_URL
-    ? String(process.env.BREVO_REDIRECTION_URL).trim()
-    : '';
+  const apiKey = trimEnvQuotes(process.env.BREVO_API_KEY);
+  const listIdRaw = trimEnvQuotes(process.env.BREVO_LIST_ID);
+  const listId = parsePositiveIntFromEnv(process.env.BREVO_LIST_ID);
+  const templateIdRaw = trimEnvQuotes(process.env.BREVO_DOUBLE_OPTIN_TEMPLATE_ID);
+  const templateId = parsePositiveIntFromEnv(process.env.BREVO_DOUBLE_OPTIN_TEMPLATE_ID);
+  const redirectionUrl = resolveRedirectionUrl(req, process.env.BREVO_REDIRECTION_URL);
   const localeAttrName = process.env.BREVO_LOCALE_ATTRIBUTE
-    ? String(process.env.BREVO_LOCALE_ATTRIBUTE).trim()
+    ? trimEnvQuotes(process.env.BREVO_LOCALE_ATTRIBUTE)
     : '';
 
-  if (
-    !apiKey ||
-    !listIdRaw ||
-    Number.isNaN(listId) ||
-    listId < 1 ||
-    !templateIdRaw ||
-    Number.isNaN(templateId) ||
-    templateId < 1 ||
-    !redirectionUrl ||
-    !isValidRedirectUrl(redirectionUrl)
-  ) {
-    console.warn('[api/subscribe] missing or invalid Brevo DOI env (LIST_ID, TEMPLATE_ID, REDIRECTION_URL)');
-    sendJson(res, 503, { ok: false });
+  const missing = [];
+  if (!apiKey) missing.push('BREVO_API_KEY');
+  if (!listIdRaw || Number.isNaN(listId) || listId < 1) missing.push('BREVO_LIST_ID');
+  if (!templateIdRaw || Number.isNaN(templateId) || templateId < 1) {
+    missing.push('BREVO_DOUBLE_OPTIN_TEMPLATE_ID');
+  }
+  if (!redirectionUrl || !isValidRedirectUrl(redirectionUrl)) {
+    missing.push('BREVO_REDIRECTION_URL');
+  }
+
+  if (missing.length) {
+    console.warn('[api/subscribe] misconfigured', missing.join(','));
+    sendJson(res, 503, { ok: false, code: 'misconfigured', missing: missing });
     return;
   }
 

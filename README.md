@@ -52,6 +52,18 @@ npx serve .
 
 Probar `/` (landing) y `/waenn-subscribe/playground.html`.
 
+## E2E (Playwright) — widget + `/api/subscribe`
+
+```bash
+npm install
+npx playwright install chromium
+set BASE_URL=https://www.waenn.com
+set WAENN_E2E_EMAIL=tu+test@gmail.com
+npm run test:e2e
+```
+
+Por defecto el test **exige** `POST /api/subscribe` → **200** y `{"ok":true}`. Si Vercel devuelve **503**, el test falla (variables Brevo o redeploy). Solo inspeccionar red sin fallar: `set WAENN_E2E_SOFT=1` y `npm run test:e2e`.
+
 ## Guía para agentes (Cursor)
 
 Ver [`CLAUDE.md`](CLAUDE.md): tokens, i18n, límites del módulo subscribe e IDs que no conviene romper.

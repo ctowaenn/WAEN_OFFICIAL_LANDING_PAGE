@@ -45,7 +45,11 @@ server.listen(0, '127.0.0.1', async () => {
       data = null;
     }
     if (r.status === 503 && data && data.ok === false) {
-      console.log('OK smoke: env Brevo no configurada (503 esperado en dev).');
+      if (data.missing && Array.isArray(data.missing)) {
+        console.log('OK smoke: 503 misconfigured — falta en servidor:', data.missing.join(', '));
+      } else {
+        console.log('OK smoke: env Brevo no configurada (503 esperado en dev).');
+      }
       process.exitCode = 0;
     } else if (r.status === 200 && data && data.ok === true) {
       console.log('OK smoke: Brevo DOI aceptó el envío (revisa email de confirmación).');
