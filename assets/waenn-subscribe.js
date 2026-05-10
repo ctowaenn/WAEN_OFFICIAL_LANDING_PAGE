@@ -177,6 +177,10 @@
   const btnEmailNext = document.getElementById('ws-btn-email-next');
   const interestsHelpBtn = document.getElementById('ws-interests-help-btn');
   const interestsHelpPop = document.getElementById('ws-interests-help-pop');
+  const submitPanel = document.getElementById('ws-submit-panel');
+  const submitHint = document.getElementById('ws-submit-hint');
+  const submitBtn = document.getElementById('ws-submit-btn');
+  const submitBtnLabel = document.getElementById('ws-submit-btn-label');
 
   function clearInterestsHelpAutoHide() {
     if (interestsHelpAutoHideTimer != null) {
@@ -291,8 +295,11 @@
 
   function updateCartUi() {
     const n = cartSet.size;
+    const consent = document.getElementById('access-consent');
+    const consentOk = Boolean(consent && consent.checked);
+    const canSubmit = currentStep === 3 && n > 0 && consentOk;
     if (cartCount) cartCount.textContent = String(n);
-    const ready = n > 0 && currentStep === 3;
+    const ready = canSubmit;
     if (cartBtn) {
       cartBtn.classList.toggle('ws-cart-btn--ready', ready);
       if (ready) {
@@ -311,6 +318,36 @@
     syncInterestCheckboxes();
     syncInterestGate();
     renderMiniChips();
+    syncSubmitCtaUi(canSubmit, n, consentOk);
+  }
+
+  function syncSubmitCtaUi(canSubmit, interestCount, consentOk) {
+    if (!submitPanel) return;
+    submitPanel.hidden = currentStep !== 3;
+    const interestsOk = currentStep === 3 && interestCount > 0;
+    const awaitingConsent = interestsOk && !consentOk;
+    submitPanel.classList.toggle('ws-submit-panel--ready', !!canSubmit);
+    submitPanel.classList.toggle('ws-submit-panel--awaiting-consent', awaitingConsent);
+    submitPanel.classList.toggle('ws-submit-panel--needs-action', currentStep === 3 && !canSubmit);
+    if (submitBtn) {
+      /* 1) Sin intereses: disabled. 2) Con intereses, sin casilla: activo, gris resaltado. 3) Con casilla: rojo listo. */
+      submitBtn.disabled = !interestsOk;
+      submitBtn.setAttribute('aria-disabled', interestsOk ? 'false' : 'true');
+      submitBtn.classList.toggle('ws-submit-btn--ready', !!canSubmit);
+      submitBtn.classList.toggle('ws-submit-btn--needs-consent', awaitingConsent);
+    }
+    if (submitBtnLabel) {
+      submitBtnLabel.textContent = Tkey(canSubmit ? 'accessGame.submitButtonReady' : 'accessGame.submitButton');
+    }
+    if (submitHint) {
+      const key =
+        interestCount < 1
+          ? 'accessGame.submitHintNeedInterest'
+          : consentOk
+            ? 'accessGame.submitHintReady'
+            : 'accessGame.submitHintNeedConsent';
+      submitHint.textContent = Tkey(key);
+    }
   }
 
   function findTagOnShelf(value) {
@@ -701,6 +738,7 @@
 
   const nameInput = document.getElementById('f-name');
   const emailInput = document.getElementById('f-email');
+  const consentInput = document.getElementById('access-consent');
   if (nameInput) {
     nameInput.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && currentStep === 1) {
@@ -716,6 +754,9 @@
         goStep3();
       }
     });
+  }
+  if (consentInput) {
+    consentInput.addEventListener('change', updateCartUi);
   }
 
   function validateBeforeSubmit() {
@@ -741,15 +782,38 @@
       return false;
     }
     if (!consent || !consent.checked) {
-      consent && consent.focus();
-      try {
-        consent && consent.reportValidity();
-      } catch {
-        /* ignore */
-      }
+      nudgeConsentRequired();
       return false;
     }
     return true;
+  }
+
+  /** Sin rellenar #ws-submit-hint con texto largo: aviso breve solo en aria-live + foco en la casilla. */
+  function nudgeConsentRequired() {
+    showCartMessage('accessGame.consentNudgeLive');
+    const consent = document.getElementById('access-consent');
+    if (consentBlock) {
+      try {
+        consentBlock.scrollIntoView({
+          behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+          block: 'nearest',
+        });
+      } catch {
+        /* ignore */
+      }
+    }
+    if (consent) {
+      try {
+        consent.focus();
+      } catch {
+        /* ignore */
+      }
+      try {
+        consent.reportValidity();
+      } catch {
+        /* ignore */
+      }
+    }
   }
 
   function setCartBusy(busy) {
@@ -761,6 +825,13 @@
     if (busy) {
       cartBtn.classList.add('ws-cart-btn--lock', 'ws-cart-btn--sending');
       cartBtn.setAttribute('aria-busy', 'true');
+      if (submitPanel) submitPanel.classList.add('ws-submit-panel--sending');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.setAttribute('aria-busy', 'true');
+      }
+      if (submitBtnLabel) submitBtnLabel.textContent = Tkey('accessGame.submitButtonSending');
+      if (submitHint) submitHint.textContent = Tkey('accessGame.submitHintSending');
       cartBusyDelayTimer = window.setTimeout(function () {
         cartBusyDelayTimer = null;
         cartBtn.classList.add('ws-cart-btn--busy');
@@ -768,6 +839,9 @@
     } else {
       cartBtn.classList.remove('ws-cart-btn--lock', 'ws-cart-btn--busy', 'ws-cart-btn--sending');
       cartBtn.setAttribute('aria-busy', 'false');
+      if (submitPanel) submitPanel.classList.remove('ws-submit-panel--sending', 'ws-submit-panel--pressed');
+      if (submitBtn) submitBtn.setAttribute('aria-busy', 'false');
+      updateCartUi();
     }
   }
 
@@ -934,6 +1008,32 @@
     });
   }
 
+  if (submitBtn) {
+    submitBtn.addEventListener('click', function () {
+      const n = cartSet.size;
+      const consent = document.getElementById('access-consent');
+      const consentOk = Boolean(consent && consent.checked);
+      const interestsOk = currentStep === 3 && n > 0;
+
+      if (!interestsOk) {
+        updateCartUi();
+        return;
+      }
+      if (!consentOk) {
+        nudgeConsentRequired();
+        if (submitPanel) submitPanel.classList.remove('ws-submit-panel--pressed');
+        return;
+      }
+
+      if (submitPanel) {
+        submitPanel.classList.remove('ws-submit-panel--pressed');
+        void submitPanel.offsetWidth;
+        submitPanel.classList.add('ws-submit-panel--pressed');
+      }
+      submitCart();
+    });
+  }
+
   document.addEventListener('visibilitychange', function () {
     document.documentElement.classList.toggle('ac-paused', document.hidden);
   });
@@ -973,6 +1073,7 @@
         d.kind === 'success' &&
         (d.key === 'accessGame.success' || d.key === 'accessGame.successPending')
       ) {
+        if (submitPanel) submitPanel.classList.add('ws-submit-panel--success');
         showSubscribeSuccessPersist();
         resetCartAfterSubmitSuccess();
         resetStepFlow();
@@ -1038,10 +1139,20 @@
             continue: 'Continuar',
             completeSteps: 'Completa los pasos.',
             cartEmpty: 'Vacío',
-            cartReady: 'Todo listo — pulsa el carrito',
-            cartNeedInterest: 'Añade un interés; luego pulsa el carrito.',
-            cartSubmitCta: 'Enviar — pulsa el carrito',
-            cartAria: 'Carrito',
+            cartReady: 'Listo en tu carrito.',
+            cartNeedInterest: 'Añade un interés para desbloquear el envío.',
+            cartSubmitCta: 'Unirse al acceso anticipado',
+            cartSubmit: 'Unirse al acceso anticipado',
+            submitHintNeedInterest: 'Elige al menos un interés para desbloquear el envío.',
+            submitHintNeedConsent: 'Marca la casilla de abajo para continuar.',
+            consentNudgeLive: 'Primero marca la casilla de comunicaciones y privacidad.',
+            submitHintReady: 'Todo listo. Pulsa UNIRSE para entrar en la lista.',
+            submitHintSending: 'Enviando tu acceso…',
+            submitButton: 'UNIRSE',
+            submitButtonReady: 'UNIRSE',
+            submitButtonSending: 'Enviando…',
+            submitButtonAria: 'Unirse a la lista de acceso anticipado',
+            cartAria: 'Carrito de tu solicitud',
             loading: 'Enviando…',
             success: 'Revisa tu correo',
             successPending: 'Enviado; revisa correo/spam en unos minutos.',

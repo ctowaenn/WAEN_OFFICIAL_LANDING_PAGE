@@ -115,7 +115,26 @@
               <span id="access-cart-count" class="ws-badge" aria-hidden="true">0</span>
             </button>
             <div id="access-cart-chips" class="ws-cart-chips" aria-hidden="true"></div>
-            <span id="access-cart-status" class="ws-cart-status" data-i18n-key="accessGame.cartEmpty" aria-live="polite">Cesta vacía</span>
+            <span
+              id="access-cart-status"
+              class="ws-cart-status ws-visually-hidden"
+              data-i18n-key="accessGame.cartEmpty"
+              aria-live="polite">Cesta vacía</span>
+            <div id="ws-submit-panel" class="ws-submit-panel ws-submit-panel--cart" hidden>
+              <p id="ws-submit-hint" class="ws-submit-hint" aria-live="polite" data-i18n-key="accessGame.submitHintNeedInterest">
+                Elige al menos un interés para desbloquear el envío.
+              </p>
+              <button
+                type="button"
+                id="ws-submit-btn"
+                class="ws-submit-btn"
+                aria-describedby="ws-submit-hint"
+                data-i18n-aria-label="accessGame.submitButtonAria">
+                <span class="ws-submit-btn__shine" aria-hidden="true"></span>
+                <span id="ws-submit-btn-label" class="ws-submit-btn__label" data-i18n-key="accessGame.submitButton">UNIRSE</span>
+                <span class="ws-submit-btn__icon" aria-hidden="true">→</span>
+              </button>
+            </div>
           </div>
         </aside>
       </div>
