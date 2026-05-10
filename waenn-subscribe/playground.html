@@ -104,13 +104,24 @@
               class="ws-cart-btn"
               aria-describedby="access-cart-status"
               aria-label="Cesta">
-              <span class="ws-cart-btn__tilt" aria-hidden="true">
-                <svg class="ws-cart-btn__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M6 6h15l-1.5 9h-11z" />
-                  <path d="M6 6L5 3H2" />
-                  <circle cx="9" cy="20" r="1.35" />
-                  <circle cx="17" cy="20" r="1.35" />
-                </svg>
+              <span class="ws-cart-btn__motion" aria-hidden="true">
+                <span class="ws-cart-btn__tilt">
+                  <span class="ws-cart-btn__face ws-cart-btn__face--cart">
+                    <svg class="ws-cart-btn__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M6 6h15l-1.5 9h-11z" />
+                      <path d="M6 6L5 3H2" />
+                      <circle cx="9" cy="20" r="1.35" />
+                      <circle cx="17" cy="20" r="1.35" />
+                    </svg>
+                  </span>
+                  <span class="ws-cart-btn__face ws-cart-btn__face--letter">
+                    <svg class="ws-cart-btn__letter-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M4 8.5 12 14 20 8.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M5 7h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" />
+                      <path class="ws-cart-btn__letter-seal" d="M12 12.5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.45" />
+                    </svg>
+                  </span>
+                </span>
               </span>
               <span id="access-cart-count" class="ws-badge" aria-hidden="true">0</span>
             </button>

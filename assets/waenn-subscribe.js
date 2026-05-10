@@ -26,6 +26,11 @@
   let currentStep = 1;
   let cartBusyDelayTimer = null;
   let interestsHelpAutoHideTimer = null;
+  let sendLaunchTimer = null;
+  let sendDepartTimer = null;
+  let pendingSuccessAfterLaunch = null;
+  const SEND_LAUNCH_MS = 560;
+  const SEND_DEPART_MS = 480;
 
   function getCartBase() {
     const h = document.documentElement.getAttribute('data-cart-base');
@@ -816,6 +821,92 @@
     }
   }
 
+  function clearSendAnimTimers() {
+    if (sendLaunchTimer) {
+      window.clearTimeout(sendLaunchTimer);
+      sendLaunchTimer = null;
+    }
+    if (sendDepartTimer) {
+      window.clearTimeout(sendDepartTimer);
+      sendDepartTimer = null;
+    }
+  }
+
+  function clearLetterSendVisualState() {
+    pendingSuccessAfterLaunch = null;
+    if (dropTarget) dropTarget.classList.remove('ws-drop-target--send');
+    if (!cartBtn) return;
+    cartBtn.classList.remove(
+      'ws-cart-btn--send-phase-launch',
+      'ws-cart-btn--send-phase-flight',
+      'ws-cart-btn--send-phase-depart',
+      'ws-cart-send--reduced'
+    );
+  }
+
+  function beginLetterSendVisuals() {
+    if (!cartBtn || !dropTarget) return;
+    if (
+      dropTarget.classList.contains('ws-drop-target--send') &&
+      (cartBtn.classList.contains('ws-cart-btn--send-phase-launch') ||
+        cartBtn.classList.contains('ws-cart-btn--send-phase-flight'))
+    ) {
+      return;
+    }
+    dropTarget.classList.add('ws-drop-target--send');
+    if (prefersReducedMotion()) {
+      cartBtn.classList.add('ws-cart-btn--send-phase-flight', 'ws-cart-send--reduced');
+      return;
+    }
+    cartBtn.classList.add('ws-cart-btn--send-phase-launch');
+    sendLaunchTimer = window.setTimeout(function () {
+      sendLaunchTimer = null;
+      if (!cartBtn || !cartBtn.classList.contains('ws-cart-btn--send-phase-launch')) return;
+      cartBtn.classList.remove('ws-cart-btn--send-phase-launch');
+      cartBtn.classList.add('ws-cart-btn--send-phase-flight');
+      if (pendingSuccessAfterLaunch) {
+        var cb = pendingSuccessAfterLaunch;
+        pendingSuccessAfterLaunch = null;
+        playDepartThen(cb);
+      }
+    }, SEND_LAUNCH_MS);
+  }
+
+  function playDepartThen(cb) {
+    if (!cartBtn) {
+      if (cb) cb();
+      return;
+    }
+    if (prefersReducedMotion() || cartBtn.classList.contains('ws-cart-send--reduced')) {
+      cartBtn.classList.remove('ws-cart-btn--send-phase-flight');
+      if (cb) cb();
+      return;
+    }
+    cartBtn.classList.remove('ws-cart-btn--send-phase-flight');
+    cartBtn.classList.add('ws-cart-btn--send-phase-depart');
+    sendDepartTimer = window.setTimeout(function () {
+      sendDepartTimer = null;
+      if (cartBtn) cartBtn.classList.remove('ws-cart-btn--send-phase-depart');
+      if (cb) cb();
+    }, SEND_DEPART_MS);
+  }
+
+  function finishCartBusyAfterSuccess() {
+    clearSendAnimTimers();
+    clearLetterSendVisualState();
+    if (!cartBtn) return;
+    cartBtn.classList.remove(
+      'ws-cart-btn--letter-send-flow',
+      'ws-cart-btn--lock',
+      'ws-cart-btn--busy',
+      'ws-cart-btn--sending'
+    );
+    cartBtn.setAttribute('aria-busy', 'false');
+    if (submitPanel) submitPanel.classList.remove('ws-submit-panel--sending', 'ws-submit-panel--pressed');
+    if (submitBtn) submitBtn.setAttribute('aria-busy', 'false');
+    updateCartUi();
+  }
+
   function setCartBusy(busy) {
     if (!cartBtn) return;
     if (cartBusyDelayTimer) {
@@ -823,8 +914,9 @@
       cartBusyDelayTimer = null;
     }
     if (busy) {
-      cartBtn.classList.add('ws-cart-btn--lock', 'ws-cart-btn--sending');
+      cartBtn.classList.add('ws-cart-btn--lock', 'ws-cart-btn--letter-send-flow');
       cartBtn.setAttribute('aria-busy', 'true');
+      beginLetterSendVisuals();
       if (submitPanel) submitPanel.classList.add('ws-submit-panel--sending');
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -832,12 +924,11 @@
       }
       if (submitBtnLabel) submitBtnLabel.textContent = Tkey('accessGame.submitButtonSending');
       if (submitHint) submitHint.textContent = Tkey('accessGame.submitHintSending');
-      cartBusyDelayTimer = window.setTimeout(function () {
-        cartBusyDelayTimer = null;
-        cartBtn.classList.add('ws-cart-btn--busy');
-      }, 640);
     } else {
-      cartBtn.classList.remove('ws-cart-btn--lock', 'ws-cart-btn--busy', 'ws-cart-btn--sending');
+      pendingSuccessAfterLaunch = null;
+      clearSendAnimTimers();
+      clearLetterSendVisualState();
+      cartBtn.classList.remove('ws-cart-btn--lock', 'ws-cart-btn--busy', 'ws-cart-btn--sending', 'ws-cart-btn--letter-send-flow');
       cartBtn.setAttribute('aria-busy', 'false');
       if (submitPanel) submitPanel.classList.remove('ws-submit-panel--sending', 'ws-submit-panel--pressed');
       if (submitBtn) submitBtn.setAttribute('aria-busy', 'false');
@@ -913,6 +1004,18 @@
     setCartBusy(true);
     showCartMessage('accessGame.loading');
 
+    function playgroundSuccessDepart(body) {
+      function done() {
+        if (body) body();
+        setCartBusy(false);
+      }
+      if (cartBtn && cartBtn.classList.contains('ws-cart-btn--send-phase-launch')) {
+        pendingSuccessAfterLaunch = done;
+      } else {
+        playDepartThen(done);
+      }
+    }
+
     const action = await loadBrevoActionUrl();
     if (!isValidBrevoAction(action)) {
       showCartMessage('accessGame.error');
@@ -941,14 +1044,15 @@
       }
       if (res.ok) {
         if (!bodyText || bodyText.trim().length < 64) {
-          showCartMessage('accessGame.success');
-          try {
-            form.reset();
-          } catch {
-            /* ignore */
-          }
-          resetCartVisual();
-          setCartBusy(false);
+          playgroundSuccessDepart(function () {
+            showCartMessage('accessGame.success');
+            try {
+              form.reset();
+            } catch {
+              /* ignore */
+            }
+            resetCartVisual();
+          });
           return;
         }
         var okPhrase =
@@ -962,14 +1066,15 @@
           return;
         }
         if (okPhrase && !errPhrase) {
-          showCartMessage('accessGame.success');
-          try {
-            form.reset();
-          } catch {
-            /* ignore */
-          }
-          resetCartVisual();
-          setCartBusy(false);
+          playgroundSuccessDepart(function () {
+            showCartMessage('accessGame.success');
+            try {
+              form.reset();
+            } catch {
+              /* ignore */
+            }
+            resetCartVisual();
+          });
           return;
         }
         showCartMessage('accessGame.sibformsUncertain');
@@ -982,6 +1087,7 @@
         /* ignore */
       }
       showCartMessage('accessGame.success');
+      playgroundSuccessDepart(null);
     } catch (err) {
       if (timeoutId) window.clearTimeout(timeoutId);
       console.warn('[waenn-subscribe]', err);
@@ -991,8 +1097,7 @@
         /* ignore */
       }
       showCartMessage('accessGame.success');
-    } finally {
-      setCartBusy(false);
+      playgroundSuccessDepart(null);
     }
   }
 
@@ -1069,16 +1174,32 @@
     window.addEventListener('waenn:formFeedback', function (ev) {
       const d = (ev && ev.detail) || {};
       if (d.key === 'accessGame.loading') setCartBusy(true);
-      if (
+
+      const isSubscribeSuccess =
         d.kind === 'success' &&
-        (d.key === 'accessGame.success' || d.key === 'accessGame.successPending')
-      ) {
-        if (submitPanel) submitPanel.classList.add('ws-submit-panel--success');
-        showSubscribeSuccessPersist();
-        resetCartAfterSubmitSuccess();
-        resetStepFlow();
+        (d.key === 'accessGame.success' || d.key === 'accessGame.successPending');
+
+      if (isSubscribeSuccess) {
+        function completeEmbeddedSuccess() {
+          if (submitPanel) submitPanel.classList.add('ws-submit-panel--success');
+          showSubscribeSuccessPersist();
+          resetCartAfterSubmitSuccess();
+          resetStepFlow();
+          finishCartBusyAfterSuccess();
+        }
+        if (cartBtn && cartBtn.classList.contains('ws-cart-btn--send-phase-launch')) {
+          pendingSuccessAfterLaunch = completeEmbeddedSuccess;
+        } else {
+          playDepartThen(completeEmbeddedSuccess);
+        }
       }
-      if (d.kind === 'success' || d.kind === 'error') setCartBusy(false);
+
+      if (d.kind === 'error') {
+        pendingSuccessAfterLaunch = null;
+        setCartBusy(false);
+      } else if (d.kind === 'success' && !isSubscribeSuccess) {
+        setCartBusy(false);
+      }
     });
   }
 
