@@ -80,10 +80,7 @@ footer[id] {
   content-visibility: auto;
   contain-intrinsic-size: 1px 560px;
 }
-#s-access {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 820px;
-}
+/* Sin content-visibility aquí: evita scroll/hash a #s-access desfasado en móvil (titular abajo en pantalla). */
 #s-vision {
   content-visibility: auto;
   contain-intrinsic-size: 1px 760px;
@@ -176,6 +173,12 @@ footer[id] {
   transition: filter 0.35s;
 }
 #nav.dark #nav-logo-img { filter: invert(1); }
+
+/* CTA acceso anticipado solo móvil (no .btn: el .btn del nav se oculta ≤900px). */
+.nav-early-mobile {
+  display: none;
+}
+
 #nav-links {
   display: flex;
   align-items: center;
@@ -1407,13 +1410,17 @@ select.form-input option:checked {
 ================================================================ */
 .mobile-dock { display: none; }
 
-@media (max-width: 900px) {
+@media screen and (max-width: 900px) {
+  html {
+    scroll-padding-bottom: calc(var(--mobile-dock-compact-h) + env(safe-area-inset-bottom, 0px));
+  }
   .mobile-dock {
     display: block;
     position: fixed;
     inset: 0;
-    z-index: 850;
+    z-index: 1100;
     pointer-events: none;
+    isolation: isolate;
   }
   .mobile-dock__backdrop {
     position: absolute;
@@ -1432,7 +1439,7 @@ select.form-input option:checked {
   .mobile-dock__shell {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
     bottom: calc(10px + env(safe-area-inset-bottom, 0px));
     width: min(94vw, 400px);
     pointer-events: auto;
@@ -1617,7 +1624,7 @@ select.form-input option:checked {
   }
 }
 
-@media (max-width: 420px) {
+@media screen and (max-width: 420px) {
   .mobile-dock__compact {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -1629,14 +1636,40 @@ select.form-input option:checked {
 ================================================================ */
 @media screen and (max-width: 900px) {
   #nav { padding: 0 16px; }
-  /* CTA solo en el pill dock inferior */
+  /* CTA principal en pill dock; header: enlace compacto .nav-early-mobile */
   nav#nav > a.btn[href="#s-access"],
   #nav > a.btn {
     display: none !important;
   }
   #nav-links { display: none; }
-  #nav .lang-toggle {
+  .nav-early-mobile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     margin-left: auto;
+    margin-right: 8px;
+    max-width: min(46vw, 200px);
+    padding: 0 4px;
+    font-size: clamp(8px, 2.1vw, 10px);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #nav.dark .nav-early-mobile {
+    color: rgba(255, 255, 255, 0.88);
+  }
+  .nav-early-mobile:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.35);
+    border-radius: 2px;
+  }
+  #nav .lang-toggle {
+    margin-left: 0;
     margin-right: 0;
   }
   /* Antes min(720px,120vw) dejaba ~<500px de recorrido: la máscara acababa muy rápido en móvil.
@@ -1673,7 +1706,14 @@ select.form-input option:checked {
   .dif-col { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 0 28px; margin-bottom: 28px; }
   .dif-col + .dif-col { padding-left: 0; }
   .access-inner { grid-template-columns: 1fr; min-height: 0; }
-  .access-left { padding: 56px 22px 40px; height: auto; border-right: none; border-bottom: 1px solid var(--beige); }
+  .access-left {
+    padding: 56px 22px 40px;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--beige);
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
   .access-right { padding: 40px 22px 48px; }
   .access-h2 { font-size: clamp(36px, 9vw, 64px); }
   .access-sub { margin-top: 32px; font-size: clamp(15px, 3.6vw, 18px); }
