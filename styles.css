@@ -1434,7 +1434,7 @@ select.form-input option:checked {
     left: 50%;
     transform: translateX(-50%);
     bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-    width: min(90vw, 360px);
+    width: min(94vw, 400px);
     pointer-events: auto;
     display: flex;
     flex-direction: column;
@@ -1455,18 +1455,22 @@ select.form-input option:checked {
       0 6px 28px rgba(0, 0, 0, 0.1),
       0 1px 6px rgba(0, 0, 0, 0.05);
   }
-  /* Dock CTA: glass ligero sin sombras pesadas del .btn global */
+  /* Dock CTA: mismo copy que nav.earlyAccess; legible (antes 8.5px) + ellipsis en pantallas muy estrechas */
   .mobile-dock__cta.btn {
     flex: 1;
+    min-width: 0;
+    max-width: 100%;
     justify-content: center;
     align-items: center;
     display: inline-flex;
     min-height: 44px;
     height: 44px;
-    font-size: 8.5px;
-    letter-spacing: 1.35px;
-    padding: 0 12px;
+    font-size: clamp(10px, 2.65vw, 12px);
+    letter-spacing: 0.07em;
+    padding: 0 10px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     box-shadow:
       0 2px 10px rgba(0, 0, 0, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 0.65);
