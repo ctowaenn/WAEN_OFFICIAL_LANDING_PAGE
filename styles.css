@@ -1635,7 +1635,9 @@ select.form-input option:checked {
     margin-left: auto;
     margin-right: 0;
   }
-  #s-intro { height: calc(100vh + min(720px, 120vw)); }
+  /* Antes min(720px,120vw) dejaba ~<500px de recorrido: la máscara acababa muy rápido en móvil.
+     ~clamp(900px,235vw,960px) alinea con el extra 900px de escritorio, con techo en tablets estrechas. */
+  #s-intro { height: calc(100vh + clamp(900px, 235vw, 960px)); }
   .intro-coming {
     letter-spacing: 0.12em;
     font-size: clamp(14px, 3.8vw, 22px);

@@ -144,8 +144,8 @@
 
   /**
    * GSAP ScrollTrigger: scrub true = progress 1:1 con el scroll (reversible al subir).
-   * La sensación “premium” viene de easeInOutQuint / smoothstep en updateIntroFromProgress;
-   * un scrub numérico añadía inercia y retrasaba la vuelta al estado inicial.
+   * La sensación “premium” viene de easeInOutQuint / smoothstep en updateIntroFromProgress.
+   * En viewport táctil estrecho, scrub numérico (~1.2s) suaviza saltos entre frames de scroll.
    */
   function initIntroScrollEngine() {
     if (!introSection || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
@@ -159,7 +159,13 @@
     }
     const reduce =
       typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const scrub = reduce ? 0 : true;
+    const mq = typeof window.matchMedia === 'function' ? window.matchMedia.bind(window) : null;
+    const isTouchIntro =
+      mq &&
+      mq('(max-width: 900px)').matches &&
+      mq('(pointer: coarse)').matches;
+    /* Desktop: scrub true = 1:1 con scroll. Móvil táctil: scrub ~1.2s suaviza el “salto” entre frames de scroll. */
+    const scrub = reduce ? 0 : isTouchIntro ? 1.2 : true;
 
     const st = ScrollTrigger.create({
       id: 'intro-pin-scrub',
