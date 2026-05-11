@@ -32,6 +32,19 @@
   const SEND_LAUNCH_MS = 560;
   const SEND_DEPART_MS = 480;
 
+  function focusNoScroll(el) {
+    if (!el || typeof el.focus !== 'function') return;
+    try {
+      el.focus({ preventScroll: true });
+    } catch {
+      try {
+        el.focus();
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
   function getCartBase() {
     const h = document.documentElement.getAttribute('data-cart-base');
     if (h !== null && h !== undefined) return h;
@@ -680,7 +693,7 @@
     const name = document.getElementById('f-name');
     if (!name || !name.value.trim()) {
       alert(Tkey('accessGame.validationName'));
-      name && name.focus();
+      focusNoScroll(name);
       return false;
     }
     return true;
@@ -690,12 +703,12 @@
     const email = document.getElementById('f-email');
     if (!email || !email.value.trim()) {
       alert(Tkey('accessGame.validationEmail'));
-      email && email.focus();
+      focusNoScroll(email);
       return false;
     }
     if (typeof email.checkValidity === 'function' && !email.checkValidity()) {
       alert(Tkey('accessGame.validationEmail'));
-      email.focus();
+      focusNoScroll(email);
       return false;
     }
     return true;
@@ -709,7 +722,7 @@
       currentStep = 2;
       updateStepUi();
       const email = document.getElementById('f-email');
-      email && email.focus();
+      focusNoScroll(email);
     }
     if (prefersReducedMotion()) {
       pulseLand();
@@ -728,7 +741,7 @@
       buildShelf();
       updateStepUi();
       const c = document.getElementById('access-consent');
-      c && c.focus();
+      focusNoScroll(c);
     }
     if (prefersReducedMotion()) {
       pulseLand();
@@ -774,12 +787,12 @@
     const consent = document.getElementById('access-consent');
     if (!name || !name.value.trim()) {
       alert(Tkey('accessGame.validationName'));
-      name && name.focus();
+      focusNoScroll(name);
       return false;
     }
     if (!email || !email.value.trim()) {
       alert(Tkey('accessGame.validationEmail'));
-      email && email.focus();
+      focusNoScroll(email);
       return false;
     }
     if (cartSet.size < 1) {
@@ -809,7 +822,7 @@
     }
     if (consent) {
       try {
-        consent.focus();
+        focusNoScroll(consent);
       } catch {
         /* ignore */
       }
@@ -955,7 +968,7 @@
     buildShelf();
     updateStepUi();
     const name = document.getElementById('f-name');
-    name && name.focus();
+    focusNoScroll(name);
   }
 
   function resetCartVisual() {
@@ -1153,7 +1166,7 @@
     try {
       const t = done.querySelector('.access-subscribe-done__title');
       t && t.focus && t.setAttribute('tabindex', '-1');
-      t && t.focus();
+      focusNoScroll(t);
     } catch {
       /* ignore */
     }

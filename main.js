@@ -16,6 +16,9 @@
   let introBrandRow = null;
   /** When true, intro progress comes from GSAP ScrollTrigger (smoothed scrub), not raw scroll. */
   let introDrivenByST = false;
+  /** Width at last intro metrics refresh — distinguish rotation vs keyboard-only viewport noise (iOS). */
+  let lastIntroLayoutWidth = typeof window !== 'undefined' ? window.innerWidth : 0;
+  let introVvResizeTimer = null;
 
   const clamp01 = (n) => Math.min(Math.max(n, 0), 1);
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -149,6 +152,11 @@
       return false;
     }
     gsap.registerPlugin(ScrollTrigger);
+    try {
+      ScrollTrigger.config({ ignoreMobileResize: true });
+    } catch {
+      /* ignore */
+    }
     const reduce =
       typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const scrub = reduce ? 0 : true;
@@ -1012,20 +1020,53 @@
     });
   }
 
-  function refreshIntroScrollMetrics() {
+  /** Early-access form focused — virtual keyboard (esp. iOS) must not chain into ScrollTrigger.refresh(). */
+  function isAccessViewportTypingContext() {
+    try {
+      const el = document.activeElement;
+      if (!el || typeof el.closest !== 'function') return false;
+      if (!el.closest('#access-experience') && !el.closest('#s-access')) return false;
+      const tag = (el.tagName || '').toLowerCase();
+      return tag === 'input' || tag === 'textarea' || tag === 'select';
+    } catch {
+      return false;
+    }
+  }
+
+  function refreshIntroScrollMetrics(opts) {
+    const forceFull = opts && opts.forceFull === true;
+    const w = window.innerWidth;
+    const widthChanged = Math.abs(w - lastIntroLayoutWidth) > 1;
+
     recalcIntroMaxScroll();
-    if (introDrivenByST && typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+    const stOk = introDrivenByST && typeof ScrollTrigger !== 'undefined';
+    const skipST =
+      stOk &&
+      !forceFull &&
+      isAccessViewportTypingContext() &&
+      !widthChanged;
+    if (stOk && !skipST) ScrollTrigger.refresh();
     onScroll();
+    lastIntroLayoutWidth = w;
   }
 
   function wireScrollAndViewport() {
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', refreshIntroScrollMetrics, { passive: true });
-    window.addEventListener('load', refreshIntroScrollMetrics, { passive: true });
+    window.addEventListener('resize', () => refreshIntroScrollMetrics(), { passive: true });
+    window.addEventListener('load', () => refreshIntroScrollMetrics({ forceFull: true }), { passive: true });
     const vv = window.visualViewport;
     if (vv) {
-      vv.addEventListener('resize', refreshIntroScrollMetrics, { passive: true });
-      vv.addEventListener('scroll', refreshIntroScrollMetrics, { passive: true });
+      vv.addEventListener(
+        'resize',
+        () => {
+          if (introVvResizeTimer) window.clearTimeout(introVvResizeTimer);
+          introVvResizeTimer = window.setTimeout(() => {
+            introVvResizeTimer = null;
+            refreshIntroScrollMetrics();
+          }, 200);
+        },
+        { passive: true }
+      );
     }
   }
 
