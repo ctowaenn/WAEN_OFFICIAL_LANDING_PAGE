@@ -375,6 +375,63 @@
     });
   }
 
+  /**
+   * Móvil: el hash a #s-access quedaba corto (se veía #s-dif) porque content-visibility:auto
+   * en secciones previas usa alturas intrínsecas hasta expandirse. Forzamos layout real un frame
+   * y hacemos scrollIntoView; luego quitamos el override inline.
+   */
+  function initAccessHashScrollFix() {
+    const mq = window.matchMedia('(max-width: 900px)');
+    const prereqIds = ['s-hero', 's-app', 's-ticker', 's-dif'];
+
+    document.addEventListener(
+      'click',
+      (e) => {
+        if (e.defaultPrevented) return;
+        if (e.button !== 0) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const a = e.target.closest && e.target.closest('a');
+        if (!a) return;
+        if (a.getAttribute('href') !== '#s-access') return;
+        if (!mq.matches) return;
+
+        const sec = document.getElementById('s-access');
+        if (!sec) return;
+
+        e.preventDefault();
+
+        const nodes = prereqIds.map((id) => document.getElementById(id)).filter(Boolean);
+        nodes.forEach((n) => {
+          n.style.setProperty('content-visibility', 'visible');
+        });
+
+        const reduce =
+          typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const behavior = reduce ? 'auto' : 'smooth';
+
+        requestAnimationFrame(() => {
+          void sec.offsetHeight;
+          sec.scrollIntoView({ behavior, block: 'start' });
+
+          const path = window.location.pathname || '/';
+          const search = window.location.search || '';
+          if (window.history && typeof window.history.replaceState === 'function') {
+            window.history.replaceState(null, '', `${path}${search}#s-access`);
+          }
+
+          requestAnimationFrame(() => {
+            nodes.forEach((n) => {
+              n.style.removeProperty('content-visibility');
+            });
+          });
+
+          window.dispatchEvent(new Event('hashchange'));
+        });
+      },
+      true
+    );
+  }
+
   function initMobileDock() {
     const dock = $('mobileDock');
     const toggle = $('mobileDockToggle');
@@ -1127,6 +1184,7 @@
     onScroll();
     initHeroCtaSwitch();
     initMobileDock();
+    initAccessHashScrollFix();
   }
 
   /** Scroll reveals + forms: after i18n so copy/aria matches language before unhiding blocks. */

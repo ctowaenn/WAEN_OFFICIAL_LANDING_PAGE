@@ -76,11 +76,7 @@ footer[id] {
   content-visibility: auto;
   contain-intrinsic-size: 1px 48px;
 }
-#s-dif {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 560px;
-}
-/* Sin content-visibility aquí: evita scroll/hash a #s-access desfasado en móvil (titular abajo en pantalla). */
+/* Sin content-visibility en #s-dif: el intrinsic placeholder desfasaba el scroll/hash a #s-access (quedaba visible s-dif). */
 #s-vision {
   content-visibility: auto;
   contain-intrinsic-size: 1px 760px;
