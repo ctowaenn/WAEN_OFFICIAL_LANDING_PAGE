@@ -29,6 +29,8 @@
   let sendLaunchTimer = null;
   let sendDepartTimer = null;
   let pendingSuccessAfterLaunch = null;
+  let mobileSubmitRevealTimer = null;
+  let lastCanSubmit = false;
   const SEND_LAUNCH_MS = 560;
   const SEND_DEPART_MS = 480;
 
@@ -176,6 +178,7 @@
   }
 
   const cartSet = new Set();
+  const accessExperience = document.getElementById('access-experience');
   const shelf = document.getElementById('ws-shelf');
   const chipsHost = document.getElementById('access-cart-chips');
   const cartBtn = document.getElementById('ws-cart-btn');
@@ -199,6 +202,69 @@
   const submitHint = document.getElementById('ws-submit-hint');
   const submitBtn = document.getElementById('ws-submit-btn');
   const submitBtnLabel = document.getElementById('ws-submit-btn-label');
+  const mobileSubmitHost = document.getElementById('ws-mobile-submit-host');
+  const submitPanelDesktopParent = submitPanel && submitPanel.parentNode;
+  const submitPanelDesktopAnchor = submitPanel && submitPanel.nextSibling;
+  const mobileSubmitMq =
+    typeof window.matchMedia === 'function' ? window.matchMedia('(max-width: 720px)') : null;
+
+  function syncAccessStepState() {
+    if (accessExperience) accessExperience.setAttribute('data-ws-step', String(currentStep));
+  }
+
+  function setSubmitPanelStepVisibility() {
+    if (!submitPanel) return;
+    if (currentStep === 3) {
+      submitPanel.hidden = false;
+      submitPanel.removeAttribute('hidden');
+    } else {
+      submitPanel.hidden = true;
+      submitPanel.setAttribute('hidden', '');
+    }
+  }
+
+  function updateMobileSubmitHostA11y() {
+    if (!mobileSubmitHost) return;
+    const active = submitPanel && mobileSubmitHost.contains(submitPanel) && currentStep === 3;
+    mobileSubmitHost.setAttribute('aria-hidden', active ? 'false' : 'true');
+  }
+
+  function syncSubmitPanelPlacement() {
+    if (!submitPanel) return;
+    const useMobileHost = Boolean(mobileSubmitMq && mobileSubmitMq.matches && mobileSubmitHost);
+    const target = useMobileHost ? mobileSubmitHost : submitPanelDesktopParent;
+    if (!target) return;
+
+    if (submitPanel.parentNode !== target) {
+      if (useMobileHost) {
+        target.appendChild(submitPanel);
+      } else {
+        target.insertBefore(submitPanel, submitPanelDesktopAnchor || null);
+      }
+    }
+
+    submitPanel.classList.toggle('ws-submit-panel--mobile-hosted', useMobileHost);
+    if (mobileSubmitHost) {
+      mobileSubmitHost.classList.toggle('ws-mobile-submit-host--active', useMobileHost && currentStep === 3);
+    }
+    updateMobileSubmitHostA11y();
+  }
+
+  function revealMobileSubmitCta() {
+    if (!submitPanel || !mobileSubmitHost || !mobileSubmitHost.contains(submitPanel)) return;
+    if (mobileSubmitRevealTimer != null) window.clearTimeout(mobileSubmitRevealTimer);
+    mobileSubmitRevealTimer = window.setTimeout(function () {
+      mobileSubmitRevealTimer = null;
+      try {
+        submitPanel.scrollIntoView({
+          behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+          block: 'center',
+        });
+      } catch {
+        /* ignore */
+      }
+    }, 80);
+  }
 
   function clearInterestsHelpAutoHide() {
     if (interestsHelpAutoHideTimer != null) {
@@ -316,6 +382,9 @@
     const consent = document.getElementById('access-consent');
     const consentOk = Boolean(consent && consent.checked);
     const canSubmit = currentStep === 3 && n > 0 && consentOk;
+    syncAccessStepState();
+    setSubmitPanelStepVisibility();
+    syncSubmitPanelPlacement();
     if (cartCount) cartCount.textContent = String(n);
     const ready = canSubmit;
     if (cartBtn) {
@@ -337,11 +406,14 @@
     syncInterestGate();
     renderMiniChips();
     syncSubmitCtaUi(canSubmit, n, consentOk);
+    if (canSubmit && !lastCanSubmit) revealMobileSubmitCta();
+    lastCanSubmit = canSubmit;
   }
 
   function syncSubmitCtaUi(canSubmit, interestCount, consentOk) {
     if (!submitPanel) return;
-    submitPanel.hidden = currentStep !== 3;
+    setSubmitPanelStepVisibility();
+    syncSubmitPanelPlacement();
     const interestsOk = currentStep === 3 && interestCount > 0;
     const awaitingConsent = interestsOk && !consentOk;
     submitPanel.classList.toggle('ws-submit-panel--ready', !!canSubmit);
@@ -616,6 +688,9 @@
   }
 
   function updateStepUi() {
+    syncAccessStepState();
+    setSubmitPanelStepVisibility();
+    syncSubmitPanelPlacement();
     if (stepHint) {
       stepHint.textContent = Tkey('accessGame.formHint');
     }
@@ -775,6 +850,17 @@
   }
   if (consentInput) {
     consentInput.addEventListener('change', updateCartUi);
+  }
+  if (mobileSubmitMq) {
+    const onSubmitLayoutChange = function () {
+      syncSubmitPanelPlacement();
+    };
+    if (typeof mobileSubmitMq.addEventListener === 'function') {
+      mobileSubmitMq.addEventListener('change', onSubmitLayoutChange);
+    } else if (typeof mobileSubmitMq.addListener === 'function') {
+      mobileSubmitMq.addListener(onSubmitLayoutChange);
+    }
+    syncSubmitPanelPlacement();
   }
 
   function validateBeforeSubmit() {

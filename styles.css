@@ -264,6 +264,11 @@ footer[id] {
   overflow: hidden;
   background: var(--black);
 }
+@supports (height: 100svh) {
+  .intro-pin {
+    height: 100svh;
+  }
+}
 /* Dedicated background layer for cinematic finish (no black cut) */
 .intro-pin::before {
   content: "";
@@ -1646,6 +1651,7 @@ select.form-input option:checked {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     margin-left: auto;
     margin-right: 8px;
     max-width: min(46vw, 200px);
@@ -1675,6 +1681,9 @@ select.form-input option:checked {
   /* Antes min(720px,120vw) dejaba ~<500px de recorrido: la máscara acababa muy rápido en móvil.
      ~clamp(900px,235vw,960px) alinea con el extra 900px de escritorio, con techo en tablets estrechas. */
   #s-intro { height: calc(100vh + clamp(900px, 235vw, 960px)); }
+  @supports (height: 100svh) {
+    #s-intro { height: calc(100svh + clamp(980px, 255vw, 1120px)); }
+  }
   .intro-coming {
     letter-spacing: 0.12em;
     font-size: clamp(14px, 3.8vw, 22px);
@@ -1714,14 +1723,19 @@ select.form-input option:checked {
     justify-content: flex-start;
     align-items: flex-start;
   }
-  .access-right { padding: 40px 22px 48px; }
+  .access-right {
+    padding: 40px 22px calc(var(--mobile-dock-compact-h) + env(safe-area-inset-bottom, 0px) + 28px);
+  }
   .access-h2 { font-size: clamp(36px, 9vw, 64px); }
   .access-sub { margin-top: 32px; font-size: clamp(15px, 3.6vw, 18px); }
   .form-group { margin-bottom: 40px; }
   .form-label { letter-spacing: 2.2px; margin-bottom: 18px; }
   .form-consent { margin-bottom: 24px; }
   .form-consent-text { font-size: 12px; line-height: 1.45; }
-  #access-experience.access-experience { min-height: 580px; }
+  #access-experience.access-experience {
+    min-height: 580px;
+    padding-bottom: calc(var(--mobile-dock-compact-h) + env(safe-area-inset-bottom, 0px) + 20px);
+  }
   #s-vision { grid-template-columns: 1fr; width: 100%; min-height: 0; }
   .vision-left { min-height: min(52vw, 420px); aspect-ratio: 16 / 11; }
   .vision-right {

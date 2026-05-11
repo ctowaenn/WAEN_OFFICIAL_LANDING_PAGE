@@ -19,6 +19,10 @@
   /** Width at last intro metrics refresh — distinguish rotation vs keyboard-only viewport noise (iOS). */
   let lastIntroLayoutWidth = typeof window !== 'undefined' ? window.innerWidth : 0;
   let introVvResizeTimer = null;
+  let introTargetProgress = 0;
+  let introDisplayedProgress = 0;
+  let introSmoothRaf = 0;
+  let introUseSmoothedProgress = false;
 
   const clamp01 = (n) => Math.min(Math.max(n, 0), 1);
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -36,6 +40,11 @@
     const t = clamp01((x - edge0) / Math.max(edge1 - edge0, 1e-6));
     return t * t * (3 - 2 * t);
   };
+
+  function isTouchIntroViewport() {
+    if (typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia('(max-width: 900px)').matches && window.matchMedia('(pointer: coarse)').matches;
+  }
 
   function supportsMask() {
     return (
@@ -71,12 +80,13 @@
     if (!introSection || !introReveal) return;
 
     const p = clamp01(pRaw);
+    const isMobileIntro = isTouchIntroViewport();
     const pe = easeInOutQuint(p);
 
     // Scale the mask from small → massive so the letters expand and then disappear.
     // Use vmin so it behaves consistently across aspect ratios.
     const start = 26; // vmin
-    const end = 1200; // vmin (guarantee offscreen on ultrawide)
+    const end = isMobileIntro ? 780 : 1200; // mobile repaints less; desktop still guarantees ultrawide coverage.
     const size = lerp(start, end, pe);
     introReveal.style.webkitMaskSize = `${size}vmin`;
     introReveal.style.maskSize = `${size}vmin`;
@@ -114,13 +124,12 @@
         const move = easeOutExpo(smoothstep(0, 0.36, p));
         const y = reduceMotion ? 0 : lerp(20, 0, move);
         const sc = reduceMotion ? 1 : lerp(0.96, 1, move);
-        const blurCap =
-          reduceMotion || (window.matchMedia && window.matchMedia('(max-width: 600px)').matches) ? 4 : 7;
-        const blurPx = reduceMotion ? 0 : lerp(blurCap, 0, easeOutCubic(vis));
-        const trackingEm = lerp(0.4, 0.18, easeInOutCubic(smoothstep(0, 0.52, p)));
+        const blurCap = reduceMotion || isMobileIntro ? 0 : 7;
+        const blurPx = reduceMotion || isMobileIntro ? 0 : lerp(blurCap, 0, easeOutCubic(vis));
+        const trackingEm = isMobileIntro ? null : lerp(0.4, 0.18, easeInOutCubic(smoothstep(0, 0.52, p)));
         introComingLine.style.opacity = String(Math.min(1, vis * 0.94));
         introComingLine.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(${sc.toFixed(4)})`;
-        introComingLine.style.letterSpacing = reduceMotion ? '' : `${trackingEm.toFixed(3)}em`;
+        introComingLine.style.letterSpacing = reduceMotion || trackingEm === null ? '' : `${trackingEm.toFixed(3)}em`;
         introComingLine.style.filter = blurPx > 0.04 ? `blur(${blurPx.toFixed(2)}px)` : 'none';
       }
 
@@ -139,13 +148,43 @@
   function updateIntroFromScroll() {
     if (!introSection || !introReveal) return;
     const denom = Math.max(introMaxScroll, 1);
-    updateIntroFromProgress(window.scrollY / denom);
+    setIntroTargetProgress(window.scrollY / denom);
+  }
+
+  function runIntroSmoothLoop() {
+    introSmoothRaf = 0;
+    const delta = introTargetProgress - introDisplayedProgress;
+    if (Math.abs(delta) < 0.001) {
+      introDisplayedProgress = introTargetProgress;
+      updateIntroFromProgress(introDisplayedProgress);
+      return;
+    }
+    introDisplayedProgress += delta * 0.12;
+    updateIntroFromProgress(introDisplayedProgress);
+    introSmoothRaf = requestAnimationFrame(runIntroSmoothLoop);
+  }
+
+  function setIntroTargetProgress(pRaw) {
+    const p = clamp01(pRaw);
+    if (!introUseSmoothedProgress) {
+      introTargetProgress = p;
+      introDisplayedProgress = p;
+      if (introSmoothRaf) {
+        cancelAnimationFrame(introSmoothRaf);
+        introSmoothRaf = 0;
+      }
+      updateIntroFromProgress(p);
+      return;
+    }
+    introTargetProgress = p;
+    if (!introSmoothRaf) introSmoothRaf = requestAnimationFrame(runIntroSmoothLoop);
   }
 
   /**
-   * GSAP ScrollTrigger: scrub true = progress 1:1 con el scroll (reversible al subir).
+   * GSAP ScrollTrigger: desktop uses 1:1 progress. Native touch viewports smooth
+   * with our own rAF loop because ScrollTrigger numeric scrub only smooths timelines,
+   * not manual `self.progress` DOM writes in `onUpdate`.
    * La sensación “premium” viene de easeInOutQuint / smoothstep en updateIntroFromProgress.
-   * En viewport táctil estrecho, scrub numérico (~1.2s) suaviza saltos entre frames de scroll.
    */
   function initIntroScrollEngine() {
     if (!introSection || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
@@ -159,13 +198,9 @@
     }
     const reduce =
       typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const mq = typeof window.matchMedia === 'function' ? window.matchMedia.bind(window) : null;
-    const isTouchIntro =
-      mq &&
-      mq('(max-width: 900px)').matches &&
-      mq('(pointer: coarse)').matches;
-    /* Desktop: scrub true = 1:1 con scroll. Móvil táctil: scrub ~1.2s suaviza el “salto” entre frames de scroll. */
-    const scrub = reduce ? 0 : isTouchIntro ? 1.2 : true;
+    const isTouchIntro = isTouchIntroViewport();
+    introUseSmoothedProgress = Boolean(!reduce && isTouchIntro);
+    const scrub = reduce ? 0 : true;
 
     const st = ScrollTrigger.create({
       id: 'intro-pin-scrub',
@@ -174,10 +209,10 @@
       end: 'bottom bottom',
       scrub,
       onUpdate: (self) => {
-        updateIntroFromProgress(self.progress);
+        setIntroTargetProgress(self.progress);
       },
     });
-    updateIntroFromProgress(st.progress);
+    setIntroTargetProgress(st.progress);
     return true;
   }
 
@@ -1046,6 +1081,11 @@
 
     recalcIntroMaxScroll();
     const stOk = introDrivenByST && typeof ScrollTrigger !== 'undefined';
+    if (stOk) {
+      const reduce =
+        typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      introUseSmoothedProgress = Boolean(!reduce && isTouchIntroViewport());
+    }
     const skipST =
       stOk &&
       !forceFull &&

@@ -969,12 +969,17 @@
   margin-top: 1rem;
 }
 
+.ws-mobile-submit-host {
+  display: none;
+}
+
 .ws-submit-panel {
   position: relative;
   margin-top: 0.85rem;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.55rem;
+  scroll-margin-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Submit CTA sits under the cart inside the drop zone (replaces visible cart status). */
@@ -1258,11 +1263,26 @@
   .ws-main-row {
     grid-template-columns: 1fr;
   }
+  .ws-mobile-submit-host--active {
+    display: block;
+    width: 100%;
+    margin-top: 0.9rem;
+    padding-bottom: 0.35rem;
+  }
   .ws-drop-target {
     min-height: 140px;
   }
   .ws-drop-target > .ws-submit-panel--cart {
     margin-top: 0.5rem;
+  }
+  .ws-submit-panel--mobile-hosted {
+    width: 100%;
+    margin: 0;
+  }
+  .ws-submit-panel--mobile-hosted .ws-submit-hint {
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.45;
   }
   .ws-submit-panel:not(.ws-submit-panel--cart) {
     margin-top: 0.75rem;
@@ -1270,5 +1290,6 @@
   .ws-submit-btn {
     min-height: 56px;
     padding-inline: 1rem;
+    font-size: 12px;
   }
 }
