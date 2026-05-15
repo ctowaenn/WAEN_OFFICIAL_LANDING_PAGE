@@ -3,7 +3,11 @@
    RESET & BASE
 ================================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+/* Smooth scroll only via JS scrollIntoView(behavior:'smooth') — global smooth amplifies iOS keyboard/dock jitter. */
+html { scroll-behavior: auto; }
+@media (prefers-reduced-motion: no-preference) {
+  html.scroll-smooth-intent { scroll-behavior: smooth; }
+}
 body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background: #fff;
@@ -63,40 +67,7 @@ footer[id] {
 .d4 { transition-delay: 0.46s; }
 .d5 { transition-delay: 0.58s; }
 
-/* Below intro: skip layout/paint until near viewport (placeholders ≈ min-heights). */
-#s-hero {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 720px;
-}
-#s-app {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 780px;
-}
-#s-ticker {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 48px;
-}
-/* Sin content-visibility en #s-dif: el intrinsic placeholder desfasaba el scroll/hash a #s-access (quedaba visible s-dif). */
-#s-vision {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 760px;
-}
-#s-marca {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 620px;
-}
-#s-mosaic {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 900px;
-}
-#s-historia {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 760px;
-}
-#s-footer {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 320px;
-}
+/* content-visibility removed: intrinsic placeholders caused document height jumps on scroll (iOS). */
 
 /* ================================================================
    GLASS BUTTON
@@ -1720,7 +1691,7 @@ select.form-input option:checked {
     align-items: flex-start;
   }
   .access-right {
-    padding: 40px 22px calc(var(--mobile-dock-compact-h) + env(safe-area-inset-bottom, 0px) + 28px);
+    padding: 40px 22px 28px;
   }
   .access-h2 { font-size: clamp(36px, 9vw, 64px); }
   .access-sub { margin-top: 32px; font-size: clamp(15px, 3.6vw, 18px); }
@@ -1730,7 +1701,21 @@ select.form-input option:checked {
   .form-consent-text { font-size: 12px; line-height: 1.45; }
   #access-experience.access-experience {
     min-height: 580px;
-    padding-bottom: calc(var(--mobile-dock-compact-h) + env(safe-area-inset-bottom, 0px) + 20px);
+    padding-bottom: 20px;
+  }
+
+  /* Teclado virtual: una sola reserva inferior (body); ocultar dock para no pelear con el input */
+  body.access-keyboard-open {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html.access-keyboard-open {
+    scroll-padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  body.access-keyboard-open .mobile-dock__shell {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-50%, 120%, 0);
+    transition: opacity 0.2s ease, transform 0.25s var(--mobile-dock-ease);
   }
   #s-vision { grid-template-columns: 1fr; width: 100%; min-height: 0; }
   .vision-left { min-height: min(52vw, 420px); aspect-ratio: 16 / 11; }

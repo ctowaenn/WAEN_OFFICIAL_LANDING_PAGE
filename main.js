@@ -198,8 +198,8 @@
     }
     const reduce =
       typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isTouchIntro = isTouchIntroViewport();
-    introUseSmoothedProgress = Boolean(!reduce && isTouchIntro);
+    /* Touch: progress 1:1 with scroll — rAF lerp caused mask/scroll desync on iOS. */
+    introUseSmoothedProgress = false;
     const scrub = reduce ? 0 : true;
 
     const st = ScrollTrigger.create({
@@ -375,14 +375,63 @@
     });
   }
 
-  /**
-   * Móvil: el hash a #s-access quedaba corto (se veía #s-dif) porque content-visibility:auto
-   * en secciones previas usa alturas intrínsecas hasta expandirse. Forzamos layout real un frame
-   * y hacemos scrollIntoView; luego quitamos el override inline.
-   */
-  function initAccessHashScrollFix() {
+  const SECTION_SCROLL_ORDER = [
+    's-intro',
+    's-hero',
+    's-app',
+    's-ticker',
+    's-dif',
+    's-marca',
+    's-mosaic',
+    's-historia',
+    's-access',
+    's-vision',
+    's-footer',
+  ];
+
+  function prefersReducedMotion() {
+    return (
+      typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
+  }
+
+  function scrollBehaviorForHash() {
+    return prefersReducedMotion() ? 'auto' : 'smooth';
+  }
+
+  /** Móvil: anclas internas con scrollIntoView controlado (sin depender de scroll-behavior global). */
+  function scrollToSectionId(id, opts) {
+    const behavior = (opts && opts.behavior) || scrollBehaviorForHash();
+    const sec = document.getElementById(id);
+    if (!sec) return false;
+
+    void sec.offsetHeight;
+    sec.scrollIntoView({ behavior, block: 'start' });
+
+    const path = window.location.pathname || '/';
+    const search = window.location.search || '';
+    if (window.history && typeof window.history.replaceState === 'function') {
+      window.history.replaceState(null, '', `${path}${search}#${id}`);
+    }
+    window.dispatchEvent(new Event('hashchange'));
+    return true;
+  }
+
+  function initMobileHashScrollFix() {
     const mq = window.matchMedia('(max-width: 900px)');
-    const prereqIds = ['s-hero', 's-app', 's-ticker', 's-dif'];
+
+    function parseSectionHash(href) {
+      if (!href || href.charAt(0) !== '#') return null;
+      const id = href.slice(1);
+      if (!id || !SECTION_SCROLL_ORDER.includes(id)) return null;
+      if (!document.getElementById(id)) return null;
+      return id;
+    }
+
+    function navigateToHash(id) {
+      if (!mq.matches || !id) return false;
+      return scrollToSectionId(id);
+    }
 
     document.addEventListener(
       'click',
@@ -392,44 +441,29 @@
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         const a = e.target.closest && e.target.closest('a');
         if (!a) return;
-        if (a.getAttribute('href') !== '#s-access') return;
+        const id = parseSectionHash(a.getAttribute('href'));
+        if (!id) return;
         if (!mq.matches) return;
 
-        const sec = document.getElementById('s-access');
-        if (!sec) return;
-
         e.preventDefault();
-
-        const nodes = prereqIds.map((id) => document.getElementById(id)).filter(Boolean);
-        nodes.forEach((n) => {
-          n.style.setProperty('content-visibility', 'visible');
-        });
-
-        const reduce =
-          typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const behavior = reduce ? 'auto' : 'smooth';
-
         requestAnimationFrame(() => {
-          void sec.offsetHeight;
-          sec.scrollIntoView({ behavior, block: 'start' });
-
-          const path = window.location.pathname || '/';
-          const search = window.location.search || '';
-          if (window.history && typeof window.history.replaceState === 'function') {
-            window.history.replaceState(null, '', `${path}${search}#s-access`);
-          }
-
-          requestAnimationFrame(() => {
-            nodes.forEach((n) => {
-              n.style.removeProperty('content-visibility');
-            });
-          });
-
-          window.dispatchEvent(new Event('hashchange'));
+          navigateToHash(id);
         });
       },
       true
     );
+
+    function applyInitialHash() {
+      if (!mq.matches) return;
+      const raw = (location.hash || '').replace(/^#/, '');
+      if (!raw || !SECTION_SCROLL_ORDER.includes(raw)) return;
+      requestAnimationFrame(() => {
+        scrollToSectionId(raw, { behavior: 'auto' });
+      });
+    }
+
+    if (document.readyState === 'complete') applyInitialHash();
+    else window.addEventListener('load', applyInitialHash, { once: true });
   }
 
   function initMobileDock() {
@@ -1131,26 +1165,117 @@
     }
   }
 
+  function isPastIntroScroll() {
+    return window.scrollY > introMaxScroll + 32;
+  }
+
+  let lastMetricsScrollY = null;
+
   function refreshIntroScrollMetrics(opts) {
     const forceFull = opts && opts.forceFull === true;
+    const fromVv = opts && opts.fromVisualViewport === true;
     const w = window.innerWidth;
     const widthChanged = Math.abs(w - lastIntroLayoutWidth) > 1;
+    const typing = isAccessViewportTypingContext();
+    const pastIntro = isPastIntroScroll();
 
-    recalcIntroMaxScroll();
-    const stOk = introDrivenByST && typeof ScrollTrigger !== 'undefined';
-    if (stOk) {
-      const reduce =
-        typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      introUseSmoothedProgress = Boolean(!reduce && isTouchIntroViewport());
+    if (forceFull || widthChanged || !pastIntro) {
+      recalcIntroMaxScroll();
     }
-    const skipST =
-      stOk &&
-      !forceFull &&
-      isAccessViewportTypingContext() &&
-      !widthChanged;
+
+    const stOk = introDrivenByST && typeof ScrollTrigger !== 'undefined';
+    const skipIntroRefresh = pastIntro && !forceFull && !widthChanged;
+    const skipST = stOk && !forceFull && (typing || skipIntroRefresh) && !widthChanged;
     if (stOk && !skipST) ScrollTrigger.refresh();
-    onScroll();
+
+    const y = window.scrollY;
+    const scrollMoved =
+      lastMetricsScrollY === null || Math.abs(y - lastMetricsScrollY) > 2;
+    const shouldOnScroll = forceFull || widthChanged || !fromVv || !typing || scrollMoved;
+    if (shouldOnScroll) {
+      onScroll();
+      lastMetricsScrollY = y;
+    }
     lastIntroLayoutWidth = w;
+  }
+
+  function initAccessMobileLayout() {
+    const sec = $('s-access');
+    if (!sec) return;
+    const mq = window.matchMedia('(max-width: 900px)');
+    const desktopLayout = sec.getAttribute('data-access-layout') || 'split';
+
+    function apply() {
+      if (mq.matches) {
+        sec.setAttribute('data-access-layout', 'stack');
+      } else {
+        sec.setAttribute('data-access-layout', desktopLayout);
+      }
+    }
+    apply();
+    mq.addEventListener('change', apply);
+  }
+
+  function initAccessKeyboardGuard() {
+    const root = $('s-access');
+    if (!root) return;
+
+    let anchorY = 0;
+    let restoreRaf = 0;
+
+    function isFormField(el) {
+      if (!el || !el.tagName) return false;
+      const tag = el.tagName.toLowerCase();
+      return tag === 'input' || tag === 'textarea' || tag === 'select';
+    }
+
+    function stabilizeScroll() {
+      if (Math.abs(window.scrollY - anchorY) > 6) {
+        window.scrollTo(0, anchorY);
+      }
+    }
+
+    root.addEventListener(
+      'focusin',
+      (e) => {
+        if (!isFormField(e.target)) return;
+        anchorY = window.scrollY;
+        document.body.classList.add('access-keyboard-open');
+        document.documentElement.classList.add('access-keyboard-open');
+        requestAnimationFrame(stabilizeScroll);
+        window.setTimeout(stabilizeScroll, 120);
+      },
+      true
+    );
+
+    root.addEventListener(
+      'focusout',
+      () => {
+        window.setTimeout(() => {
+          if (isAccessViewportTypingContext()) return;
+          document.body.classList.remove('access-keyboard-open');
+          document.documentElement.classList.remove('access-keyboard-open');
+          if (restoreRaf) cancelAnimationFrame(restoreRaf);
+          restoreRaf = requestAnimationFrame(() => {
+            restoreRaf = 0;
+            stabilizeScroll();
+          });
+        }, 100);
+      },
+      true
+    );
+
+    const vv = window.visualViewport;
+    if (vv) {
+      vv.addEventListener(
+        'resize',
+        () => {
+          if (!document.body.classList.contains('access-keyboard-open')) return;
+          stabilizeScroll();
+        },
+        { passive: true }
+      );
+    }
   }
 
   function wireScrollAndViewport() {
@@ -1165,8 +1290,8 @@
           if (introVvResizeTimer) window.clearTimeout(introVvResizeTimer);
           introVvResizeTimer = window.setTimeout(() => {
             introVvResizeTimer = null;
-            refreshIntroScrollMetrics();
-          }, 200);
+            refreshIntroScrollMetrics({ fromVisualViewport: true });
+          }, 360);
         },
         { passive: true }
       );
@@ -1184,7 +1309,9 @@
     onScroll();
     initHeroCtaSwitch();
     initMobileDock();
-    initAccessHashScrollFix();
+    initMobileHashScrollFix();
+    initAccessMobileLayout();
+    initAccessKeyboardGuard();
   }
 
   /** Scroll reveals + forms: after i18n so copy/aria matches language before unhiding blocks. */
